@@ -13,10 +13,10 @@ const NavBar = () => {
 
       <div className=" flex flex-row items-center gap-8 font-semibold">
         <ul className=" flex flex-row items-center gap-8">
-          <li>How it works</li>
-          <li>Benefits</li>
-          <li>Features</li>
-          <li>Faq</li>
+          <li className=" cursor-pointer">How it works</li>
+          <li className=" cursor-pointer">Benefits</li>
+          <li className=" cursor-pointer">Features</li>
+          <li className=" cursor-pointer">Faq</li>
         </ul>
 
         <button className=" px-4 py-3 rounded-lg bg-custom-green text-white">
