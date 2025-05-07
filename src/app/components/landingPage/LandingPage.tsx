@@ -2,6 +2,9 @@ import NavBar from "./Navbar";
 import HeroSection from "./HeroSection";
 import WhatWeOffer from "./WhatWeOffer";
 import KeepTrackOfTransactions from "./KeepTrackOfTransactions";
+import HowToSetUp from "./HowToSetUp";
+
+import Footer from "./Footer";
 
 const LandingPage = () => {
   return (
@@ -10,6 +13,9 @@ const LandingPage = () => {
       <HeroSection />
       <WhatWeOffer />
       <KeepTrackOfTransactions />
+      <HowToSetUp />
+
+      <Footer />
     </div>
   );
 };
