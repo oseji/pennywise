@@ -3,6 +3,7 @@ import HeroSection from "./HeroSection";
 import WhatWeOffer from "./WhatWeOffer";
 import KeepTrackOfTransactions from "./KeepTrackOfTransactions";
 import HowToSetUp from "./HowToSetUp";
+import ContactUs from "./ContactUs";
 
 import Footer from "./Footer";
 
@@ -14,6 +15,7 @@ const LandingPage = () => {
       <WhatWeOffer />
       <KeepTrackOfTransactions />
       <HowToSetUp />
+      <ContactUs />
 
       <Footer />
     </div>
