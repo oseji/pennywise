@@ -21,15 +21,3 @@
 button {
   @apply cursor-pointer transition ease-in-out duration-200 hover:scale-110;
 }
-
-.whatWeOfferBox {
-  @apply w-80 flex flex-row items-start gap-6;
-}
-
-.whatWeOfferText {
-  @apply flex flex-col items-start gap-2;
-}
-
-.whatWeOfferText h2 {
-  @apply text-2xl font-bold;
-}

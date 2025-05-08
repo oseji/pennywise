@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+.sectionHeading {
+  @apply text-3xl font-bold text-center mb-6;
+}
+
+.whatWeOfferBox {
+  @apply w-80 flex flex-row items-start gap-6;
+}
+
+.whatWeOfferText {
+  @apply flex flex-col items-start gap-2;
+}
+
+.whatWeOfferText h2 {
+  @apply text-2xl font-bold;
+}
+
+.faqGrp {
+  @apply w-full lg:w-3/4 mx-auto gap-5 flex flex-col mt-8;
+}
+
+.faq {
+  @apply py-5 px-6 border border-slate-300 rounded-xl hover:scale-105 transition ease-in-out duration-200;
+}
+
+.faq img {
+  @apply transition ease-in-out duration-200;
+}
+
+.faqHeading {
+  @apply flex flex-row justify-between items-center cursor-pointer;
+}
+
+.faqAnswer {
+  @apply font-light mt-2 text-sm;
+}
+
+.hiddenAnswer {
+  @apply -translate-y-7 h-0 overflow-hidden transition-all ease-in-out duration-200;
+}
+.visibleAnswer {
+  @apply -translate-y-0 opacity-100  h-10 overflow-hidden transition-all ease-in-out duration-200;
+}

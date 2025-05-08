@@ -5,7 +5,7 @@ import tick from "../../../assets/landingPageIcons/tick icon.svg";
 const ContactUs = () => {
   return (
     <div className="px-28 py-20">
-      <h1 className=" text-3xl font-bold text-center mb-12">Contact us</h1>
+      <h1 className=" sectionHeading">Contact us</h1>
 
       <div className=" flex flex-row items-start justify-between">
         <div className=" w-full lg:w-[40%]">
@@ -51,21 +51,25 @@ const ContactUs = () => {
             <input
               type="text"
               placeholder="Full Name"
-              className=" border-2 border-slate-500 rounded-lg px-4 py-2 w-full"
+              className=" border-2 border-slate-300 rounded-lg px-4 py-2 w-full"
             />
 
             <input
               type="email"
               placeholder="Email"
-              className=" border-2 border-slate-500 rounded-lg px-4 py-2 w-full"
+              className=" border-2 border-slate-300 rounded-lg px-4 py-2 w-full"
             />
 
             <input
               type="number"
               inputMode="numeric"
               placeholder="Phone Number"
-              className=" border-2 border-slate-500 rounded-lg px-4 py-2 w-full"
+              className=" border-2 border-slate-300 rounded-lg px-4 py-2 w-full"
             />
+
+            <button className=" w-fit text-white font-semibold px-8 py-2 rounded-lg bg-[#2D6A4F]">
+              Send
+            </button>
           </div>
         </form>
       </div>

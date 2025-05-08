@@ -7,7 +7,7 @@ import insightfulAnalytics from "../../../assets/landingPageIcons/insightful ana
 const WhatWeOffer = () => {
   return (
     <div className=" px-28 py-20">
-      <h1 className=" text-3xl font-bold text-center mb-12">What We Offer</h1>
+      <h1 className=" sectionHeading">What We Offer</h1>
 
       <div className=" flex flex-row items-center justify-center gap-12">
         <div className=" whatWeOfferBox">

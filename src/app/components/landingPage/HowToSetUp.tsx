@@ -29,7 +29,7 @@ const HowToSetUp = () => {
 
   return (
     <div className=" px-28 py-20 bg-[#F9FAFB]">
-      <h2 className=" text-3xl font-bold text-center mb-12">How To Set Up</h2>
+      <h2 className=" sectionHeading">How To Set Up</h2>
 
       <p className=" text-custom-gray text-center">
         We don’t like to brag, but we don’t mind letting our customers do it for
