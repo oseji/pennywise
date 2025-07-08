@@ -14,3 +14,15 @@
 .hideAlertModal {
 	@apply -translate-y-96;
 }
+
+/* sidebar */
+.sidebarRow {
+	@apply flex flex-row items-center gap-2 capitalize;
+}
+
+.sidebarIndicator {
+	@apply p-0.5 h-8 bg-slate-200;
+}
+.sidebarIndicatorActive {
+	@apply p-0.5 h-8 bg-[#2D6A4F];
+}

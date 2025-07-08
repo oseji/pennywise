@@ -63,12 +63,15 @@ const Login = () => {
 						</p>
 					</Link>
 
-					<button
-						type="submit"
-						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 mb-4"
-					>
-						Login
-					</button>
+					<Link href={"/Dashboard"}>
+						<button
+							type="submit"
+							className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 mb-4"
+						>
+							Login
+						</button>
+					</Link>
+
 					<p className=" text-center">
 						Don’t have an account ?{" "}
 						<span className=" text-[#2D6A4F] cursor-pointer">
