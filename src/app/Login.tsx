@@ -58,7 +58,9 @@ const Login = () => {
 					</div>
 
 					<Link href={"/auth/Forgot-password"}>
-						<p className=" py-4 cursor-pointer">Forgot password</p>
+						<p className=" py-4 cursor-pointer underline text-[#2D6A4F]">
+							Forgot password
+						</p>
 					</Link>
 
 					<button

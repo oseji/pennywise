@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* auth screens */
 .inputLabelGroup {
 	@apply flex flex-col gap-1;
 }
 
 .inputLabel {
 	@apply font-semibold mb-2 capitalize;
+}
+
+.hideAlertModal {
+	@apply -translate-y-96;
 }
