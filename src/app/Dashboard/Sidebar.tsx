@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 
 import dashboardIcon from "../../assets/sidebar/dashboard.svg";
 import incomeIcon from "../../assets/sidebar/income.svg";
@@ -26,17 +27,21 @@ const Sidebar = () => {
 				<div className=" flex flex-col gap-4">
 					<h1 className=" text-slate-400 mb-2">Overview</h1>
 
-					<div className=" sidebarRow">
-						<span className=" sidebarIndicatorActive"></span>
-						<Image src={dashboardIcon} alt="Dashboard" />
-						<span>Dashboard</span>
-					</div>
+					<Link href={"/Dashboard/overview"}>
+						<div className=" sidebarRow">
+							<span className=" sidebarIndicatorActive"></span>
+							<Image src={dashboardIcon} alt="Dashboard" />
+							<span>Dashboard</span>
+						</div>
+					</Link>
 
-					<div className=" sidebarRow">
-						<span className=" sidebarIndicator"></span>
-						<Image src={incomeIcon} alt="income" />
-						<span>income</span>
-					</div>
+					<Link href={"/Dashboard/income"}>
+						<div className=" sidebarRow">
+							<span className=" sidebarIndicator"></span>
+							<Image src={incomeIcon} alt="income" />
+							<span>income</span>
+						</div>
+					</Link>
 
 					<div className=" sidebarRow">
 						<span className=" sidebarIndicator"></span>

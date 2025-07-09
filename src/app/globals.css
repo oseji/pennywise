@@ -17,7 +17,7 @@
 
 /* sidebar */
 .sidebarRow {
-	@apply flex flex-row items-center gap-2 capitalize;
+	@apply flex flex-row items-center gap-2 capitalize cursor-pointer;
 }
 
 .sidebarIndicator {
@@ -25,4 +25,9 @@
 }
 .sidebarIndicatorActive {
 	@apply p-0.5 h-8 bg-[#2D6A4F];
+}
+
+/* dashboard */
+.dashboardHeading {
+	@apply text-[#2D6A4F] text-2xl font-bold capitalize;
 }

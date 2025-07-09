@@ -1,13 +1,8 @@
-import Sidebar from "./Sidebar";
-import Dashboard from "./Dashboard";
+import Dashboard from "./overview/page";
 
 const DashboardPage = () => {
 	return (
 		<div className=" flex flex-row max-h-screen min-w-full">
-			{/* sidebar */}
-			<Sidebar />
-
-			{/* main content */}
 			<Dashboard />
 		</div>
 	);
