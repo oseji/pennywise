@@ -2,7 +2,7 @@ import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 
 export const metadata = {
-	title: "Dashboard",
+	title: "Pennywise | Dashboard",
 	description: "Your personal finance dashboard",
 };
 
@@ -12,18 +12,14 @@ export default function DashboardLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en">
-			<body>
-				<div className=" flex flex-row max-h-screen w-full">
-					<Sidebar />
+		<div className=" flex flex-row max-h-screen w-full">
+			<Sidebar />
 
-					<main className=" w-full">
-						<DashboardHeader />
+			<main className=" w-full">
+				<DashboardHeader />
 
-						{children}
-					</main>
-				</div>
-			</body>
-		</html>
+				{children}
+			</main>
+		</div>
 	);
 }

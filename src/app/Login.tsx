@@ -63,7 +63,7 @@ const Login = () => {
 						</p>
 					</Link>
 
-					<Link href={"/Dashboard"}>
+					<Link href={"/dashboard"}>
 						<button
 							type="submit"
 							className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 mb-4"

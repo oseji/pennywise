@@ -14,7 +14,7 @@ import logoutIcon from "../../assets/sidebar/logout.svg";
 
 const Sidebar = () => {
 	return (
-		<div className=" p-6">
+		<div className=" p-6 w-64">
 			<div className=" flex flex-row items-center justify-center gap-4 font-bold text-2xl mb-4 border-b border-slate-400 pb-4 px-6">
 				<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
 					P
@@ -27,7 +27,7 @@ const Sidebar = () => {
 				<div className=" flex flex-col gap-4">
 					<h1 className=" text-slate-400 mb-2">Overview</h1>
 
-					<Link href={"/Dashboard/overview"}>
+					<Link href={"/dashboard/overview"}>
 						<div className=" sidebarRow">
 							<span className=" sidebarIndicatorActive"></span>
 							<Image src={dashboardIcon} alt="Dashboard" />
@@ -35,7 +35,7 @@ const Sidebar = () => {
 						</div>
 					</Link>
 
-					<Link href={"/Dashboard/income"}>
+					<Link href={"/dashboard/income"}>
 						<div className=" sidebarRow">
 							<span className=" sidebarIndicator"></span>
 							<Image src={incomeIcon} alt="income" />
@@ -43,11 +43,13 @@ const Sidebar = () => {
 						</div>
 					</Link>
 
-					<div className=" sidebarRow">
-						<span className=" sidebarIndicator"></span>
-						<Image src={budgetIcon} alt="budget" />
-						<span>budget</span>
-					</div>
+					<Link href={"/dashboard/budget"}>
+						<div className=" sidebarRow">
+							<span className=" sidebarIndicator"></span>
+							<Image src={budgetIcon} alt="budget" />
+							<span>budget</span>
+						</div>
+					</Link>
 
 					<div className=" sidebarRow">
 						<span className=" sidebarIndicator"></span>
