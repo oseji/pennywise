@@ -15,7 +15,7 @@ export default function DashboardLayout({
 		<div className=" flex flex-row max-h-screen w-full">
 			<Sidebar />
 
-			<main className=" w-full">
+			<main className=" w-full min-h-screen overflow-y-scroll">
 				<DashboardHeader />
 
 				{children}
