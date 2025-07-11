@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
 /* auth screens */
 .inputLabelGroup {
 	@apply flex flex-col gap-1;
@@ -13,6 +23,19 @@
 
 .hideAlertModal {
 	@apply -translate-y-96;
+}
+
+/* amimations */
+.isPaid {
+	@apply translate-x-8;
+}
+
+.isNotPaid {
+	@apply translate-x-0;
+}
+
+.hideIncomeModal {
+	@apply hidden;
 }
 
 /* sidebar */
@@ -34,12 +57,4 @@
 
 .dashboardHeading {
 	@apply text-[#2D6A4F] text-3xl font-bold capitalize mb-4;
-}
-
-.isPaid {
-	@apply translate-x-8;
-}
-
-.isNotPaid {
-	@apply translate-x-0;
 }
