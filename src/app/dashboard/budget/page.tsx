@@ -1,5 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+
+import editIcon from "../../../assets/dashboard/edit icon.svg";
 
 const BudgetScreen = () => {
 	const [isPaid, setIsPaid] = useState<boolean>(false);
@@ -28,7 +31,7 @@ const BudgetScreen = () => {
 				<h1 className="dashboardHeading">budget</h1>
 
 				{/* daily needs */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 ">
+				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
 					<div className=" flex flex-row items-center justify-between border-b border-slate-200 pb-3">
 						<h1 className=" capitalize text-2xl font-bold">daily needs</h1>
 
@@ -43,12 +46,12 @@ const BudgetScreen = () => {
 						</button>
 					</div>
 
-					<table className="table-fixed w-full mt-4">
+					<table className="table-fixed border-separate border-spacing-x-4 w-full mt-4">
 						<colgroup>
-							<col className="w-72" />
+							<col className=" w-72" />
 							<col className="w-32" />
 							<col className="w-32" />
-							<col className="w-64" />
+							<col className="w-60" />
 						</colgroup>
 
 						<thead className="capitalize">
@@ -77,14 +80,21 @@ const BudgetScreen = () => {
 
 								<td className=" py-4">150000</td>
 								<td className=" py-4">120000</td>
-								<td className=" py-4">progresssssssssssssssssssssssss</td>
+								<td className=" py-4 flex flex-row items-center gap-8">
+									<span>progresssssssssssssssssssssssss</span>
+									<Image
+										src={editIcon}
+										alt=" edit icon"
+										className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+									/>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 
 				{/* planned payments */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6">
+				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
 					<div className=" flex flex-row items-center justify-between border-b border-slate-200 pb-3">
 						<h1 className=" capitalize text-2xl font-bold">planned payments</h1>
 
@@ -146,7 +156,7 @@ const BudgetScreen = () => {
 				</div>
 
 				{/* others */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 ">
+				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
 					<div className="  border-b border-slate-200 pb-3">
 						<div className=" flex flex-row items-center justify-between">
 							<h1 className=" capitalize text-2xl font-bold">others</h1>
@@ -208,9 +218,9 @@ const BudgetScreen = () => {
 				</div>
 			</div>
 
-			{/* Add Income Modal */}
+			{/* Modals */}
 			<div
-				className="fixed inset-0 z-10 flex items-center justify-center hideIncomeModal"
+				className="fixed inset-0 z-50 flex items-center justify-center hideIncomeModal"
 				ref={modalRef}
 			>
 				{/* Overlay */}
@@ -261,7 +271,7 @@ const BudgetScreen = () => {
 									Description
 								</label>
 								<textarea
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0 max-h-32"
 									name="description"
 									id="description"
 									placeholder="Enter description"

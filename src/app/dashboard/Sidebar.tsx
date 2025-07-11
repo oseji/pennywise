@@ -51,17 +51,21 @@ const Sidebar = () => {
 						</div>
 					</Link>
 
-					<div className=" sidebarRow">
-						<span className=" sidebarIndicator"></span>
-						<Image src={expensesIcon} alt="expenses" />
-						<span>expenses</span>
-					</div>
+					<Link href={"/dashboard/expenses"}>
+						<div className=" sidebarRow">
+							<span className=" sidebarIndicator"></span>
+							<Image src={expensesIcon} alt="expenses" />
+							<span>expenses</span>
+						</div>
+					</Link>
 
-					<div className=" sidebarRow">
-						<span className=" sidebarIndicator"></span>
-						<Image src={savingsIcon} alt="savings" />
-						<span>savings</span>
-					</div>
+					<Link href={"/dashboard/savings"}>
+						<div className=" sidebarRow">
+							<span className=" sidebarIndicator"></span>
+							<Image src={savingsIcon} alt="savings" />
+							<span>savings</span>
+						</div>
+					</Link>
 
 					<div className=" sidebarRow">
 						<span className=" sidebarIndicator"></span>

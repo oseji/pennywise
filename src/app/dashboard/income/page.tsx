@@ -98,7 +98,7 @@ const IncomeScreen = () => {
 
 			{/* Add Income Modal */}
 			<div
-				className="fixed inset-0 z-10 flex items-center justify-center hideIncomeModal"
+				className="fixed inset-0 z-50 flex items-center justify-center hideIncomeModal"
 				ref={modalRef}
 			>
 				{/* Overlay */}
