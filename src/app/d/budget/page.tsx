@@ -227,12 +227,12 @@ const BudgetScreen = () => {
 						""
 					)}
 					{selectedModal === "planned payments" ? (
-						<h2 className="text-2xl font-bold mb-6">Planned Payments</h2>
+						<h2 className="text-2xl font-bold mb-6">Add Planned Payments</h2>
 					) : (
 						""
 					)}
 					{selectedModal === "others" ? (
-						<h2 className="text-2xl font-bold mb-6">Others</h2>
+						<h2 className="text-2xl font-bold mb-6">Add Others</h2>
 					) : (
 						""
 					)}
