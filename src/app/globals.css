@@ -25,7 +25,11 @@ input[type="number"] {
 	@apply -translate-y-96;
 }
 
-/* amimations */
+.hidePasswordError {
+	@apply scale-0;
+}
+
+/* animations */
 .isPaid {
 	@apply translate-x-8;
 }
