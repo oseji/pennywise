@@ -3,7 +3,7 @@
 import { ChangeEvent, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Spinner } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
@@ -23,6 +23,7 @@ type SignUpInfo = {
 const SignUp = () => {
 	const passwordErrorRef = useRef<HTMLParagraphElement>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const router = useRouter();
 
 	const [signUpInfo, setSignUpInfo] = useState<SignUpInfo>({
 		firstName: "",
@@ -74,6 +75,10 @@ const SignUp = () => {
 
 			// hide error message
 			passwordErrorRef.current?.classList.add("hidePasswordError");
+
+			if (user) {
+				router.push("/dashboard");
+			}
 		} catch (err) {
 			const message = formatAuthError(err);
 			setSignUpErrorMessage(message);
@@ -228,9 +233,7 @@ const SignUp = () => {
 						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 my-4 capitalize"
 					>
 						{isLoading ? (
-							<div className=" max-h-4">
-								<Spinner color={"white"} />
-							</div>
+							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
 						) : (
 							"sign up"
 						)}
