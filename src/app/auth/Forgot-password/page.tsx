@@ -14,7 +14,7 @@ const ForgotPassword = () => {
 	};
 
 	return (
-		<div className="  max-h-[100dvh] h-[100dvh] text-xs relative">
+		<div className="  max-h-[100dvh] h-[100dvh]  relative">
 			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
 				<form
 					action=""

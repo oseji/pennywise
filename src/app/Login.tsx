@@ -70,7 +70,7 @@ const Login = () => {
 	};
 
 	return (
-		<div className=" flex flex-col md:flex-row md:justify-between items-center max-h-[100dvh] h-[100dvh] text-xs">
+		<div className=" flex flex-col md:flex-row md:justify-between items-center max-h-[100dvh] h-[100dvh]">
 			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
 				<form
 					action=""

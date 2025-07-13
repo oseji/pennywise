@@ -7,7 +7,10 @@ import {
 	collection,
 	getDocs,
 	serverTimestamp,
+	query,
+	orderBy,
 } from "firebase/firestore";
+import { FirebaseError } from "firebase/app";
 
 import Image from "next/image";
 
@@ -24,21 +27,44 @@ type tableDataType = {
 const IncomeScreen = () => {
 	const user = auth.currentUser;
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [currentBalance, setCurrentBalance] = useState<string>("");
+	const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 	const [incomeData, setIncomeData] = useState<tableDataType>([]);
+	const totalIncome = incomeData.reduce((sum, entry) => sum + entry.amount, 0);
 
 	const [incomeInput, setIncomeInput] = useState<string>("");
 	const [narrationInput, setNarrationInput] = useState<string>("");
 
-	const tableData: tableDataType = [
-		{ date: "July", narration: "testing", amount: 100000 },
-		{ date: "July", narration: "testing", amount: 100000 },
-		{ date: "July", narration: "testing", amount: 100000 },
-		{ date: "July", narration: "testing", amount: 100000 },
-	];
-
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+	const formatFetchError = (error: unknown): string => {
+		if (error instanceof FirebaseError) {
+			switch (error.code) {
+				case "permission-denied":
+					return "You do not have permission to access this data.";
+				case "unavailable":
+					return "Firestore service is temporarily unavailable. Please try again later.";
+				case "deadline-exceeded":
+					return "The request timed out. Please try again.";
+				case "cancelled":
+					return "The operation was cancelled.";
+				case "not-found":
+					return "The requested document was not found.";
+				case "resource-exhausted":
+					return "You have exceeded your quota or usage limits.";
+				case "unauthenticated":
+					return "You must be signed in to fetch this data.";
+				case "network-request-failed":
+					return "Network error. Please check your internet connection.";
+				default:
+					return error.message
+						.replace("Firebase: ", "")
+						.replace(/\(.*\)/, "")
+						.trim();
+			}
+		}
+		return "An unknown error occurred while fetching data.";
+	};
 
 	const addIncome = async () => {
 		if (!user) return;
@@ -62,6 +88,10 @@ const IncomeScreen = () => {
 			});
 
 			toast.success("Income added successfully");
+			setIsModalOpen(false);
+
+			const updatedData = await fetchIncomeData(user.uid);
+			setIncomeData(updatedData ?? []);
 		} catch (err) {
 			console.log(`error adding income: ${err}`);
 			toast.error("An error occurred");
@@ -71,6 +101,58 @@ const IncomeScreen = () => {
 			setIncomeInput("");
 		}
 	};
+
+	const fetchIncomeData = async (userId: string) => {
+		if (!userId) return;
+
+		setIsDataLoading(true);
+
+		try {
+			const incomeReference = collection(db, `users/${userId}/incomeData`);
+			const q = query(incomeReference, orderBy("createdAt", "desc"));
+
+			const querySnapshot = await getDocs(q);
+
+			const incomeList = querySnapshot.docs.map((doc) => {
+				const data = doc.data();
+
+				return {
+					date:
+						data.createdAt?.toDate().toLocaleString("en-GB", {
+							day: "2-digit",
+							month: "short",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							hour12: true,
+						}) || "",
+					narration: data.narration || "",
+					amount: Number(data.amount) || 0,
+				};
+			});
+
+			toast.success("Income data fetched successfully");
+
+			return incomeList;
+		} catch (err) {
+			const message = formatFetchError(err);
+			toast.error(`${message}`);
+		} finally {
+			setIsDataLoading(false);
+		}
+	};
+
+	// fetch income data
+	useEffect(() => {
+		const getData = async () => {
+			if (user) {
+				setIncomeData((await fetchIncomeData(user.uid)) ?? []);
+			}
+		};
+		getData();
+
+		console.log(incomeData);
+	}, []);
 
 	// toggle modal
 	useEffect(() => {
@@ -90,7 +172,7 @@ const IncomeScreen = () => {
 
 				<p className="  font-bold my-10">
 					<span className=" text-2xl">Balance: </span>{" "}
-					<span className="text-5xl">{currentBalance}</span>
+					<span className="text-5xl">{totalIncome.toLocaleString()}</span>
 				</p>
 
 				<div className=" flex flex-row items-center justify-between">
@@ -104,45 +186,53 @@ const IncomeScreen = () => {
 					</button>
 				</div>
 
-				<table className=" w-full mt-5 border-collapse table-auto">
-					<thead>
-						<tr className=" capitalize bg-slate-200 rounded-lg">
-							<th className=" py-4 px-14 font-bold">date | time</th>
-							<th className=" py-4 px-14 font-bold">narration</th>
-							<th className=" py-4 px-14 font-bold">amount </th>
-							<th className=" py-4 px-14 font-bold">action</th>
-						</tr>
-					</thead>
-
-					<tbody className=" bg-white w-full">
-						{tableData.map((item, index) => (
-							<tr key={index} className=" shadow-2xl rounded-lg px-4 py-2">
-								<td className=" font-medium pt-4 text-center">{item.date}</td>
-
-								<td className=" font-medium pt-4 text-center">
-									{item.narration}
-								</td>
-
-								<td className=" font-medium pt-4 text-center">{item.amount}</td>
-
-								<td>
-									<div className=" flex flex-row items-center gap-4 justify-center">
-										<Image
-											src={editIcon}
-											alt="edit icon"
-											className=" cursor-pointer hover:scale-110 transition ease-in-out"
-										/>
-										<Image
-											src={deleteIcon}
-											alt="delete icon"
-											className=" cursor-pointer hover:scale-110 transition ease-in-out"
-										/>
-									</div>
-								</td>
+				{isDataLoading ? (
+					<div>
+						<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+					</div>
+				) : (
+					<table className=" w-full mt-5 border-collapse table-auto">
+						<thead>
+							<tr className=" capitalize bg-slate-200 rounded-lg">
+								<th className=" py-4 text-start font-bold">date | time</th>
+								<th className=" py-4 text-start font-bold">narration</th>
+								<th className=" py-4 text-start font-bold">amount </th>
+								<th className=" py-4 text-start font-bold">action</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+
+						<tbody className=" bg-white w-full">
+							{incomeData.map((item, index) => (
+								<tr key={index} className=" shadow-2xl rounded-lg px-4 py-2">
+									<td className=" font-medium pt-4 text-start">{item.date}</td>
+
+									<td className=" font-medium pt-4 text-start">
+										{item.narration}
+									</td>
+
+									<td className=" font-medium pt-4 text-start">
+										{item.amount.toLocaleString()}
+									</td>
+
+									<td>
+										<div className=" flex flex-row items-center gap-4 justify-start">
+											<Image
+												src={editIcon}
+												alt="edit icon"
+												className=" cursor-pointer hover:scale-110 transition ease-in-out"
+											/>
+											<Image
+												src={deleteIcon}
+												alt="delete icon"
+												className=" cursor-pointer hover:scale-110 transition ease-in-out"
+											/>
+										</div>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				)}
 			</div>
 
 			{/* Add Income Modal */}
