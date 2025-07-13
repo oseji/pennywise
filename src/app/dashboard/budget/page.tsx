@@ -14,6 +14,27 @@ const BudgetScreen = () => {
 		"daily needs" | "planned payments" | "others"
 	>("daily needs");
 
+	// daily needs
+	const [dailyNeedsCategoryInput, setDailyNeedsCategoryInput] =
+		useState<string>("");
+	const [dailyNeedsDescriptionInput, setDailyNeedsDescriptionInput] =
+		useState<string>("");
+	const [dailyNeedsLimitInput, setDailyNeedsLimitInput] = useState<string>("");
+
+	// planned payments
+	const [plannedPaymentsCategoryInput, setPlannedPaymentsCategoryInput] =
+		useState<string>("");
+	const [plannedPaymentsAmountInput, setPlannedPaymentsAmountInput] =
+		useState<string>("");
+	const [plannedPaymentsFrequencyInput, setPlannedPaymentsFrequencyInput] =
+		useState<string>("");
+
+	// others
+	const [othersCategoryInput, setOthersCategoryInput] = useState<string>("");
+	const [othersDescriptionInput, setOthersDescriptionInput] =
+		useState<string>("");
+	const [othersLimitInput, setOthersLimitInput] = useState<string>("");
+
 	// toggle modal
 	useEffect(() => {
 		if (isModalOpen) {
@@ -81,7 +102,10 @@ const BudgetScreen = () => {
 								<td className=" py-4">150000</td>
 								<td className=" py-4">120000</td>
 								<td className=" py-4 flex flex-row items-center gap-8">
-									<span>progresssssssssssssssssssssssss</span>
+									<div className=" w-64 h-3 rounded-full bg-slate-100">
+										<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
+									</div>
+
 									<Image
 										src={editIcon}
 										alt=" edit icon"
@@ -211,7 +235,9 @@ const BudgetScreen = () => {
 
 								<td className=" py-4">150000</td>
 								<td className=" py-4">120000</td>
-								<td className=" py-4">progresssssssssssssssssssssssss</td>
+								<div className=" w-64 h-3 rounded-full bg-slate-100">
+									<div className=" bg-green-400 rounded-full h-3 w-[70%]"></div>
+								</div>
 							</tr>
 						</tbody>
 					</table>
@@ -259,6 +285,22 @@ const BudgetScreen = () => {
 									name="category"
 									id="category"
 									placeholder="Enter category name"
+									value={
+										selectedModal === "daily needs"
+											? dailyNeedsCategoryInput
+											: selectedModal === "others"
+											? othersCategoryInput
+											: ""
+									}
+									onChange={(e) => {
+										if (selectedModal === "daily needs") {
+											setDailyNeedsCategoryInput(e.target.value);
+										}
+
+										if (selectedModal === "others") {
+											setOthersCategoryInput(e.target.value);
+										}
+									}}
 								/>
 							</div>
 						) : (
@@ -275,6 +317,22 @@ const BudgetScreen = () => {
 									name="description"
 									id="description"
 									placeholder="Enter description"
+									value={
+										selectedModal === "daily needs"
+											? dailyNeedsDescriptionInput
+											: selectedModal === "others"
+											? othersDescriptionInput
+											: ""
+									}
+									onChange={(e) => {
+										if (selectedModal === "daily needs") {
+											setDailyNeedsDescriptionInput(e.target.value);
+										}
+
+										if (selectedModal === "others") {
+											setOthersDescriptionInput(e.target.value);
+										}
+									}}
 								></textarea>
 							</div>
 						) : (
@@ -284,14 +342,18 @@ const BudgetScreen = () => {
 						{selectedModal === "planned payments" ? (
 							<div className="inputLabelGroup">
 								<label htmlFor="amount" className="inputLabel">
-									Amount
+									category
 								</label>
 								<input
 									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
-									type="number"
-									name="amount"
-									id="amount"
-									placeholder="Enter amount"
+									type="text"
+									name="category"
+									id="category"
+									placeholder="Enter category name"
+									value={plannedPaymentsCategoryInput}
+									onChange={(e) =>
+										setPlannedPaymentsCategoryInput(e.target.value)
+									}
 								/>
 							</div>
 						) : (
@@ -309,6 +371,22 @@ const BudgetScreen = () => {
 									name="set-limit"
 									id="set-limit"
 									placeholder="Set Limit"
+									value={
+										selectedModal === "daily needs"
+											? dailyNeedsLimitInput
+											: selectedModal === "others"
+											? othersLimitInput
+											: ""
+									}
+									onChange={(e) => {
+										if (selectedModal === "daily needs") {
+											setDailyNeedsLimitInput(e.target.value);
+										}
+
+										if (selectedModal === "others") {
+											setOthersLimitInput(e.target.value);
+										}
+									}}
 								/>
 							</div>
 						) : (
@@ -326,6 +404,10 @@ const BudgetScreen = () => {
 									name="set-amount"
 									id="set-amount"
 									placeholder="Set amount"
+									value={plannedPaymentsAmountInput}
+									onChange={(e) =>
+										setPlannedPaymentsAmountInput(e.target.value)
+									}
 								/>
 							</div>
 						) : (
@@ -335,13 +417,17 @@ const BudgetScreen = () => {
 						{selectedModal === "planned payments" ? (
 							<div className="inputLabelGroup">
 								<label htmlFor="set-frequency" className="inputLabel">
-									Amount
+									frequency
 								</label>
 
 								<select
 									name="set-frequency"
 									id="set-frequency"
 									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									value={plannedPaymentsFrequencyInput}
+									onChange={(e) =>
+										setPlannedPaymentsFrequencyInput(e.target.value)
+									}
 								>
 									<option value="daily">Daily</option>
 									<option value="monthly">Monthly</option>
