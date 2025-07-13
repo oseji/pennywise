@@ -9,14 +9,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 
 import loginImage from "../assets/onboarding/login screen image.svg";
-import eyeIcon from "../assets/onboarding/eye icon.svg";
 
 const Login = () => {
 	const errorMessageRef = useRef<HTMLParagraphElement>(null);
-	const [userEmail, setUserEmail] = useState<string>("");
-	const [userPassword, setUserPassword] = useState<string>("");
+	const [userEmail, setUserEmail] = useState<string>("fake@gmail.com");
+	const [userPassword, setUserPassword] = useState<string>("523577");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 	const router = useRouter();
 
 	const formatSignInError = (error: unknown): string => {
@@ -111,18 +111,19 @@ const Login = () => {
 
 							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
 								<input
-									type="password"
+									type={isPasswordVisible ? "text" : "password"}
 									placeholder="Password"
 									className=" outline-0 focus:outline-0 w-full"
 									value={userPassword}
 									onChange={(e) => setUserPassword(e.target.value)}
 								/>
 
-								<Image
-									src={eyeIcon}
-									alt="Eye icon"
-									className=" cursor-pointer"
-								/>
+								<span
+									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+									className=" cursor-pointer underline"
+								>
+									{isPasswordVisible ? "Hide" : "Show"}
+								</span>
 							</div>
 						</div>
 					</div>

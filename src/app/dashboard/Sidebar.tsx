@@ -50,7 +50,6 @@ const Sidebar = () => {
 		} catch (err) {
 			const message = formatLogoutError(err);
 			setErrorMessage(message);
-
 			alert(errorMessage);
 		}
 	};

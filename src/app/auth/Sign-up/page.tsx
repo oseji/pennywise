@@ -10,7 +10,6 @@ import { auth } from "@/firebase/firebase";
 import { FirebaseError } from "firebase/app";
 
 import loginImage2 from "../../../assets/onboarding/login screen image 2.svg";
-import eyeIcon from "../../../assets/onboarding/eye icon.svg";
 
 type SignUpInfo = {
 	firstName: string;
@@ -22,6 +21,9 @@ type SignUpInfo = {
 
 const SignUp = () => {
 	const passwordErrorRef = useRef<HTMLParagraphElement>(null);
+	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+	const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+		useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -179,7 +181,7 @@ const SignUp = () => {
 
 							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
 								<input
-									type="password"
+									type={isPasswordVisible ? "text" : "password"}
 									placeholder="Password"
 									id="password"
 									name="password"
@@ -188,11 +190,12 @@ const SignUp = () => {
 									onChange={handleChange}
 								/>
 
-								<Image
-									src={eyeIcon}
-									alt="Eye icon"
-									className=" cursor-pointer"
-								/>
+								<span
+									className=" underline cursor-pointer"
+									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+								>
+									{isPasswordVisible ? "Hide" : "Show"}
+								</span>
 							</div>
 						</div>
 
@@ -203,7 +206,7 @@ const SignUp = () => {
 
 							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
 								<input
-									type="password"
+									type={isConfirmPasswordVisible ? "text" : "password"}
 									placeholder="Password"
 									id="confirm-password"
 									name="confirmPassword"
@@ -212,11 +215,14 @@ const SignUp = () => {
 									onChange={handleChange}
 								/>
 
-								<Image
-									src={eyeIcon}
-									alt="Eye icon"
-									className=" cursor-pointer"
-								/>
+								<span
+									className=" underline cursor-pointer"
+									onClick={() =>
+										setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+									}
+								>
+									{isConfirmPasswordVisible ? "Hide" : "Show"}
+								</span>
 							</div>
 						</div>
 					</div>
