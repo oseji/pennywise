@@ -144,6 +144,7 @@ const Login = () => {
 					<button
 						type="submit"
 						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 mb-4"
+						disabled={isLoading}
 					>
 						{isLoading ? (
 							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />

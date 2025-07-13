@@ -1,10 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
+import { db, auth } from "@/firebase/firebase";
+import {
+	addDoc,
+	collection,
+	getDocs,
+	serverTimestamp,
+} from "firebase/firestore";
+
 import Image from "next/image";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 import deleteIcon from "../../../assets/dashboard/delete icon.svg";
+import toast from "react-hot-toast";
 
 type tableDataType = {
 	date: string;
@@ -13,6 +22,14 @@ type tableDataType = {
 }[];
 
 const IncomeScreen = () => {
+	const user = auth.currentUser;
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [currentBalance, setCurrentBalance] = useState<string>("");
+	const [incomeData, setIncomeData] = useState<tableDataType>([]);
+
+	const [incomeInput, setIncomeInput] = useState<string>("");
+	const [narrationInput, setNarrationInput] = useState<string>("");
+
 	const tableData: tableDataType = [
 		{ date: "July", narration: "testing", amount: 100000 },
 		{ date: "July", narration: "testing", amount: 100000 },
@@ -22,6 +39,38 @@ const IncomeScreen = () => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+	const addIncome = async () => {
+		if (!user) return;
+
+		if (
+			!narrationInput.trim() ||
+			isNaN(Number(incomeInput)) ||
+			Number(incomeInput) <= 0
+		) {
+			toast.error("Narration and a valid income amount are required");
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await addDoc(collection(db, `users/${user.uid}/incomeData`), {
+				narration: narrationInput,
+				amount: Number(incomeInput),
+				createdAt: serverTimestamp(),
+			});
+
+			toast.success("Income added successfully");
+		} catch (err) {
+			console.log(`error adding income: ${err}`);
+			toast.error("An error occurred");
+		} finally {
+			setIsLoading(false);
+			setNarrationInput("");
+			setIncomeInput("");
+		}
+	};
 
 	// toggle modal
 	useEffect(() => {
@@ -41,7 +90,7 @@ const IncomeScreen = () => {
 
 				<p className="  font-bold my-10">
 					<span className=" text-2xl">Balance: </span>{" "}
-					<span className="text-5xl">1,000,000</span>
+					<span className="text-5xl">{currentBalance}</span>
 				</p>
 
 				<div className=" flex flex-row items-center justify-between">
@@ -111,7 +160,14 @@ const IncomeScreen = () => {
 				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
 					<h2 className="text-2xl font-bold mb-6">Add Cash Income</h2>
 
-					<form className="flex flex-col gap-2">
+					<form
+						className="flex flex-col gap-2"
+						onSubmit={(e) => {
+							e.preventDefault();
+
+							addIncome();
+						}}
+					>
 						<div className="inputLabelGroup">
 							<label htmlFor="narration" className="inputLabel">
 								Narration
@@ -122,6 +178,8 @@ const IncomeScreen = () => {
 								name="narration"
 								id="narration"
 								placeholder="Enter Narration"
+								value={narrationInput}
+								onChange={(e) => setNarrationInput(e.target.value)}
 							/>
 						</div>
 
@@ -135,11 +193,21 @@ const IncomeScreen = () => {
 								name="amount"
 								id="amount"
 								placeholder="Enter amount"
+								value={incomeInput}
+								onChange={(e) => setIncomeInput(e.target.value)}
 							/>
 						</div>
 
-						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
-							Add
+						<button
+							type="submit"
+							className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110 capitalize"
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto " />
+							) : (
+								"Add"
+							)}
 						</button>
 					</form>
 				</div>

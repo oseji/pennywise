@@ -14,6 +14,7 @@ const DashboardHeader = () => {
 					name="searchbar"
 					id="searchbar"
 					placeholder="Search"
+					className=" focus:outline-0"
 				/>
 			</div>
 
