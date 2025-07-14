@@ -75,7 +75,7 @@ const ExpensesPage = () => {
 
 					<div className=" bg-white p-4 rounded-lg shadow-md mt-5 ">
 						<div className=" flex flex-row justify-between items-center border-b border-slate-200">
-							<p className=" text-[#2D6A4F] font-semibold">date</p>
+							<p className=" text-[#2D6A4F] font-semibold">DAY</p>
 
 							<button
 								className=" text-[#004FFF] font-semibold"

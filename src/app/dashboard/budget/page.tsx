@@ -2,10 +2,16 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
+import { auth, db } from "@/firebase/firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import toast from "react-hot-toast";
+
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 
 const BudgetScreen = () => {
+	const user = auth.currentUser;
 	const [isPaid, setIsPaid] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const toggleBtnRef = useRef<HTMLDivElement>(null);
 
 	const modalRef = useRef<HTMLDivElement>(null);
@@ -34,6 +40,81 @@ const BudgetScreen = () => {
 	const [othersDescriptionInput, setOthersDescriptionInput] =
 		useState<string>("");
 	const [othersLimitInput, setOthersLimitInput] = useState<string>("");
+
+	const addCategory = async (
+		selectedCategory: "daily needs" | "planned payments" | "others"
+	) => {
+		if (!user) return;
+
+		const category =
+			selectedCategory === "daily needs"
+				? "dailyNeeds"
+				: selectedCategory === "planned payments"
+				? "plannedPayments"
+				: selectedCategory === "others"
+				? "others"
+				: "";
+
+		setIsLoading(true);
+
+		try {
+			await addDoc(
+				collection(db, `users/${user.uid}/budgetData/${category}/data`),
+				{
+					createdAt: serverTimestamp(),
+					category:
+						selectedCategory === "daily needs"
+							? dailyNeedsCategoryInput
+							: selectedCategory === "planned payments"
+							? plannedPaymentsCategoryInput
+							: selectedCategory === "others"
+							? othersCategoryInput
+							: null,
+
+					description:
+						selectedCategory === "daily needs"
+							? dailyNeedsDescriptionInput
+							: selectedCategory === "others"
+							? othersDescriptionInput
+							: null,
+					amount:
+						selectedCategory === "planned payments"
+							? Number(plannedPaymentsAmountInput)
+							: null,
+
+					setLimit:
+						selectedCategory === "daily needs"
+							? Number(dailyNeedsLimitInput)
+							: selectedCategory === "others"
+							? Number(othersLimitInput)
+							: null,
+
+					frequency:
+						selectedCategory === "planned payments"
+							? plannedPaymentsFrequencyInput
+							: null,
+				}
+			);
+
+			toast.success(`${selectedModal} entry added successfully`);
+			setIsModalOpen(false);
+		} catch (err) {
+			console.log(`error adding entry: ${err}`);
+			toast.error("An error occurred");
+		} finally {
+			setIsLoading(false);
+
+			setDailyNeedsCategoryInput("");
+			setDailyNeedsDescriptionInput("");
+			setDailyNeedsLimitInput("");
+			setPlannedPaymentsCategoryInput("");
+			setPlannedPaymentsAmountInput("");
+			setPlannedPaymentsFrequencyInput("");
+			setOthersCategoryInput("");
+			setOthersDescriptionInput("");
+			setOthersLimitInput("");
+		}
+	};
 
 	// toggle modal
 	useEffect(() => {
@@ -235,9 +316,17 @@ const BudgetScreen = () => {
 
 								<td className=" py-4">150000</td>
 								<td className=" py-4">120000</td>
-								<div className=" w-64 h-3 rounded-full bg-slate-100">
-									<div className=" bg-green-400 rounded-full h-3 w-[70%]"></div>
-								</div>
+								<td className=" py-4 flex flex-row items-center gap-8">
+									<div className=" w-64 h-3 rounded-full bg-slate-100">
+										<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
+									</div>
+
+									<Image
+										src={editIcon}
+										alt=" edit icon"
+										className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+									/>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -273,7 +362,14 @@ const BudgetScreen = () => {
 						""
 					)}
 
-					<form className="flex flex-col gap-2">
+					<form
+						className="flex flex-col gap-2"
+						onSubmit={(e) => {
+							e.preventDefault();
+
+							addCategory(selectedModal);
+						}}
+					>
 						{selectedModal === "daily needs" || selectedModal === "others" ? (
 							<div className="inputLabelGroup">
 								<label htmlFor="category" className="inputLabel">
@@ -439,7 +535,11 @@ const BudgetScreen = () => {
 						)}
 
 						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
-							Add
+							{isLoading ? (
+								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+							) : (
+								"Add"
+							)}
 						</button>
 					</form>
 				</div>
