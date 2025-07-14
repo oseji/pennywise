@@ -237,12 +237,12 @@ const IncomeScreen = () => {
 
 			{/* Add Income Modal */}
 			<div
-				className="fixed inset-0 z-50 flex items-center justify-center hideIncomeModal"
+				className="fixed inset-0 z-50 flex items-center backdrop-blur-sm justify-center hideIncomeModal"
 				ref={modalRef}
 			>
 				{/* Overlay */}
 				<div
-					className="absolute inset-0 bg-black opacity-90 cursor-pointer"
+					className="absolute inset-0 bg-black opacity-50  cursor-pointer"
 					onClick={() => setIsModalOpen(!isModalOpen)}
 				></div>
 

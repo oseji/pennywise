@@ -246,12 +246,12 @@ const BudgetScreen = () => {
 
 			{/* Modals */}
 			<div
-				className="fixed inset-0 z-50 flex items-center justify-center hideIncomeModal"
+				className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideIncomeModal"
 				ref={modalRef}
 			>
 				{/* Overlay */}
 				<div
-					className="absolute inset-0 bg-black opacity-90 cursor-pointer"
+					className="absolute inset-0 bg-black opacity-50 cursor-pointer"
 					onClick={() => setIsModalOpen(!isModalOpen)}
 				></div>
 
