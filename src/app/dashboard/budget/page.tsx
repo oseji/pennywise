@@ -3,22 +3,39 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 import { auth, db } from "@/firebase/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+	addDoc,
+	getDocs,
+	collection,
+	serverTimestamp,
+	query,
+	orderBy,
+} from "firebase/firestore";
 import toast from "react-hot-toast";
+import { formatFetchError } from "../income/page";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 
 const BudgetScreen = () => {
 	const user = auth.currentUser;
-	const [isPaid, setIsPaid] = useState<boolean>(false);
+
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const toggleBtnRef = useRef<HTMLDivElement>(null);
+	const [dataLoading, setDataLoading] = useState<boolean>(false);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [selectedModal, setSelectedModal] = useState<
 		"daily needs" | "planned payments" | "others"
 	>("daily needs");
+
+	type budgetDataType = {
+		category: string;
+		description: string | null;
+		amount: number | null;
+		setLimit: number;
+		frequency: string | null;
+		date: string;
+	}[];
 
 	// daily needs
 	const [dailyNeedsCategoryInput, setDailyNeedsCategoryInput] =
@@ -40,6 +57,12 @@ const BudgetScreen = () => {
 	const [othersDescriptionInput, setOthersDescriptionInput] =
 		useState<string>("");
 	const [othersLimitInput, setOthersLimitInput] = useState<string>("");
+
+	// budget category data
+	const [plannedPaymentsData, setPlannedPaymentsData] =
+		useState<budgetDataType>([]);
+	const [dailyNeedsData, setDailyNeedsData] = useState<budgetDataType>([]);
+	const [othersData, setOthersData] = useState<budgetDataType>([]);
 
 	const addCategory = async (
 		selectedCategory: "daily needs" | "planned payments" | "others"
@@ -97,6 +120,8 @@ const BudgetScreen = () => {
 			);
 
 			toast.success(`${selectedModal} entry added successfully`);
+
+			fetchBudgetData(user.uid);
 			setIsModalOpen(false);
 		} catch (err) {
 			console.log(`error adding entry: ${err}`);
@@ -115,6 +140,70 @@ const BudgetScreen = () => {
 			setOthersLimitInput("");
 		}
 	};
+
+	const fetchBudgetData = async (userId: string) => {
+		if (!user) return;
+
+		setDataLoading(true);
+
+		try {
+			const fetchCategory = async (category: string) => {
+				const ref = collection(
+					db,
+					`users/${userId}/budgetData/${category}/data`
+				);
+				const q = query(ref, orderBy("createdAt", "desc"));
+				const snapshot = await getDocs(q);
+
+				return snapshot.docs.map((doc) => {
+					const data = doc.data();
+
+					return {
+						date:
+							data.createdAt?.toDate().toLocaleString("en-GB", {
+								day: "2-digit",
+								month: "short",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: true,
+							}) || "",
+						category: data.category,
+						description: data.description || "",
+						amount: Number(data.amount) || 0,
+						setLimit: Number(data.setLimit) || 0,
+						frequency: data.frequency || "",
+					};
+				});
+			};
+
+			// Fetch all three categories in parallel
+			const [dailyNeeds, plannedPayments, others] = await Promise.all([
+				fetchCategory("dailyNeeds"),
+				fetchCategory("plannedPayments"),
+				fetchCategory("others"),
+			]);
+
+			setDailyNeedsData(dailyNeeds);
+			setPlannedPaymentsData(plannedPayments);
+			setOthersData(others);
+
+			toast.success("Budget categories fetched successfully");
+		} catch (err) {
+			const message = formatFetchError(err);
+			console.log(err);
+			toast.error(`${message}`);
+		} finally {
+			setDataLoading(false);
+		}
+	};
+
+	// fetch budget data
+	useEffect(() => {
+		if (user) {
+			fetchBudgetData(user.uid);
+		}
+	}, [user]);
 
 	// toggle modal
 	useEffect(() => {
@@ -138,13 +227,17 @@ const BudgetScreen = () => {
 						<h1 className=" capitalize text-2xl font-bold">daily needs</h1>
 
 						<button
-							className=" text-[#2D6A4F] bg-white border border-[#2D6A4F] rounded-lg px-6 py-2 font-semibold transition ease-in-out duration-200 hover:scale-110"
+							className=" dailyNeedsAddButton"
 							onClick={() => {
 								setIsModalOpen(!isModalOpen);
 								setSelectedModal("daily needs");
 							}}
 						>
-							+ New Category
+							{selectedModal === "daily needs" && dataLoading ? (
+								<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+							) : (
+								"+ New Category"
+							)}
 						</button>
 					</div>
 
@@ -166,34 +259,33 @@ const BudgetScreen = () => {
 						</thead>
 
 						<tbody>
-							<tr className=" border-b border-slate-200">
-								<td className=" py-4">
-									<div className="flex flex-col gap-2">
-										<p>personal care</p>
-										<p className="text-xs">
-											<span className="text-[#52B788]">Description: </span>
-											<span className="italic">
-												Includes items such as toiletries, skin care, cravings,
-												sanitary items etc
-											</span>
-										</p>
-									</div>
-								</td>
+							{dailyNeedsData.map((element, index) => (
+								<tr className=" border-b border-slate-200" key={index}>
+									<td className=" py-4">
+										<div className="flex flex-col gap-2">
+											<p className=" capitalize">{element.category}</p>
+											<p className="text-xs">
+												<span className="text-[#52B788]">Description: </span>
+												<span className="italic">{element.description}</span>
+											</p>
+										</div>
+									</td>
 
-								<td className=" py-4">150000</td>
-								<td className=" py-4">120000</td>
-								<td className=" py-4 flex flex-row items-center gap-8">
-									<div className=" w-64 h-3 rounded-full bg-slate-100">
-										<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
-									</div>
+									<td className=" py-4">{element.setLimit.toLocaleString()}</td>
+									<td className=" py-4">120000</td>
+									<td className=" py-4 flex flex-row items-center gap-8">
+										<div className=" w-64 h-3 rounded-full bg-slate-100">
+											<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
+										</div>
 
-									<Image
-										src={editIcon}
-										alt=" edit icon"
-										className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
-									/>
-								</td>
-							</tr>
+										<Image
+											src={editIcon}
+											alt=" edit icon"
+											className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+										/>
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
@@ -204,13 +296,17 @@ const BudgetScreen = () => {
 						<h1 className=" capitalize text-2xl font-bold">planned payments</h1>
 
 						<button
-							className=" text-[#2D6A4F] bg-white border border-[#2D6A4F] rounded-lg px-6 py-2 font-semibold transition ease-in-out duration-200 hover:scale-110"
+							className=" dailyNeedsAddButton"
 							onClick={() => {
 								setIsModalOpen(!isModalOpen);
 								setSelectedModal("planned payments");
 							}}
 						>
-							+ New Category
+							{selectedModal === "planned payments" && dataLoading ? (
+								<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+							) : (
+								"+ New Category"
+							)}
 						</button>
 					</div>
 
@@ -220,42 +316,17 @@ const BudgetScreen = () => {
 								<th className="text-start">category</th>
 								<th className="text-start">amount</th>
 								<th className="text-start">frequency</th>
-								<th className="text-start">status</th>
 							</tr>
 						</thead>
 
 						<tbody>
-							<tr className=" border-b border-slate-200">
-								<td className=" py-4 capitalize">rent</td>
-								<td className=" py-4">150000</td>
-								<td className=" py-4 capitalize">monthly</td>
-								<td className=" py-4">
-									<div className=" flex flex-row items-center gap-4">
-										<div
-											className={`relative  px-1 py-1 rounded-2xl w-14 h-6 cursor-pointer  ${
-												isPaid ? "bg-[#219653]" : "bg-slate-400"
-											}`}
-											onClick={() => {
-												toggleBtnRef.current?.classList.toggle("isPaid");
-												toggleBtnRef.current?.classList.toggle("isNotPaid");
-
-												setIsPaid(!isPaid);
-											}}
-										>
-											<div
-												ref={toggleBtnRef}
-												className="absolute top-1/2 -translate-y-1/2 left-1 h-4 w-4 rounded-full bg-white transition-transform duration-300 ease-in-out isNotPaid"
-											></div>
-										</div>
-
-										<span
-											className={isPaid ? " text-[#27AE60]" : " text-black"}
-										>
-											{isPaid ? "Paid" : "Not Paid"}
-										</span>
-									</div>
-								</td>
-							</tr>
+							{plannedPaymentsData.map((element, index) => (
+								<tr className=" border-b border-slate-200" key={index}>
+									<td className=" py-4 capitalize">{element.category}</td>
+									<td className=" py-4">{element.amount?.toLocaleString()}</td>
+									<td className=" py-4 capitalize">{element.frequency}</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
@@ -267,13 +338,17 @@ const BudgetScreen = () => {
 							<h1 className=" capitalize text-2xl font-bold">others</h1>
 
 							<button
-								className=" text-[#2D6A4F] bg-white border border-[#2D6A4F] rounded-lg px-6 py-2 font-semibold transition ease-in-out duration-200 hover:scale-110"
+								className=" dailyNeedsAddButton"
 								onClick={() => {
 									setIsModalOpen(!isModalOpen);
 									setSelectedModal("others");
 								}}
 							>
-								+ New Entry
+								{selectedModal === "others" && dataLoading ? (
+									<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+								) : (
+									"+ New Entry"
+								)}
 							</button>
 						</div>
 
@@ -301,33 +376,33 @@ const BudgetScreen = () => {
 						</thead>
 
 						<tbody>
-							<tr className=" border-b border-slate-200">
-								<td className=" py-4">
-									<div className="flex flex-col gap-2">
-										<p>data</p>
-										<p className="text-xs">
-											<span className="text-[#52B788]">Description: </span>
-											<span className="italic">
-												bought data for airtel mifi
-											</span>
-										</p>
-									</div>
-								</td>
+							{othersData.map((element, index) => (
+								<tr className=" border-b border-slate-200" key={index}>
+									<td className=" py-4">
+										<div className="flex flex-col gap-2">
+											<p className=" capitalize">{element.category}</p>
+											<p className="text-xs">
+												<span className="text-[#52B788]">Description: </span>
+												<span className="italic">{element.description}</span>
+											</p>
+										</div>
+									</td>
 
-								<td className=" py-4">150000</td>
-								<td className=" py-4">120000</td>
-								<td className=" py-4 flex flex-row items-center gap-8">
-									<div className=" w-64 h-3 rounded-full bg-slate-100">
-										<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
-									</div>
+									<td className=" py-4">{element.setLimit.toLocaleString()}</td>
+									<td className=" py-4">120000</td>
+									<td className=" py-4 flex flex-row items-center gap-8">
+										<div className=" w-64 h-3 rounded-full bg-slate-100">
+											<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
+										</div>
 
-									<Image
-										src={editIcon}
-										alt=" edit icon"
-										className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
-									/>
-								</td>
-							</tr>
+										<Image
+											src={editIcon}
+											alt=" edit icon"
+											className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+										/>
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
