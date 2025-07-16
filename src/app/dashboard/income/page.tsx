@@ -12,7 +12,8 @@ import {
 } from "firebase/firestore";
 
 import Image from "next/image";
-import { formatFetchError } from "@/utils/formatError";
+import { formatFetchError } from "@/utils/formatFetchError";
+import { formatAddDocError } from "@/utils/formatAddDocError";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 import deleteIcon from "../../../assets/dashboard/delete icon.svg";
@@ -36,42 +37,6 @@ const IncomeScreen = () => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-	const addIncome = async () => {
-		if (!user) return;
-
-		if (
-			!narrationInput.trim() ||
-			isNaN(Number(incomeInput)) ||
-			Number(incomeInput) <= 0
-		) {
-			toast.error("Narration and a valid income amount are required");
-			return;
-		}
-
-		setIsLoading(true);
-
-		try {
-			await addDoc(collection(db, `users/${user.uid}/incomeData`), {
-				narration: narrationInput,
-				amount: Number(incomeInput),
-				createdAt: serverTimestamp(),
-			});
-
-			toast.success("Income added successfully");
-			setIsModalOpen(false);
-
-			const updatedData = await fetchIncomeData(user.uid);
-			setIncomeData(updatedData ?? []);
-		} catch (err) {
-			console.log(`error adding income: ${err}`);
-			toast.error("An error occurred");
-		} finally {
-			setIsLoading(false);
-			setNarrationInput("");
-			setIncomeInput("");
-		}
-	};
 
 	const fetchIncomeData = async (userId: string) => {
 		if (!userId) return;
@@ -110,6 +75,42 @@ const IncomeScreen = () => {
 			toast.error(`${message}`);
 		} finally {
 			setIsDataLoading(false);
+		}
+	};
+
+	const addIncome = async () => {
+		if (!user) return;
+
+		if (
+			!narrationInput.trim() ||
+			isNaN(Number(incomeInput)) ||
+			Number(incomeInput) <= 0
+		) {
+			toast.error("Narration and a valid income amount are required");
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await addDoc(collection(db, `users/${user.uid}/incomeData`), {
+				narration: narrationInput,
+				amount: Number(incomeInput),
+				createdAt: serverTimestamp(),
+			});
+
+			toast.success("Income added successfully");
+			setIsModalOpen(false);
+
+			const updatedData = await fetchIncomeData(user.uid);
+			setIncomeData(updatedData ?? []);
+		} catch (err) {
+			console.log(`error adding income: ${err}`);
+			toast.error(`${formatAddDocError(err)}`);
+		} finally {
+			setIsLoading(false);
+			setNarrationInput("");
+			setIncomeInput("");
 		}
 	};
 

@@ -12,9 +12,10 @@ import {
 	orderBy,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
-import { formatFetchError } from "@/utils/formatError";
+import { formatFetchError } from "@/utils/formatFetchError";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
+import { formatAddDocError } from "@/utils/formatAddDocError";
 
 const BudgetScreen = () => {
 	const user = auth.currentUser;
@@ -78,6 +79,50 @@ const BudgetScreen = () => {
 				? "others"
 				: "";
 
+		// validation for daily needs
+		if (selectedModal === "daily needs") {
+			if (
+				!dailyNeedsCategoryInput.trim() ||
+				!dailyNeedsDescriptionInput.trim() ||
+				isNaN(Number(dailyNeedsLimitInput)) ||
+				Number(dailyNeedsLimitInput) <= 0
+			) {
+				toast.error(
+					"All fields are required and amount must be a valid number"
+				);
+				return;
+			}
+		}
+
+		// validation for others
+		if (selectedModal === "others") {
+			if (
+				!othersCategoryInput.trim() ||
+				!othersDescriptionInput.trim() ||
+				isNaN(Number(othersLimitInput)) ||
+				Number(othersLimitInput) <= 0
+			) {
+				toast.error(
+					"All fields are required and amount must be a valid number"
+				);
+				return;
+			}
+		}
+
+		// planned payments validation
+		if (selectedModal === "planned payments") {
+			if (
+				!plannedPaymentsCategoryInput.trim() ||
+				!plannedPaymentsAmountInput.trim() ||
+				!plannedPaymentsFrequencyInput.trim()
+			) {
+				toast.error(
+					"All fields are required and amount must be a valid number"
+				);
+				return;
+			}
+		}
+
 		setIsLoading(true);
 
 		try {
@@ -125,7 +170,7 @@ const BudgetScreen = () => {
 			setIsModalOpen(false);
 		} catch (err) {
 			console.log(`error adding entry: ${err}`);
-			toast.error("An error occurred");
+			toast.error(`${formatAddDocError(err)}`);
 		} finally {
 			setIsLoading(false);
 
