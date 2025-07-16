@@ -12,7 +12,7 @@ import {
 	orderBy,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
-import { formatFetchError } from "../income/page";
+import { formatFetchError } from "@/utils/formatError";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 
