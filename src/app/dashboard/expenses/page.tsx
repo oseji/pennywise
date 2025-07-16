@@ -34,6 +34,9 @@ const ExpensesPage = () => {
 
 	const [expenseData, setExpenseData] = useState<expenseDataType>([]);
 
+	const [selectedCategory, setSelectedCategory] = useState("");
+	const [subCategories, setSubCategories] = useState<string[]>([]);
+
 	const [categoryInput, setCategoriesInput] = useState<string>("");
 	const [subCategoryInput, setSubCategoryInput] = useState<string>("");
 	const [narrationInput, setNarrationInput] = useState<string>("");
@@ -123,6 +126,42 @@ const ExpensesPage = () => {
 		}
 	};
 
+	// fetch sub categories on category change
+	useEffect(() => {
+		const fetchSubCategories = async () => {
+			if (!user?.uid || !selectedCategory) return;
+
+			// Map UI label to Firestore collection key
+			const categoryKey =
+				selectedCategory === "planned payments"
+					? "plannedPayments"
+					: selectedCategory === "daily needs"
+					? "dailyNeeds"
+					: selectedCategory === "others"
+					? "others"
+					: "";
+
+			if (!categoryKey) return;
+
+			const querySnapshot = await getDocs(
+				collection(db, `users/${user.uid}/budgetData/${categoryKey}/data`)
+			);
+
+			const fetchedCategories = new Set<string>();
+
+			querySnapshot.forEach((doc) => {
+				const data = doc.data();
+				if (data.category) {
+					fetchedCategories.add(data.category);
+				}
+			});
+
+			setSubCategories(Array.from(fetchedCategories));
+		};
+
+		fetchSubCategories();
+	}, [selectedCategory, user?.uid]);
+
 	// fetch expense data
 	useEffect(() => {
 		const getData = async () => {
@@ -135,6 +174,9 @@ const ExpensesPage = () => {
 		console.log(expenseData);
 	}, []);
 
+	useEffect(() => {
+		console.log(selectedCategory);
+	}, [selectedCategory]);
 	// toggle modal
 	useEffect(() => {
 		if (isModalOpen) {
@@ -222,7 +264,9 @@ const ExpensesPage = () => {
 							<div className=" grid grid-cols-4" key={index}>
 								<div className=" pt-2 capitalize">
 									<p>{element.category}</p>
-									<p className=" text-sm">{element.subCategory}</p>
+									<p className=" text-sm text-[#2D6A4F]">
+										{element.subCategory}
+									</p>
 								</div>
 
 								<p className=" pt-2">{element.narration}</p>
@@ -267,16 +311,18 @@ const ExpensesPage = () => {
 								id="category"
 								className=" border border-slate-200 rounded-l p-2 focus:outline-0"
 								value={categoryInput}
-								onChange={(e) => setCategoriesInput(e.target.value)}
+								onChange={(e) => {
+									setCategoriesInput(e.target.value);
+
+									setSelectedCategory(e.target.value);
+								}}
 							>
 								<option value="" disabled>
 									Enter category
 								</option>
-								<option value="Transportation">Transportation</option>
-								<option value="Entertainment">Entertainment</option>
-								<option value="Food">Food</option>
-								<option value="Clothing">Clothing</option>
-								<option value="Other">Other</option>
+								<option value="planned payments">Planned Payments</option>
+								<option value="daily needs">Daily Needs</option>
+								<option value="others">Others</option>
 							</select>
 						</div>
 
@@ -289,13 +335,21 @@ const ExpensesPage = () => {
 								name="subcategory"
 								id="subcategory"
 								className=" capitalize px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								// size={5}
 								value={subCategoryInput}
-								onChange={(e) => setSubCategoryInput(e.target.value)}
+								onChange={(e) => {
+									setSubCategoryInput(e.target.value);
+								}}
 							>
 								<option value="" disabled>
 									Select a sub category
 								</option>
-								<option value="test"> test</option>
+
+								{subCategories.map((element, index) => (
+									<option value={element} key={index} className=" capitalize">
+										{element}
+									</option>
+								))}
 							</select>
 						</div>
 
