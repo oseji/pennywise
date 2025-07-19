@@ -17,12 +17,12 @@ const SavingsPage = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className=" dashboardScreen relative">
+		<div className="relative  dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">savings</h1>
 
-				<div className=" flex flex-row items-center justify-between capitalize">
-					<h2 className=" font-bold text-xl">savings target</h2>
+				<div className="flex flex-row items-center justify-between capitalize ">
+					<h2 className="text-xl font-bold ">savings target</h2>
 
 					<button
 						className=" capitalize text-white rounded-lg px-4 py-2 bg-[#2D6A4F]"
@@ -34,6 +34,7 @@ const SavingsPage = () => {
 					</button>
 				</div>
 
+				{/* table header */}
 				<div className=" p-4 rounded-lg bg-slate-200 text-[#2D6A4F] capitalize font-semibold grid grid-cols-5 mt-6">
 					<p>purpose</p>
 					<p>frequency</p>
@@ -42,13 +43,14 @@ const SavingsPage = () => {
 					<p>progress</p>
 				</div>
 
-				<div className=" grid grid-cols-5 pt-5 px-4">
+				{/* table content */}
+				<div className="grid grid-cols-5 px-4 pt-5 ">
 					<p>
 						<span>1. </span>
-						<span className=" capitalize">emergency</span>
+						<span className="capitalize ">emergency</span>
 					</p>
 
-					<p className=" capitalize">monthly</p>
+					<p className="capitalize ">monthly</p>
 
 					<p>100,000</p>
 
@@ -57,19 +59,19 @@ const SavingsPage = () => {
 					<p>progresssssssssssssssssssssssssssss</p>
 				</div>
 
-				<div className=" flex flex-row items-center justify-between mt-10 text-sm">
-					<div className=" flex flex-row items-end gap-4">
-						<div className=" w-5 h-5 p-1 bg-green-500"></div>
+				<div className="flex flex-row items-center justify-between mt-10 text-sm ">
+					<div className="flex flex-row items-end gap-4 ">
+						<div className="w-5 h-5 p-1 bg-green-500 "></div>
 						<p>Savings on track</p>
 					</div>
 
-					<div className=" flex flex-row items-end gap-4">
-						<div className=" w-5 h-5 p-1 bg-yellow-500"></div>
+					<div className="flex flex-row items-end gap-4 ">
+						<div className="w-5 h-5 p-1 bg-yellow-500 "></div>
 						<p>1 payment behind</p>
 					</div>
 
-					<div className=" flex flex-row items-end gap-4">
-						<div className=" w-5 h-5 p-1 bg-red-500"></div>
+					<div className="flex flex-row items-end gap-4 ">
+						<div className="w-5 h-5 p-1 bg-red-500 "></div>
 						<p>Multiple payments behind</p>
 					</div>
 				</div>
@@ -82,13 +84,13 @@ const SavingsPage = () => {
 			>
 				{/* Overlay */}
 				<div
-					className="absolute inset-0 bg-black opacity-90 cursor-pointer"
+					className="absolute inset-0 bg-black cursor-pointer opacity-90"
 					onClick={() => setIsModalOpen(!isModalOpen)}
 				></div>
 
 				{/* Modal Content */}
 				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
-					<h2 className="text-2xl font-bold mb-6">Add Savings Target</h2>
+					<h2 className="mb-6 text-2xl font-bold">Add Savings Target</h2>
 
 					<form
 						className="flex flex-col gap-2"
@@ -101,7 +103,7 @@ const SavingsPage = () => {
 								Savings purpose
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="text"
 								name="narration"
 								id="narration"
@@ -116,7 +118,7 @@ const SavingsPage = () => {
 							<select
 								name="frequency"
 								id="frequency"
-								className=" border border-slate-200 rounded-l p-2 focus:outline-0"
+								className="p-2 border rounded-l  border-slate-200 focus:outline-0"
 							>
 								<option value="" disabled>
 									Enter frequency
@@ -132,7 +134,7 @@ const SavingsPage = () => {
 								Target Amount
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="number"
 								name="amount"
 								id="amount"
@@ -145,7 +147,7 @@ const SavingsPage = () => {
 								Target date
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="date"
 								name="date"
 								id="date"

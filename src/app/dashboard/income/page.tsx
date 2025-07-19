@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Pagination from "@/utils/Pagination";
 
 import { db, auth } from "@/firebase/firebase";
 import {
@@ -14,6 +15,7 @@ import {
 import Image from "next/image";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { formatAddDocError } from "@/utils/formatAddDocError";
+import { getPaginationRange } from "@/utils/getPaginationRange";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 import deleteIcon from "../../../assets/dashboard/delete icon.svg";
@@ -37,6 +39,16 @@ const IncomeScreen = () => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentItems = incomeData.slice(indexOfFirstItem, indexOfLastItem);
+
+	const totalPages = Math.ceil(incomeData.length / itemsPerPage);
+	const paginationRange = getPaginationRange(currentPage, totalPages);
 
 	const fetchIncomeData = async (userId: string) => {
 		if (!userId) return;
@@ -138,17 +150,17 @@ const IncomeScreen = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className=" dashboardScreen relative">
+		<div className="relative dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">income</h1>
 
-				<p className="  font-bold my-10">
-					<span className=" text-2xl">Balance: </span>{" "}
+				<p className="my-10 font-bold ">
+					<span className="text-2xl ">Balance: </span>{" "}
 					<span className="text-5xl">{totalIncome.toLocaleString()}</span>
 				</p>
 
-				<div className=" flex flex-row items-center justify-between">
-					<h1 className=" font-bold text-2xl">Date</h1>
+				<div className="flex flex-row items-center justify-between ">
+					<h1 className="text-2xl font-bold ">Date</h1>
 
 					<button
 						className="  bg-white border border-[#2D6A4F] text-[#2D6A4F] px-4 py-2 rounded-lg hover:scale-110 transition ease-in-out"
@@ -160,67 +172,68 @@ const IncomeScreen = () => {
 
 				{isDataLoading ? (
 					<div>
-						<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+						<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
 					</div>
 				) : (
-					<table className=" w-full mt-5 border-collapse table-auto">
-						<thead>
-							<tr className=" capitalize bg-slate-200 rounded-lg">
-								<th className=" py-4 text-start font-bold">date | time</th>
-								<th className=" py-4 text-start font-bold">narration</th>
-								<th className=" py-4 text-start font-bold">amount </th>
-								<th className=" py-4 text-start font-bold">action</th>
-							</tr>
-						</thead>
+					<div>
+						<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-10 font-bold">
+							<p className="text-center ">date | time</p>
+							<p className=" text-start">narration</p>
+							<p className="text-center ">amount</p>
+							<p className="text-center ">action</p>
+						</div>
 
-						<tbody className=" bg-white w-full">
-							{incomeData.map((item, index) => (
-								<tr key={index} className=" shadow-2xl rounded-lg px-4 py-2">
-									<td className=" font-medium pt-4 text-start">{item.date}</td>
+						<div className="p-4 mt-4 bg-white rounded-lg shadow">
+							{currentItems.map((element, index) => (
+								<div className="grid grid-cols-4 py-4" key={index}>
+									<p className="text-center ">{element.date}</p>
 
-									<td className=" font-medium pt-4 text-start">
-										{item.narration}
-									</td>
+									<p>{element.narration}</p>
 
-									<td className=" font-medium pt-4 text-start">
-										{item.amount.toLocaleString()}
-									</td>
+									<p className="text-center ">
+										{element.amount.toLocaleString()}
+									</p>
 
-									<td>
-										<div className=" flex flex-row items-center gap-4 justify-start">
-											<Image
-												src={editIcon}
-												alt="edit icon"
-												className=" cursor-pointer hover:scale-110 transition ease-in-out"
-											/>
-											<Image
-												src={deleteIcon}
-												alt="delete icon"
-												className=" cursor-pointer hover:scale-110 transition ease-in-out"
-											/>
-										</div>
-									</td>
-								</tr>
+									<div className="flex flex-row items-center justify-center gap-4 ">
+										<Image
+											src={editIcon}
+											alt="edit icon"
+											className="transition ease-in-out cursor-pointer hover:scale-110"
+										/>
+										<Image
+											src={deleteIcon}
+											alt="delete icon"
+											className="transition ease-in-out cursor-pointer hover:scale-110"
+										/>
+									</div>
+								</div>
 							))}
-						</tbody>
-					</table>
+						</div>
+
+						<Pagination
+							currentPage={currentPage}
+							totalPages={totalPages}
+							paginationRange={paginationRange}
+							onPageChange={setCurrentPage}
+						/>
+					</div>
 				)}
 			</div>
 
 			{/* Add Income Modal */}
 			<div
-				className="fixed inset-0 z-50 flex items-center backdrop-blur-sm justify-center hideIncomeModal"
+				className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideIncomeModal"
 				ref={modalRef}
 			>
 				{/* Overlay */}
 				<div
-					className="absolute inset-0 bg-black opacity-50  cursor-pointer"
+					className="absolute inset-0 bg-black opacity-50 cursor-pointer"
 					onClick={() => setIsModalOpen(!isModalOpen)}
 				></div>
 
 				{/* Modal Content */}
 				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
-					<h2 className="text-2xl font-bold mb-6">Add Cash Income</h2>
+					<h2 className="mb-6 text-2xl font-bold">Add Cash Income</h2>
 
 					<form
 						className="flex flex-col gap-2"
@@ -235,7 +248,7 @@ const IncomeScreen = () => {
 								Narration
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="text"
 								name="narration"
 								id="narration"
@@ -250,7 +263,7 @@ const IncomeScreen = () => {
 								Amount
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="number"
 								name="amount"
 								id="amount"
@@ -266,7 +279,7 @@ const IncomeScreen = () => {
 							disabled={isLoading}
 						>
 							{isLoading ? (
-								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto " />
+								<div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin " />
 							) : (
 								"Add"
 							)}

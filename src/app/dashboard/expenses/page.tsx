@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Pagination from "@/utils/Pagination";
 import Image from "next/image";
 import { auth, db } from "@/firebase/firebase";
 import {
@@ -13,6 +14,7 @@ import {
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { formatAddDocError } from "@/utils/formatAddDocError";
+import { getPaginationRange } from "@/utils/getPaginationRange";
 
 import searchIcon from "../../../assets/dashboard/search.svg";
 
@@ -41,6 +43,16 @@ const ExpensesPage = () => {
 	const [subCategoryInput, setSubCategoryInput] = useState<string>("");
 	const [narrationInput, setNarrationInput] = useState<string>("");
 	const [amountInput, setAmountInput] = useState<string>("");
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentItems = expenseData.slice(indexOfFirstItem, indexOfLastItem);
+
+	const totalPages = Math.ceil(expenseData.length / itemsPerPage);
+	const paginationRange = getPaginationRange(currentPage, totalPages);
 
 	const fetchExpenses = async (userId: string) => {
 		if (!user) setIsDataLoading(true);
@@ -162,7 +174,7 @@ const ExpensesPage = () => {
 		fetchSubCategories();
 	}, [selectedCategory, user?.uid]);
 
-	// fetch expense data
+	// fetch expense data on mount
 	useEffect(() => {
 		const getData = async () => {
 			if (user) {
@@ -174,9 +186,6 @@ const ExpensesPage = () => {
 		console.log(expenseData);
 	}, []);
 
-	useEffect(() => {
-		console.log(selectedCategory);
-	}, [selectedCategory]);
 	// toggle modal
 	useEffect(() => {
 		if (isModalOpen) {
@@ -189,20 +198,20 @@ const ExpensesPage = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className=" dashboardScreen relative">
+		<div className="relative dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">expenses</h1>
 
-				<h3 className="mt-10 font-semibold mb-2">Search Transaction</h3>
+				<h3 className="mt-10 mb-2 font-semibold">Search Transaction</h3>
 
 				<form
-					className=" flex flex-row items-end gap-4"
+					className="flex flex-row items-end gap-4 "
 					onSubmit={(e) => {
 						e.preventDefault();
 					}}
 				>
 					<div className=" inputLabelGroup">
-						<label htmlFor="from-date-picker" className="inputLabel text-sm">
+						<label htmlFor="from-date-picker" className="text-sm inputLabel">
 							from
 						</label>
 
@@ -211,12 +220,12 @@ const ExpensesPage = () => {
 							name="from-date-picker"
 							id="from-date-picker"
 							placeholder="From"
-							className=" p-2 border border-slate-200 rounded-lg"
+							className="p-2 border rounded-lg border-slate-200"
 						/>
 					</div>
 
 					<div className=" inputLabelGroup">
-						<label htmlFor="to-date-picker" className="inputLabel text-sm">
+						<label htmlFor="to-date-picker" className="text-sm inputLabel">
 							to
 						</label>
 
@@ -225,7 +234,7 @@ const ExpensesPage = () => {
 							name="to-date-picker"
 							id="to-date-picker"
 							placeholder="To"
-							className=" p-2 border border-slate-200 rounded-lg"
+							className="p-2 border rounded-lg border-slate-200"
 						/>
 					</div>
 
@@ -242,8 +251,8 @@ const ExpensesPage = () => {
 						<p>amount</p>
 					</div>
 
-					<div className=" bg-white p-4 rounded-lg shadow-md mt-5 ">
-						<div className=" flex flex-row justify-between items-center border-b border-slate-200">
+					<div className="p-4 mt-5 bg-white rounded-lg shadow-md ">
+						<div className="flex flex-row items-center justify-between border-b border-slate-200">
 							<p className=" text-[#2D6A4F] font-semibold">DAY</p>
 
 							<button
@@ -253,28 +262,35 @@ const ExpensesPage = () => {
 								}}
 							>
 								{isDataLoading ? (
-									<div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+									<div className="w-5 h-5 mx-auto capitalize border-2 border-blue-500 rounded-full border-t-transparent animate-spin" />
 								) : (
 									"+ Add"
 								)}
 							</button>
 						</div>
 
-						{expenseData.map((element, index) => (
-							<div className=" grid grid-cols-4" key={index}>
-								<div className=" pt-2 capitalize">
+						{currentItems.map((element, index) => (
+							<div className="grid grid-cols-4 " key={index}>
+								<div className="pt-2 capitalize ">
 									<p>{element.category}</p>
 									<p className=" text-sm text-[#2D6A4F]">
 										{element.subCategory}
 									</p>
 								</div>
 
-								<p className=" pt-2">{element.narration}</p>
-								<p className=" pt-2">{element.date}</p>
-								<p className=" pt-2">{element.amount.toLocaleString()}</p>
-								<p className=" pt-2"></p>
+								<p className="pt-2 ">{element.narration}</p>
+								<p className="pt-2 ">{element.date}</p>
+								<p className="pt-2 ">{element.amount.toLocaleString()}</p>
+								<p className="pt-2 "></p>
 							</div>
 						))}
+
+						<Pagination
+							currentPage={currentPage}
+							totalPages={totalPages}
+							paginationRange={paginationRange}
+							onPageChange={setCurrentPage}
+						/>
 					</div>
 				</div>
 			</div>
@@ -292,7 +308,7 @@ const ExpensesPage = () => {
 
 				{/* Modal Content */}
 				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
-					<h2 className="text-2xl font-bold mb-6">Add Expenditure</h2>
+					<h2 className="mb-6 text-2xl font-bold">Add Expenditure</h2>
 
 					<form
 						className="flex flex-col gap-2"
@@ -309,7 +325,7 @@ const ExpensesPage = () => {
 							<select
 								name="category"
 								id="category"
-								className=" border border-slate-200 rounded-l p-2 focus:outline-0"
+								className="p-2 border rounded-l border-slate-200 focus:outline-0"
 								value={categoryInput}
 								onChange={(e) => {
 									setCategoriesInput(e.target.value);
@@ -334,7 +350,7 @@ const ExpensesPage = () => {
 							<select
 								name="subcategory"
 								id="subcategory"
-								className=" capitalize px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 capitalize border rounded-lg border-slate-200 focus:outline-0"
 								// size={5}
 								value={subCategoryInput}
 								onChange={(e) => {
@@ -346,7 +362,7 @@ const ExpensesPage = () => {
 								</option>
 
 								{subCategories.map((element, index) => (
-									<option value={element} key={index} className=" capitalize">
+									<option value={element} key={index} className="capitalize ">
 										{element}
 									</option>
 								))}
@@ -358,7 +374,7 @@ const ExpensesPage = () => {
 								Narration
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="text"
 								name="narration"
 								id="narration"
@@ -373,7 +389,7 @@ const ExpensesPage = () => {
 								Amount
 							</label>
 							<input
-								className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 								type="number"
 								name="amount"
 								id="amount"
@@ -385,7 +401,7 @@ const ExpensesPage = () => {
 
 						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
 							{isLoading ? (
-								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+								<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
 							) : (
 								"Add"
 							)}
