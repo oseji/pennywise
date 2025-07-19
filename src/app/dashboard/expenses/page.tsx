@@ -45,7 +45,7 @@ const ExpensesPage = () => {
 	const [amountInput, setAmountInput] = useState<string>("");
 
 	const [currentPage, setCurrentPage] = useState(1);
-	const itemsPerPage = 10;
+	const itemsPerPage = 4;
 
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -202,7 +202,7 @@ const ExpensesPage = () => {
 			<div>
 				<h1 className="dashboardHeading">expenses</h1>
 
-				<h3 className="mt-10 mb-2 font-semibold">Search Transaction</h3>
+				<h3 className="mt-5 mb-2 font-semibold">Search Transaction</h3>
 
 				<form
 					className="flex flex-row items-end gap-4 "
@@ -244,14 +244,14 @@ const ExpensesPage = () => {
 				</form>
 
 				<div>
-					<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-10">
+					<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-3 text-white rounded-lg mt-5">
 						<p>category</p>
 						<p>narration</p>
 						<p>time</p>
 						<p>amount</p>
 					</div>
 
-					<div className="p-4 mt-5 bg-white rounded-lg shadow-md ">
+					<div className="p-3 mt-5 bg-white rounded-lg shadow-md h-[40dvh]">
 						<div className="flex flex-row items-center justify-between border-b border-slate-200">
 							<p className=" text-[#2D6A4F] font-semibold">DAY</p>
 
@@ -284,14 +284,14 @@ const ExpensesPage = () => {
 								<p className="pt-2 "></p>
 							</div>
 						))}
-
-						<Pagination
-							currentPage={currentPage}
-							totalPages={totalPages}
-							paginationRange={paginationRange}
-							onPageChange={setCurrentPage}
-						/>
 					</div>
+
+					<Pagination
+						currentPage={currentPage}
+						totalPages={totalPages}
+						paginationRange={paginationRange}
+						onPageChange={setCurrentPage}
+					/>
 				</div>
 			</div>
 

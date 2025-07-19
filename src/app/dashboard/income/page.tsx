@@ -41,7 +41,7 @@ const IncomeScreen = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const [currentPage, setCurrentPage] = useState(1);
-	const itemsPerPage = 10;
+	const itemsPerPage = 4;
 
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -154,21 +154,17 @@ const IncomeScreen = () => {
 			<div>
 				<h1 className="dashboardHeading">income</h1>
 
-				<p className="my-10 font-bold ">
+				<p className="my-5 font-bold ">
 					<span className="text-2xl ">Balance: </span>{" "}
 					<span className="text-5xl">{totalIncome.toLocaleString()}</span>
 				</p>
 
-				<div className="flex flex-row items-center justify-between ">
-					<h1 className="text-2xl font-bold ">Date</h1>
-
-					<button
-						className="  bg-white border border-[#2D6A4F] text-[#2D6A4F] px-4 py-2 rounded-lg hover:scale-110 transition ease-in-out"
-						onClick={() => setIsModalOpen(!isModalOpen)}
-					>
-						+ Add income
-					</button>
-				</div>
+				<button
+					className="  bg-white border border-[#2D6A4F] text-[#2D6A4F] ml-auto block px-4 py-2 rounded-lg hover:scale-110 transition ease-in-out"
+					onClick={() => setIsModalOpen(!isModalOpen)}
+				>
+					+ Add income
+				</button>
 
 				{isDataLoading ? (
 					<div>
@@ -176,14 +172,14 @@ const IncomeScreen = () => {
 					</div>
 				) : (
 					<div>
-						<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-10 font-bold">
+						<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
 							<p className="text-center ">date | time</p>
 							<p className=" text-start">narration</p>
 							<p className="text-center ">amount</p>
 							<p className="text-center ">action</p>
 						</div>
 
-						<div className="p-4 mt-4 bg-white rounded-lg shadow">
+						<div className="p-4 mt-4 bg-white rounded-lg h-[40dvh] shadow">
 							{currentItems.map((element, index) => (
 								<div className="grid grid-cols-4 py-4" key={index}>
 									<p className="text-center ">{element.date}</p>
