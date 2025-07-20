@@ -44,7 +44,7 @@ input[type="number"] {
 
 /* sidebar */
 .sidebarRow {
-	@apply flex flex-row items-center gap-2 capitalize cursor-pointer;
+	@apply flex flex-row items-center w-full gap-2 capitalize transition-all duration-200 ease-in-out cursor-pointer;
 }
 
 .sidebarIndicator {
@@ -52,6 +52,14 @@ input[type="number"] {
 }
 .sidebarIndicatorActive {
 	@apply p-0.5 h-8 bg-[#2D6A4F];
+}
+
+.sidebarText {
+	@apply transition-all duration-200 ease-in-out cursor-pointer;
+}
+
+.activeSidebarText {
+	@apply text-[#2D6A4F] font-bold scale-125 translate-x-5;
 }
 
 /* dashboard */
