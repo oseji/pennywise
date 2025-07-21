@@ -81,15 +81,15 @@ const Login = () => {
 						signIn(userEmail, userPassword);
 					}}
 				>
-					<div className=" flex flex-row items-center justify-center gap-4 font-bold text-2xl mb-4">
+					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-2xl font-bold ">
 						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
 							P
 						</span>
 
 						<span>Pennywise</span>
 					</div>
-					<p className=" text-center mb-4">Welcome back to Pennywise</p>
-					<div className=" flex flex-col gap-4">
+					<p className="mb-4 text-center ">Welcome back to Pennywise</p>
+					<div className="flex flex-col gap-4 ">
 						<div className=" inputLabelGroup">
 							<label htmlFor="email" className=" inputLabel">
 								Email
@@ -98,7 +98,7 @@ const Login = () => {
 								type="email"
 								placeholder="Email"
 								id="email"
-								className=" w-full rounded-lg border border-slate-200 p-3 outline-0 focus:outline-0"
+								className="w-full p-3 border rounded-lg  border-slate-200 outline-0 focus:outline-0"
 								value={userEmail}
 								onChange={(e) => setUserEmail(e.target.value)}
 							/>
@@ -109,18 +109,18 @@ const Login = () => {
 								Password
 							</label>
 
-							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
+							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg  border-slate-200">
 								<input
 									type={isPasswordVisible ? "text" : "password"}
 									placeholder="Password"
-									className=" outline-0 focus:outline-0 w-full"
+									className="w-full  outline-0 focus:outline-0"
 									value={userPassword}
 									onChange={(e) => setUserPassword(e.target.value)}
 								/>
 
 								<span
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-									className=" cursor-pointer underline"
+									className="underline cursor-pointer "
 								>
 									{isPasswordVisible ? "Hide" : "Show"}
 								</span>
@@ -129,7 +129,7 @@ const Login = () => {
 					</div>
 
 					<p
-						className="hidePasswordError text-red-500 text-sm mt-2 transition-all ease-in-out duration-200"
+						className="mt-2 text-sm text-red-500 transition-all duration-200 ease-in-out hidePasswordError"
 						ref={errorMessageRef}
 					>
 						{errorMessage}
@@ -147,7 +147,7 @@ const Login = () => {
 						disabled={isLoading}
 					>
 						{isLoading ? (
-							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+							<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
 						) : (
 							"Login"
 						)}
@@ -157,7 +157,7 @@ const Login = () => {
 					
 					</Link> */}
 
-					<p className=" text-center">
+					<p className="text-center ">
 						Don’t have an account ?{" "}
 						<span className=" text-[#2D6A4F] cursor-pointer">
 							<Link href={"/auth/Sign-up"}>Sign up here</Link>

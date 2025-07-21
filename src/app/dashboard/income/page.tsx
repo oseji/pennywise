@@ -25,6 +25,7 @@ type tableDataType = {
 	date: string;
 	narration: string;
 	amount: number;
+	category: string;
 }[];
 
 const IncomeScreen = () => {
@@ -35,6 +36,7 @@ const IncomeScreen = () => {
 	const totalIncome = incomeData.reduce((sum, entry) => sum + entry.amount, 0);
 
 	const [incomeInput, setIncomeInput] = useState<string>("");
+	const [categoryInput, setCategoryInput] = useState<string>("");
 	const [narrationInput, setNarrationInput] = useState<string>("");
 
 	const modalRef = useRef<HTMLDivElement>(null);
@@ -75,6 +77,7 @@ const IncomeScreen = () => {
 							hour12: true,
 						}) || "",
 					narration: data.narration || "",
+					category: data.category,
 					amount: Number(data.amount) || 0,
 				};
 			});
@@ -107,6 +110,7 @@ const IncomeScreen = () => {
 		try {
 			await addDoc(collection(db, `users/${user.uid}/incomeData`), {
 				narration: narrationInput,
+				category: categoryInput,
 				amount: Number(incomeInput),
 				createdAt: serverTimestamp(),
 			});
@@ -123,6 +127,7 @@ const IncomeScreen = () => {
 			setIsLoading(false);
 			setNarrationInput("");
 			setIncomeInput("");
+			setCategoryInput("");
 		}
 	};
 
@@ -179,16 +184,19 @@ const IncomeScreen = () => {
 							<p className="text-center ">action</p>
 						</div>
 
-						<div className="p-4 mt-4 bg-white rounded-lg h-[40dvh] shadow">
+						<div className="p-4 mt-4 bg-white rounded-lg h-[45dvh] shadow">
 							{currentItems.map((element, index) => (
 								<div className="grid grid-cols-4 py-4" key={index}>
 									<p className="text-center ">{element.date}</p>
 
 									<p>{element.narration}</p>
 
-									<p className="text-center ">
-										{element.amount.toLocaleString()}
-									</p>
+									<div className="text-center ">
+										<p>{element.amount.toLocaleString()}</p>
+										<p className="text-xs font-semibold capitalize text-[#2D6A4F]">
+											{element.category}
+										</p>
+									</div>
 
 									<div className="flex flex-row items-center justify-center gap-4 ">
 										<Image
@@ -255,6 +263,25 @@ const IncomeScreen = () => {
 						</div>
 
 						<div className="inputLabelGroup">
+							<label htmlFor="category" className="inputLabel">
+								Category
+							</label>
+
+							<select
+								name="set-frequency"
+								id="set-frequency"
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
+								value={categoryInput}
+								onChange={(e) => setCategoryInput(e.target.value)}
+							>
+								<option value="salary">Salary</option>
+								<option value="allowance">Allowance</option>
+								<option value="gift">Gift</option>
+								<option value="petty cash">Petty Cash</option>
+							</select>
+						</div>
+
+						<div className="inputLabelGroup">
 							<label htmlFor="amount" className="inputLabel">
 								Amount
 							</label>
@@ -263,7 +290,7 @@ const IncomeScreen = () => {
 								type="number"
 								name="amount"
 								id="amount"
-								placeholder="Enter amount"
+								placeholder="Enter Amount"
 								value={incomeInput}
 								onChange={(e) => setIncomeInput(e.target.value)}
 							/>
