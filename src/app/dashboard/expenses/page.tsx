@@ -273,7 +273,7 @@ const ExpensesPage = () => {
 							<div className="grid grid-cols-4 " key={index}>
 								<div className="pt-2 capitalize ">
 									<p>{element.category}</p>
-									<p className=" text-sm text-[#2D6A4F]">
+									<p className=" text-xs font-bold text-[#2D6A4F]">
 										{element.subCategory}
 									</p>
 								</div>

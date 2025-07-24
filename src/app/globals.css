@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+	@apply scroll-smooth;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
@@ -48,10 +52,10 @@ input[type="number"] {
 }
 
 .sidebarIndicator {
-	@apply p-0.5 h-8 bg-slate-200;
+	@apply p-0.5 h-8 bg-slate-200 rounded-xl;
 }
 .sidebarIndicatorActive {
-	@apply p-0.5 h-8 bg-[#2D6A4F];
+	@apply p-0.5 h-8 bg-[#2D6A4F] rounded-xl;
 }
 
 .sidebarText {

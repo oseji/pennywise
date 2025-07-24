@@ -274,6 +274,9 @@ const IncomeScreen = () => {
 								value={categoryInput}
 								onChange={(e) => setCategoryInput(e.target.value)}
 							>
+								<option value="" disabled>
+									Select a category
+								</option>
 								<option value="salary">Salary</option>
 								<option value="allowance">Allowance</option>
 								<option value="gift">Gift</option>

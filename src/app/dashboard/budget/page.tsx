@@ -262,14 +262,14 @@ const BudgetScreen = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className=" dashboardScreen relative">
+		<div className="relative  dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">budget</h1>
 
 				{/* daily needs */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
-					<div className=" flex flex-row items-center justify-between border-b border-slate-200 pb-3">
-						<h1 className=" capitalize text-2xl font-bold">daily needs</h1>
+				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
+					<div className="flex flex-row items-center justify-between pb-3 border-b  border-slate-200">
+						<h1 className="text-2xl font-bold capitalize ">daily needs</h1>
 
 						<button
 							className=" dailyNeedsAddButton"
@@ -286,7 +286,7 @@ const BudgetScreen = () => {
 						</button>
 					</div>
 
-					<table className="table-fixed border-separate border-spacing-x-4 w-full mt-4">
+					<table className="w-full mt-4 border-separate table-fixed border-spacing-x-4">
 						<colgroup>
 							<col className=" w-72" />
 							<col className="w-32" />
@@ -305,10 +305,10 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{dailyNeedsData.map((element, index) => (
-								<tr className=" border-b border-slate-200" key={index}>
-									<td className=" py-4">
+								<tr className="border-b  border-slate-200" key={index}>
+									<td className="py-4 ">
 										<div className="flex flex-col gap-2">
-											<p className=" capitalize">{element.category}</p>
+											<p className="capitalize ">{element.category}</p>
 											<p className="text-xs">
 												<span className="text-[#52B788]">Description: </span>
 												<span className="italic">{element.description}</span>
@@ -316,17 +316,17 @@ const BudgetScreen = () => {
 										</div>
 									</td>
 
-									<td className=" py-4">{element.setLimit.toLocaleString()}</td>
-									<td className=" py-4">120000</td>
-									<td className=" py-4 flex flex-row items-center gap-8">
-										<div className=" w-64 h-3 rounded-full bg-slate-100">
+									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
+									<td className="py-4 ">120000</td>
+									<td className="flex flex-row items-center gap-8 py-4 ">
+										<div className="w-64 h-3 rounded-full  bg-slate-100">
 											<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
 										</div>
 
 										<Image
 											src={editIcon}
 											alt=" edit icon"
-											className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+											className="transition-all duration-200 ease-in-out cursor-pointer  hover:scale-110"
 										/>
 									</td>
 								</tr>
@@ -336,9 +336,9 @@ const BudgetScreen = () => {
 				</div>
 
 				{/* planned payments */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
-					<div className=" flex flex-row items-center justify-between border-b border-slate-200 pb-3">
-						<h1 className=" capitalize text-2xl font-bold">planned payments</h1>
+				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
+					<div className="flex flex-row items-center justify-between pb-3 border-b  border-slate-200">
+						<h1 className="text-2xl font-bold capitalize ">planned payments</h1>
 
 						<button
 							className=" dailyNeedsAddButton"
@@ -355,7 +355,7 @@ const BudgetScreen = () => {
 						</button>
 					</div>
 
-					<table className="table-fixed w-full mt-4">
+					<table className="w-full mt-4 table-fixed">
 						<thead className="capitalize">
 							<tr>
 								<th className="text-start">category</th>
@@ -366,10 +366,10 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{plannedPaymentsData.map((element, index) => (
-								<tr className=" border-b border-slate-200" key={index}>
-									<td className=" py-4 capitalize">{element.category}</td>
-									<td className=" py-4">{element.amount?.toLocaleString()}</td>
-									<td className=" py-4 capitalize">{element.frequency}</td>
+								<tr className="border-b  border-slate-200" key={index}>
+									<td className="py-4 capitalize ">{element.category}</td>
+									<td className="py-4 ">{element.amount?.toLocaleString()}</td>
+									<td className="py-4 capitalize ">{element.frequency}</td>
 								</tr>
 							))}
 						</tbody>
@@ -377,10 +377,10 @@ const BudgetScreen = () => {
 				</div>
 
 				{/* others */}
-				<div className="  w-full px-6 py-10 bg-white rounded-lg mb-6 shadow-md">
-					<div className="  border-b border-slate-200 pb-3">
-						<div className=" flex flex-row items-center justify-between">
-							<h1 className=" capitalize text-2xl font-bold">others</h1>
+				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
+					<div className="pb-3 border-b  border-slate-200">
+						<div className="flex flex-row items-center justify-between ">
+							<h1 className="text-2xl font-bold capitalize ">others</h1>
 
 							<button
 								className=" dailyNeedsAddButton"
@@ -397,13 +397,13 @@ const BudgetScreen = () => {
 							</button>
 						</div>
 
-						<p className=" text-sm">
+						<p className="text-sm ">
 							Includes expenditures that do not fit into pre existing
 							categories.
 						</p>
 					</div>
 
-					<table className="table-fixed w-full mt-4">
+					<table className="w-full mt-4 table-fixed">
 						<colgroup>
 							<col className="w-72" />
 							<col className="w-32" />
@@ -422,10 +422,10 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{othersData.map((element, index) => (
-								<tr className=" border-b border-slate-200" key={index}>
-									<td className=" py-4">
+								<tr className="border-b  border-slate-200" key={index}>
+									<td className="py-4 ">
 										<div className="flex flex-col gap-2">
-											<p className=" capitalize">{element.category}</p>
+											<p className="capitalize ">{element.category}</p>
 											<p className="text-xs">
 												<span className="text-[#52B788]">Description: </span>
 												<span className="italic">{element.description}</span>
@@ -433,17 +433,17 @@ const BudgetScreen = () => {
 										</div>
 									</td>
 
-									<td className=" py-4">{element.setLimit.toLocaleString()}</td>
-									<td className=" py-4">120000</td>
-									<td className=" py-4 flex flex-row items-center gap-8">
-										<div className=" w-64 h-3 rounded-full bg-slate-100">
+									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
+									<td className="py-4 ">120000</td>
+									<td className="flex flex-row items-center gap-8 py-4 ">
+										<div className="w-64 h-3 rounded-full  bg-slate-100">
 											<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
 										</div>
 
 										<Image
 											src={editIcon}
 											alt=" edit icon"
-											className=" cursor-pointer hover:scale-110 transition-all ease-in-out duration-200"
+											className="transition-all duration-200 ease-in-out cursor-pointer  hover:scale-110"
 										/>
 									</td>
 								</tr>
@@ -467,17 +467,17 @@ const BudgetScreen = () => {
 				{/* Modal Content */}
 				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
 					{selectedModal === "daily needs" ? (
-						<h2 className="text-2xl font-bold mb-6">Add Daily Needs</h2>
+						<h2 className="mb-6 text-2xl font-bold">Add Daily Needs</h2>
 					) : (
 						""
 					)}
 					{selectedModal === "planned payments" ? (
-						<h2 className="text-2xl font-bold mb-6">Add Planned Payments</h2>
+						<h2 className="mb-6 text-2xl font-bold">Add Planned Payments</h2>
 					) : (
 						""
 					)}
 					{selectedModal === "others" ? (
-						<h2 className="text-2xl font-bold mb-6">Add Others</h2>
+						<h2 className="mb-6 text-2xl font-bold">Add Others</h2>
 					) : (
 						""
 					)}
@@ -496,7 +496,7 @@ const BudgetScreen = () => {
 									Category
 								</label>
 								<input
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 									type="text"
 									name="category"
 									id="category"
@@ -529,7 +529,7 @@ const BudgetScreen = () => {
 									Description
 								</label>
 								<textarea
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0 max-h-32"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 max-h-32"
 									name="description"
 									id="description"
 									placeholder="Enter description"
@@ -561,7 +561,7 @@ const BudgetScreen = () => {
 									category
 								</label>
 								<input
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 									type="text"
 									name="category"
 									id="category"
@@ -583,7 +583,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 									name="set-limit"
 									id="set-limit"
 									placeholder="Set Limit"
@@ -616,7 +616,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 									name="set-amount"
 									id="set-amount"
 									placeholder="Set amount"
@@ -639,12 +639,15 @@ const BudgetScreen = () => {
 								<select
 									name="set-frequency"
 									id="set-frequency"
-									className="px-4 py-2 rounded-lg border border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
 									value={plannedPaymentsFrequencyInput}
 									onChange={(e) =>
 										setPlannedPaymentsFrequencyInput(e.target.value)
 									}
 								>
+									<option value="" disabled>
+										Select a category
+									</option>
 									<option value="daily">Daily</option>
 									<option value="monthly">Monthly</option>
 									<option value="yearly">Yearly</option>
@@ -656,7 +659,7 @@ const BudgetScreen = () => {
 
 						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
 							{isLoading ? (
-								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto capitalize" />
+								<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
 							) : (
 								"Add"
 							)}
