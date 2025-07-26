@@ -81,7 +81,7 @@ input[type="number"] {
 
 /* overview */
 .chartBox {
-	@apply flex flex-col items-center w-full p-4 bg-white rounded-lg;
+	@apply flex flex-col items-center w-full p-4 bg-white rounded-lg h-[450px] shadow;
 }
 
 .chartBoxHeadingGroup {

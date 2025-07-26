@@ -54,13 +54,6 @@ const Dashboard = () => {
 		value: item.totalAmount,
 	}));
 
-	const data = [
-		{ name: "Group A", value: 400 },
-		{ name: "Group B", value: 300 },
-		{ name: "Group C", value: 300 },
-		{ name: "Group D", value: 200 },
-	];
-
 	const COLORS = [
 		"#FF6F61",
 		"#6B5B95",
@@ -98,6 +91,7 @@ const Dashboard = () => {
 			const byCat: Record<string, number> = {};
 
 			snap.docs.forEach((doc) => {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const d = doc.data() as any;
 				const cat = d.category as string;
 				const amt = Number(d.amount) || 0;
@@ -176,7 +170,7 @@ const Dashboard = () => {
 							dataKey="value"
 							className="outline-none"
 						>
-							{data.map((entry, index) => (
+							{incomeChartData.map((entry, index) => (
 								<Cell
 									key={`cell-${entry.name}`}
 									fill={COLORS[index % COLORS.length]}
@@ -185,7 +179,7 @@ const Dashboard = () => {
 						</Pie>
 					</PieChart>
 
-					<div className="flex flex-row justify-start w-full ">
+					<div className="flex flex-row justify-start w-full mt-auto">
 						<ChartCategories summary={incomeSummary} limit={5} />
 					</div>
 				</div>
@@ -209,7 +203,7 @@ const Dashboard = () => {
 							dataKey="value"
 							className="outline-none"
 						>
-							{data.map((entry, index) => (
+							{expensesChartData.map((entry, index) => (
 								<Cell
 									key={`cell-${entry.name}`}
 									fill={COLORS[index % COLORS.length]}
@@ -218,7 +212,7 @@ const Dashboard = () => {
 						</Pie>
 					</PieChart>
 
-					<div className="flex flex-row justify-start w-full ">
+					<div className="flex flex-row justify-start w-full mt-auto ">
 						<ChartCategories summary={expenseSummary} limit={5} />
 					</div>
 				</div>
@@ -242,7 +236,7 @@ const Dashboard = () => {
 							dataKey="value"
 							className="outline-none"
 						>
-							{data.map((entry, index) => (
+							{budgetChartData.map((entry, index) => (
 								<Cell
 									key={`cell-${entry.name}`}
 									fill={COLORS[index % COLORS.length]}
@@ -251,7 +245,7 @@ const Dashboard = () => {
 						</Pie>
 					</PieChart>
 
-					<div className="flex flex-row justify-start w-full ">
+					<div className="flex flex-row justify-start w-full mt-auto">
 						<ChartCategories summary={budgetSummary} limit={5} />
 					</div>
 				</div>
