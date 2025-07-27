@@ -87,3 +87,12 @@ input[type="number"] {
 .chartBoxHeadingGroup {
 	@apply flex flex-row items-center justify-between w-full mb-5 font-bold;
 }
+
+/* settings */
+.settingsRow {
+	@apply flex flex-row items-center justify-between;
+}
+
+.settingsHeading {
+	@apply text-2xl font-bold capitalize;
+}

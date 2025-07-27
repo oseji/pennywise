@@ -247,19 +247,31 @@ const Sidebar = () => {
 					</div>
 				</div>
 
-				<div className="flex flex-col gap-4 ">
-					<h1 className="mb-2 text-slate-400">Others</h1>
+				<Link href={"/dashboard/settings"}>
+					<div className="flex flex-col gap-4 ">
+						<h1 className="mb-2 text-slate-400">Others</h1>
 
-					<div className=" sidebarRow">
-						<Image src={settingsIcon} alt="settings" />
-						<span>settings</span>
-					</div>
+						<div
+							className=" sidebarRow"
+							onClick={() => toggleActiveSidebaritem(7)}
+						>
+							<Image src={settingsIcon} alt="settings" />
+							<span
+								className=" sidebarText"
+								ref={(el) => {
+									sideBarTexts.current[7] = el;
+								}}
+							>
+								settings
+							</span>
+						</div>
 
-					<div className=" sidebarRow" onClick={logout}>
-						<Image src={logoutIcon} alt="logout" />
-						<span>logout</span>
+						<div className=" sidebarRow" onClick={logout}>
+							<Image src={logoutIcon} alt="logout" />
+							<span>logout</span>
+						</div>
 					</div>
-				</div>
+				</Link>
 			</div>
 		</div>
 	);
