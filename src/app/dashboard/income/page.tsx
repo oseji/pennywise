@@ -160,12 +160,14 @@ const IncomeScreen = () => {
 				<h1 className="dashboardHeading">income</h1>
 
 				<p className="my-5 font-bold ">
-					<span className="text-2xl ">Balance: </span>{" "}
-					<span className="text-5xl">{totalIncome.toLocaleString()}</span>
+					<span className="text-lg md:text-xl lg:text-2xl">Balance: </span>{" "}
+					<span className="text-xl md:text-2xl lg:text-5xl">
+						{totalIncome.toLocaleString()}
+					</span>
 				</p>
 
 				<button
-					className="  bg-white border border-[#2D6A4F] text-[#2D6A4F] ml-auto block px-4 py-2 rounded-lg hover:scale-110 transition ease-in-out"
+					className="  bg-white border border-[#2D6A4F] text-[#2D6A4F] md:ml-auto block px-4 py-2 rounded-lg hover:scale-110 transition ease-in-out"
 					onClick={() => setIsModalOpen(!isModalOpen)}
 				>
 					+ Add income
@@ -177,41 +179,43 @@ const IncomeScreen = () => {
 					</div>
 				) : (
 					<div>
-						<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
-							<p className="text-center ">date | time</p>
-							<p className=" text-start">narration</p>
-							<p className="text-center ">amount</p>
-							<p className="text-center ">action</p>
-						</div>
+						<div className="overflow-x-scroll text-sm">
+							<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
+								<p className="text-center ">date | time</p>
+								<p className=" text-start">narration</p>
+								<p className="text-center ">amount</p>
+								<p className="text-center ">action</p>
+							</div>
 
-						<div className="p-4 mt-4 bg-white rounded-lg h-[45dvh] shadow">
-							{currentItems.map((element, index) => (
-								<div className="grid grid-cols-4 py-4" key={index}>
-									<p className="text-center ">{element.date}</p>
+							<div className=" p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[45dvh] shadow">
+								{currentItems.map((element, index) => (
+									<div className="grid grid-cols-4 py-4" key={index}>
+										<p className="text-center ">{element.date}</p>
 
-									<p>{element.narration}</p>
+										<p>{element.narration}</p>
 
-									<div className="text-center ">
-										<p>{element.amount.toLocaleString()}</p>
-										<p className="text-xs font-semibold capitalize text-[#2D6A4F]">
-											{element.category}
-										</p>
+										<div className="text-center ">
+											<p>{element.amount.toLocaleString()}</p>
+											<p className="text-xs font-semibold capitalize text-[#2D6A4F]">
+												{element.category}
+											</p>
+										</div>
+
+										<div className="flex flex-row items-center justify-center gap-4 ">
+											<Image
+												src={editIcon}
+												alt="edit icon"
+												className="transition ease-in-out cursor-pointer hover:scale-110"
+											/>
+											<Image
+												src={deleteIcon}
+												alt="delete icon"
+												className="transition ease-in-out cursor-pointer hover:scale-110"
+											/>
+										</div>
 									</div>
-
-									<div className="flex flex-row items-center justify-center gap-4 ">
-										<Image
-											src={editIcon}
-											alt="edit icon"
-											className="transition ease-in-out cursor-pointer hover:scale-110"
-										/>
-										<Image
-											src={deleteIcon}
-											alt="delete icon"
-											className="transition ease-in-out cursor-pointer hover:scale-110"
-										/>
-									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 
 						<Pagination
@@ -236,8 +240,10 @@ const IncomeScreen = () => {
 				></div>
 
 				{/* Modal Content */}
-				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
-					<h2 className="mb-6 text-2xl font-bold">Add Cash Income</h2>
+				<div className={`inputModals`}>
+					<h2 className="mb-6 text-2xl font-bold text-center">
+						Add Cash Income
+					</h2>
 
 					<form
 						className="flex flex-col gap-2"

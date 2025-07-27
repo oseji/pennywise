@@ -1,24 +1,21 @@
 import Image from "next/image";
 
-import searchIcon from "../../assets/dashboard/search.svg";
+// import searchIcon from "../../assets/dashboard/search.svg";
 import bellIcon from "../../assets/dashboard/notification-bing.svg";
 import avatarIcon from "../../assets/dashboard/avatar.svg";
 
 const DashboardHeader = () => {
 	return (
-		<div className=" w-[calc(100%-256px)] flex flex-row justify-between items-center px-12 py-4 bg-white fixed top-0 left-64 right-0 z-30 border-b border-slate-200">
-			<div className=" flex flex-row items-center gap-2 w-[440px] px-6 py-3 rounded-lg border border-slate-300">
-				<Image src={searchIcon} alt="search icon" />
-				<input
-					type="text"
-					name="searchbar"
-					id="searchbar"
-					placeholder="Search"
-					className=" focus:outline-0"
-				/>
+		<div className="fixed top-0 left-0 z-30 flex flex-row items-center justify-between w-full px-4 py-4 bg-white shadow md:px-12">
+			<div className="flex flex-row items-center justify-center gap-4 text-xl font-bold md:text-2xl ">
+				<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
+					P
+				</span>
+
+				<span className="hidden md:block">Pennywise</span>
 			</div>
 
-			<div className=" flex flex-row items-center gap-4">
+			<div className="flex flex-row items-center gap-4 ">
 				<Image src={bellIcon} alt="notification icon" />
 				<Image src={avatarIcon} alt="avatar icon" />
 			</div>

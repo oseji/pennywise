@@ -150,7 +150,7 @@ const Dashboard = () => {
 		<div className="dashboardScreen">
 			<h1 className="dashboardHeading">dashboard</h1>
 
-			<div className="flex flex-row items-center justify-between gap-10">
+			<div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
 				<div className=" chartBox">
 					<div className="chartBoxHeadingGroup">
 						<h1>Income</h1>

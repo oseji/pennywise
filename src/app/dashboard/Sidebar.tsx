@@ -5,7 +5,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase/firebase";
 import { signOut } from "firebase/auth";
-import { FirebaseError } from "firebase/app";
+import { formatLogoutError } from "@/utils/formatLogoutError";
 
 import dashboardIcon from "../../assets/sidebar/dashboard.svg";
 import incomeIcon from "../../assets/sidebar/income.svg";
@@ -44,25 +44,6 @@ const Sidebar = () => {
 		});
 	};
 
-	const formatLogoutError = (error: unknown): string => {
-		if (error instanceof FirebaseError) {
-			switch (error.code) {
-				case "auth/no-current-user":
-					return "No user is currently logged in.";
-				case "auth/internal-error":
-					return "A server error occurred while logging out. Please try again.";
-				case "auth/network-request-failed":
-					return "Network error during logout. Check your internet connection.";
-				default:
-					return error.message
-						.replace("Firebase: ", "")
-						.replace(/\(.*\)/, "")
-						.trim();
-			}
-		}
-		return "An unknown logout error occurred.";
-	};
-
 	const logout = async () => {
 		try {
 			await signOut(auth);
@@ -75,19 +56,12 @@ const Sidebar = () => {
 			alert(errorMessage);
 		}
 	};
+
 	return (
-		<div className="w-64 p-6 ">
-			<div className="flex flex-row items-center justify-center gap-4 px-6 pb-4 mb-4 text-2xl font-bold border-b border-slate-400">
-				<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
-					P
-				</span>
-
-				<span>Pennywise</span>
-			</div>
-
+		<div className="w-auto p-4 mt-20 md:p-6 md:w-64">
 			<div className="flex flex-col items-start gap-10 ">
 				<div className="flex flex-col w-full gap-4">
-					<h1 className="mb-2 text-slate-400">Overview</h1>
+					<h1 className="hidden mb-2 text-slate-400 md:block">Overview</h1>
 
 					<Link href={"/dashboard/overview"}>
 						<div
@@ -146,7 +120,7 @@ const Sidebar = () => {
 									sideBarItems.current[2] = el;
 								}}
 							></span>
-							<Image src={budgetIcon} alt="budget" />
+							<Image src={budgetIcon} alt="budget" className="" />
 							<span
 								className=" sidebarText"
 								ref={(el) => {
@@ -249,10 +223,10 @@ const Sidebar = () => {
 
 				<Link href={"/dashboard/settings"}>
 					<div className="flex flex-col gap-4 ">
-						<h1 className="mb-2 text-slate-400">Others</h1>
+						<h1 className="hidden mb-2 text-slate-400 md:block">Others</h1>
 
 						<div
-							className=" sidebarRow"
+							className="ml-3 sidebarRow"
 							onClick={() => toggleActiveSidebaritem(7)}
 						>
 							<Image src={settingsIcon} alt="settings" />
@@ -266,9 +240,9 @@ const Sidebar = () => {
 							</span>
 						</div>
 
-						<div className=" sidebarRow" onClick={logout}>
+						<div className="ml-3 sidebarRow" onClick={logout}>
 							<Image src={logoutIcon} alt="logout" />
-							<span>logout</span>
+							<span className=" sidebarText">logout</span>
 						</div>
 					</div>
 				</Link>

@@ -262,14 +262,14 @@ const BudgetScreen = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className="relative  dashboardScreen">
+		<div className="relative dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">budget</h1>
 
 				{/* daily needs */}
-				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
-					<div className="flex flex-row items-center justify-between pb-3 border-b  border-slate-200">
-						<h1 className="text-2xl font-bold capitalize ">daily needs</h1>
+				<div className=" budgetCategories">
+					<div className="budgetCategoriesHeading">
+						<h1 className=" budgetCategoriesHeadingText">daily needs</h1>
 
 						<button
 							className=" dailyNeedsAddButton"
@@ -305,7 +305,7 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{dailyNeedsData.map((element, index) => (
-								<tr className="border-b  border-slate-200" key={index}>
+								<tr className="border-b border-slate-200" key={index}>
 									<td className="py-4 ">
 										<div className="flex flex-col gap-2">
 											<p className="capitalize ">{element.category}</p>
@@ -319,14 +319,14 @@ const BudgetScreen = () => {
 									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
 									<td className="py-4 ">120000</td>
 									<td className="flex flex-row items-center gap-8 py-4 ">
-										<div className="w-64 h-3 rounded-full  bg-slate-100">
+										<div className="w-64 h-3 rounded-full bg-slate-100">
 											<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
 										</div>
 
 										<Image
 											src={editIcon}
 											alt=" edit icon"
-											className="transition-all duration-200 ease-in-out cursor-pointer  hover:scale-110"
+											className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
 										/>
 									</td>
 								</tr>
@@ -336,9 +336,9 @@ const BudgetScreen = () => {
 				</div>
 
 				{/* planned payments */}
-				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
-					<div className="flex flex-row items-center justify-between pb-3 border-b  border-slate-200">
-						<h1 className="text-2xl font-bold capitalize ">planned payments</h1>
+				<div className="budgetCategories">
+					<div className="budgetCategoriesHeading">
+						<h1 className="budgetCategoriesHeadingText ">planned payments</h1>
 
 						<button
 							className=" dailyNeedsAddButton"
@@ -366,7 +366,7 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{plannedPaymentsData.map((element, index) => (
-								<tr className="border-b  border-slate-200" key={index}>
+								<tr className="border-b border-slate-200" key={index}>
 									<td className="py-4 capitalize ">{element.category}</td>
 									<td className="py-4 ">{element.amount?.toLocaleString()}</td>
 									<td className="py-4 capitalize ">{element.frequency}</td>
@@ -377,10 +377,10 @@ const BudgetScreen = () => {
 				</div>
 
 				{/* others */}
-				<div className="w-full px-6 py-10 mb-6 bg-white rounded-lg shadow-md ">
-					<div className="pb-3 border-b  border-slate-200">
-						<div className="flex flex-row items-center justify-between ">
-							<h1 className="text-2xl font-bold capitalize ">others</h1>
+				<div className="budgetCategories">
+					<div className="pb-3 border-b border-slate-200">
+						<div className="budgetCategoriesHeading">
+							<h1 className="budgetCategoriesHeadingText ">others</h1>
 
 							<button
 								className=" dailyNeedsAddButton"
@@ -422,7 +422,7 @@ const BudgetScreen = () => {
 
 						<tbody>
 							{othersData.map((element, index) => (
-								<tr className="border-b  border-slate-200" key={index}>
+								<tr className="border-b border-slate-200" key={index}>
 									<td className="py-4 ">
 										<div className="flex flex-col gap-2">
 											<p className="capitalize ">{element.category}</p>
@@ -436,14 +436,14 @@ const BudgetScreen = () => {
 									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
 									<td className="py-4 ">120000</td>
 									<td className="flex flex-row items-center gap-8 py-4 ">
-										<div className="w-64 h-3 rounded-full  bg-slate-100">
+										<div className="w-64 h-3 rounded-full bg-slate-100">
 											<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
 										</div>
 
 										<Image
 											src={editIcon}
 											alt=" edit icon"
-											className="transition-all duration-200 ease-in-out cursor-pointer  hover:scale-110"
+											className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
 										/>
 									</td>
 								</tr>
@@ -465,7 +465,7 @@ const BudgetScreen = () => {
 				></div>
 
 				{/* Modal Content */}
-				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
+				<div className={`inputModals`}>
 					{selectedModal === "daily needs" ? (
 						<h2 className="mb-6 text-2xl font-bold">Add Daily Needs</h2>
 					) : (

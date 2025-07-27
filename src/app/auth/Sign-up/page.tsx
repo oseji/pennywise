@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
-import { FirebaseError } from "firebase/app";
+import { formatAuthError } from "@/utils/formatAuthError";
 
 import loginImage2 from "../../../assets/onboarding/login screen image 2.svg";
 
@@ -36,25 +36,6 @@ const SignUp = () => {
 	});
 
 	const [signUpErrorMessage, setSignUpErrorMessage] = useState<string>("");
-
-	const formatAuthError = (error: unknown): string => {
-		if (error instanceof FirebaseError) {
-			switch (error.code) {
-				case "auth/email-already-in-use":
-					return "This email is already registered.";
-				case "auth/weak-password":
-					return "Password must be at least 6 characters.";
-				case "auth/invalid-email":
-					return "Please enter a valid email address.";
-				default:
-					return error.message
-						.replace("Firebase: ", "")
-						.replace(/\(.*\)/, "")
-						.trim();
-			}
-		}
-		return "An unknown error occurred.";
-	};
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -92,10 +73,9 @@ const SignUp = () => {
 	};
 
 	return (
-		<div className=" flex flex-col md:flex-row md:justify-between items-center max-h-[100dvh] h-[100dvh] text-xs">
+		<div className=" flex flex-col lg:flex-row lg:justify-between items-center max-h-[100dvh] h-[100dvh] text-xs">
 			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
 				<form
-					// action=""
 					className=" rounded-lg px-10 py-8 shadow-lg w-[90%] md:w-[50%] lg:w-[500px]"
 					onSubmit={(e) => {
 						e.preventDefault();
@@ -113,7 +93,7 @@ const SignUp = () => {
 						}
 					}}
 				>
-					<div className=" flex flex-row items-center justify-center gap-4 font-bold text-2xl mb-4">
+					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl ">
 						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
 							P
 						</span>
@@ -121,11 +101,11 @@ const SignUp = () => {
 						<span>Pennywise</span>
 					</div>
 
-					<p className=" text-center mb-4">
+					<p className="mb-4 text-center ">
 						Register to begin Pennywise account set up
 					</p>
 
-					<div className=" flex flex-col gap-4">
+					<div className="flex flex-col gap-4 ">
 						<div className=" inputLabelGroup">
 							<label htmlFor="first-name" className=" inputLabel">
 								First Name
@@ -136,7 +116,7 @@ const SignUp = () => {
 								placeholder="Enter your first name"
 								id="first-name"
 								name="firstName"
-								className=" w-full rounded-lg border border-slate-200 p-3 outline-0 focus:outline-0"
+								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
 								value={signUpInfo.firstName}
 								onChange={handleChange}
 							/>
@@ -152,7 +132,7 @@ const SignUp = () => {
 								placeholder="Enter your last name"
 								id="last-name"
 								name="lastName"
-								className=" w-full rounded-lg border border-slate-200 p-3 outline-0 focus:outline-0"
+								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
 								value={signUpInfo.lastName}
 								onChange={handleChange}
 							/>
@@ -168,7 +148,7 @@ const SignUp = () => {
 								placeholder="Enter your email address"
 								id="email"
 								name="email"
-								className=" w-full rounded-lg border border-slate-200 p-3 outline-0 focus:outline-0"
+								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
 								value={signUpInfo.email}
 								onChange={handleChange}
 							/>
@@ -179,19 +159,19 @@ const SignUp = () => {
 								Password
 							</label>
 
-							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
+							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
 								<input
 									type={isPasswordVisible ? "text" : "password"}
 									placeholder="Password"
 									id="password"
 									name="password"
-									className=" outline-0 focus:outline-0 w-full"
+									className="w-full outline-0 focus:outline-0"
 									value={signUpInfo.password}
 									onChange={handleChange}
 								/>
 
 								<span
-									className=" underline cursor-pointer"
+									className="underline cursor-pointer "
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
 								>
 									{isPasswordVisible ? "Hide" : "Show"}
@@ -204,19 +184,19 @@ const SignUp = () => {
 								Confirm Password
 							</label>
 
-							<div className=" flex flex-row items-center gap-4 w-full rounded-lg border border-slate-200 p-3">
+							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
 								<input
 									type={isConfirmPasswordVisible ? "text" : "password"}
 									placeholder="Password"
 									id="confirm-password"
 									name="confirmPassword"
-									className=" outline-0 focus:outline-0 w-full"
+									className="w-full outline-0 focus:outline-0"
 									value={signUpInfo.confirmPassword}
 									onChange={handleChange}
 								/>
 
 								<span
-									className=" underline cursor-pointer"
+									className="underline cursor-pointer "
 									onClick={() =>
 										setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
 									}
@@ -240,13 +220,13 @@ const SignUp = () => {
 						disabled={isLoading}
 					>
 						{isLoading ? (
-							<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+							<div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin" />
 						) : (
 							"sign up"
 						)}
 					</button>
 
-					<p className=" text-center">
+					<p className="text-center ">
 						Already have an account ?
 						<span className=" text-[#2D6A4F] cursor-pointer">
 							<Link href={"/"}> Sign in here</Link>
@@ -258,7 +238,7 @@ const SignUp = () => {
 			<Image
 				src={loginImage2}
 				alt="Login Image"
-				className=" h-[100dvh] min-h-[100dvh]"
+				className=" hidden lg:block  h-[100dvh] min-h-[100dvh]"
 			/>
 		</div>
 	);

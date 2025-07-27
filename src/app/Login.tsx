@@ -70,7 +70,7 @@ const Login = () => {
 	};
 
 	return (
-		<div className=" flex flex-col md:flex-row md:justify-between items-center max-h-[100dvh] h-[100dvh]">
+		<div className=" flex flex-col lg:flex-row md:justify-between items-center max-h-[100dvh] h-[100dvh]">
 			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
 				<form
 					action=""
@@ -81,7 +81,7 @@ const Login = () => {
 						signIn(userEmail, userPassword);
 					}}
 				>
-					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-2xl font-bold ">
+					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl ">
 						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
 							P
 						</span>
@@ -98,7 +98,7 @@ const Login = () => {
 								type="email"
 								placeholder="Email"
 								id="email"
-								className="w-full p-3 border rounded-lg  border-slate-200 outline-0 focus:outline-0"
+								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
 								value={userEmail}
 								onChange={(e) => setUserEmail(e.target.value)}
 							/>
@@ -109,11 +109,11 @@ const Login = () => {
 								Password
 							</label>
 
-							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg  border-slate-200">
+							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
 								<input
 									type={isPasswordVisible ? "text" : "password"}
 									placeholder="Password"
-									className="w-full  outline-0 focus:outline-0"
+									className="w-full outline-0 focus:outline-0"
 									value={userPassword}
 									onChange={(e) => setUserPassword(e.target.value)}
 								/>
@@ -169,7 +169,7 @@ const Login = () => {
 			<Image
 				src={loginImage}
 				alt="Login Image"
-				className=" h-[100dvh] min-h-[100dvh]"
+				className=" hidden lg:block h-[100dvh] min-h-[100dvh]"
 			/>
 		</div>
 	);

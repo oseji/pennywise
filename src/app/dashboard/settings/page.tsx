@@ -9,7 +9,7 @@ const SettingsPage = () => {
 		<div className=" dashboardScreen">
 			<h1 className="dashboardHeading">settings</h1>
 
-			<div className="flex flex-col gap-8 p-10 mt-6 bg-white rounded-lg">
+			<div className="flex flex-col gap-8 p-5 mt-6 bg-white rounded-lg md:p-10">
 				<div className="settingsRow">
 					<div>
 						<h1 className=" settingsHeading">notifications</h1>

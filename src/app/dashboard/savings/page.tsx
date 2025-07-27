@@ -17,7 +17,7 @@ const SavingsPage = () => {
 	}, [isModalOpen]);
 
 	return (
-		<div className="relative  dashboardScreen">
+		<div className="relative dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">savings</h1>
 
@@ -89,7 +89,7 @@ const SavingsPage = () => {
 				></div>
 
 				{/* Modal Content */}
-				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
+				<div className={`inputModals`}>
 					<h2 className="mb-6 text-2xl font-bold">Add Savings Target</h2>
 
 					<form
@@ -118,7 +118,7 @@ const SavingsPage = () => {
 							<select
 								name="frequency"
 								id="frequency"
-								className="p-2 border rounded-l  border-slate-200 focus:outline-0"
+								className="p-2 border rounded-l border-slate-200 focus:outline-0"
 							>
 								<option value="" disabled>
 									Enter frequency

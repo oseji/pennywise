@@ -205,7 +205,7 @@ const ExpensesPage = () => {
 				<h3 className="mt-5 mb-2 font-semibold">Search Transaction</h3>
 
 				<form
-					className="flex flex-row items-end gap-4 "
+					className="flex flex-col items-start gap-4 md:items-end md:flex-row "
 					onSubmit={(e) => {
 						e.preventDefault();
 					}}
@@ -238,7 +238,7 @@ const ExpensesPage = () => {
 						/>
 					</div>
 
-					<button className=" rounded-lg bg-[#2D6A4F] px-4 py-2 ml-5 mb-0.5 transition-all duration-200 ease-in-out hover:scale-110">
+					<button className=" rounded-lg bg-[#2D6A4F] px-4 py-2 md:ml-5 mb-0.5 transition-all duration-200 ease-in-out hover:scale-110">
 						<Image src={searchIcon} alt="search button" />
 					</button>
 				</form>
@@ -251,7 +251,7 @@ const ExpensesPage = () => {
 						<p>amount</p>
 					</div>
 
-					<div className="p-3 mt-5 bg-white rounded-lg shadow-md h-[40dvh]">
+					<div className="p-3 mt-5 bg-white rounded-lg shadow-md min-h-[40dvh]">
 						<div className="flex flex-row items-center justify-between border-b border-slate-200">
 							<p className=" text-[#2D6A4F] font-semibold">DAY</p>
 
@@ -307,7 +307,7 @@ const ExpensesPage = () => {
 				></div>
 
 				{/* Modal Content */}
-				<div className={`relative z-20 bg-white rounded-lg p-8 w-96 shadow-lg`}>
+				<div className={`inputModals`}>
 					<h2 className="mb-6 text-2xl font-bold">Add Expenditure</h2>
 
 					<form
