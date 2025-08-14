@@ -115,6 +115,14 @@ const IncomeScreen = () => {
 				createdAt: serverTimestamp(),
 			});
 
+			// add notification
+			await addDoc(collection(db, `users/${user.uid}/notifications`), {
+				notification: `${incomeInput} was added to income`,
+				category: "Income",
+				amount: Number(incomeInput),
+				createdAt: serverTimestamp(),
+			});
+
 			toast.success("Income added successfully");
 			setIsModalOpen(false);
 

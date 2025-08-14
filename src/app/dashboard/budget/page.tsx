@@ -17,26 +17,44 @@ import { formatFetchError } from "@/utils/formatFetchError";
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 import { formatAddDocError } from "@/utils/formatAddDocError";
 
+type budgetDataType = {
+	category: string;
+	description: string | null;
+	amount: number | null;
+	setLimit: number;
+	frequency: string | null;
+	date: string;
+}[];
+
+type Expense = {
+	category: string;
+	subCategory: string;
+	amount: number;
+	date: string;
+	narration: string;
+};
+
+type CategoryTotals = {
+	[category: string]: {
+		[subCategory: string]: {
+			totalSpent: number;
+			expenses: Expense[];
+		};
+	};
+};
+
 const BudgetScreen = () => {
 	const user = auth.currentUser;
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [dataLoading, setDataLoading] = useState<boolean>(false);
+	const [isExpensesLoading, setIsExpensesLoading] = useState<boolean>(false);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [selectedModal, setSelectedModal] = useState<
 		"daily needs" | "planned payments" | "others"
 	>("daily needs");
-
-	type budgetDataType = {
-		category: string;
-		description: string | null;
-		amount: number | null;
-		setLimit: number;
-		frequency: string | null;
-		date: string;
-	}[];
 
 	// daily needs
 	const [dailyNeedsCategoryInput, setDailyNeedsCategoryInput] =
@@ -243,11 +261,78 @@ const BudgetScreen = () => {
 		}
 	};
 
+	const fetchExpensesWithTotals = async (userId: string) => {
+		if (!user) setIsExpensesLoading(true);
+
+		try {
+			const expenseRef = collection(db, `users/${userId}/expenseData`);
+			const q = query(expenseRef, orderBy("createdAt", "desc"));
+
+			const snapshot = await getDocs(q);
+
+			const expenseList: Expense[] = snapshot.docs.map((doc) => {
+				const data = doc.data();
+
+				return {
+					category: data.category.toLowerCase(),
+					subCategory: data.subCategory.toLowerCase(),
+					amount: Number(data.amount) || 0,
+					narration: data.narration || "",
+					date:
+						data.createdAt?.toDate().toLocaleString("en-GB", {
+							day: "2-digit",
+							month: "short",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							hour12: true,
+						}) || "",
+				};
+			});
+
+			// ✅ Dynamically aggregate totals
+			const totals: CategoryTotals = {};
+
+			expenseList.forEach((expense) => {
+				const { category, subCategory, amount } = expense;
+
+				if (!totals[category]) {
+					totals[category] = {};
+				}
+
+				if (!totals[category][subCategory]) {
+					totals[category][subCategory] = {
+						totalSpent: 0,
+						expenses: [],
+					};
+				}
+
+				totals[category][subCategory].totalSpent += amount;
+				totals[category][subCategory].expenses.push(expense);
+			});
+
+			toast.success("Expenses and sub-category totals fetched");
+
+			return {
+				expenses: expenseList,
+				totalsByCategory: totals,
+			};
+		} catch (err) {
+			const message = formatFetchError(err);
+			toast.error(`${message}`);
+		} finally {
+			setIsExpensesLoading(false);
+		}
+	};
+
 	// fetch budget data
 	useEffect(() => {
 		if (user) {
 			fetchBudgetData(user.uid);
+			fetchExpensesWithTotals(user.uid);
 		}
+
+		console.log(isExpensesLoading);
 	}, [user]);
 
 	// toggle modal

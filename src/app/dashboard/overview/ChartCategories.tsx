@@ -51,7 +51,7 @@ const ChartCategories: React.FC<CategoryListProps> = ({
 					key={index}
 				>
 					<div
-						className="w-5 h-5"
+						className="w-5 h-5 rounded-md"
 						style={{ backgroundColor: colors[index % colors.length] }}
 					></div>
 					<span>{element.name}</span> <span>{element.percentage}%</span>

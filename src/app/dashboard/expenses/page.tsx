@@ -119,6 +119,16 @@ const ExpensesPage = () => {
 				createdAt: serverTimestamp(),
 			});
 
+			// add notification
+			await addDoc(collection(db, `users/${user.uid}/notifications`), {
+				notification: `${Number(
+					amountInput
+				)} was added to the ${categoryInput} category under expenses`,
+				category: "Expenses",
+				amount: Number(amountInput),
+				createdAt: serverTimestamp(),
+			});
+
 			toast.success("Expense added successfully");
 
 			setIsModalOpen(false);

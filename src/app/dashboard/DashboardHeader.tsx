@@ -16,7 +16,11 @@ const DashboardHeader = () => {
 			</div>
 
 			<div className="flex flex-row items-center gap-4 ">
-				<Image src={bellIcon} alt="notification icon" />
+				<Image
+					src={bellIcon}
+					alt="notification icon"
+					className="cursor-pointer "
+				/>
 				<Image src={avatarIcon} alt="avatar icon" />
 			</div>
 		</div>
