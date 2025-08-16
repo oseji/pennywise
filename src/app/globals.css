@@ -46,6 +46,10 @@ input[type="number"] {
 	@apply hidden;
 }
 
+.notificationsToggled {
+	@apply translate-x-[120%];
+}
+
 /* sidebar */
 .sidebarRow {
 	@apply flex flex-row items-center w-auto gap-2 capitalize transition-all duration-200 ease-in-out cursor-pointer md:w-full;
@@ -111,5 +115,5 @@ input[type="number"] {
 }
 
 .budgetCategoriesHeadingText {
-	@apply text-xl md:text-2xl font-bold capitalize;
+	@apply text-xl font-bold capitalize md:text-2xl;
 }

@@ -117,8 +117,8 @@ const IncomeScreen = () => {
 
 			// add notification
 			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: `${incomeInput} was added to income`,
-				category: "Income",
+				notification: ` was added to Income under the category of `,
+				category: categoryInput,
 				amount: Number(incomeInput),
 				createdAt: serverTimestamp(),
 			});

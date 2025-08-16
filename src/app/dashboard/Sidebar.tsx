@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/firebase/firebase";
 import { signOut } from "firebase/auth";
 import { formatLogoutError } from "@/utils/formatLogoutError";
+import { useNotificationStore } from "@/store/useNotificationStore";
 
 import dashboardIcon from "../../assets/sidebar/dashboard.svg";
 import incomeIcon from "../../assets/sidebar/income.svg";
@@ -19,6 +20,7 @@ import logoutIcon from "../../assets/sidebar/logout.svg";
 
 const Sidebar = () => {
 	const router = useRouter();
+	const { close } = useNotificationStore();
 
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -66,7 +68,10 @@ const Sidebar = () => {
 					<Link href={"/dashboard/overview"}>
 						<div
 							className=" sidebarRow"
-							onClick={() => toggleActiveSidebaritem(0)}
+							onClick={() => {
+								toggleActiveSidebaritem(0);
+								close();
+							}}
 						>
 							<span
 								className=" sidebarIndicatorActive"
@@ -89,7 +94,10 @@ const Sidebar = () => {
 					<Link href={"/dashboard/income"}>
 						<div
 							className=" sidebarRow"
-							onClick={() => toggleActiveSidebaritem(1)}
+							onClick={() => {
+								toggleActiveSidebaritem(1);
+								close();
+							}}
 						>
 							<span
 								className=" sidebarIndicator"
@@ -112,7 +120,10 @@ const Sidebar = () => {
 					<Link href={"/dashboard/budget"}>
 						<div
 							className=" sidebarRow"
-							onClick={() => toggleActiveSidebaritem(2)}
+							onClick={() => {
+								toggleActiveSidebaritem(2);
+								close();
+							}}
 						>
 							<span
 								className=" sidebarIndicator"
@@ -135,7 +146,10 @@ const Sidebar = () => {
 					<Link href={"/dashboard/expenses"}>
 						<div
 							className=" sidebarRow"
-							onClick={() => toggleActiveSidebaritem(3)}
+							onClick={() => {
+								toggleActiveSidebaritem(3);
+								close();
+							}}
 						>
 							<span
 								className=" sidebarIndicator"
@@ -158,7 +172,10 @@ const Sidebar = () => {
 					<Link href={"/dashboard/savings"}>
 						<div
 							className=" sidebarRow"
-							onClick={() => toggleActiveSidebaritem(4)}
+							onClick={() => {
+								toggleActiveSidebaritem(4);
+								close();
+							}}
 						>
 							<span
 								className=" sidebarIndicator"
@@ -180,7 +197,10 @@ const Sidebar = () => {
 
 					<div
 						className=" sidebarRow"
-						onClick={() => toggleActiveSidebaritem(5)}
+						onClick={() => {
+							toggleActiveSidebaritem(5);
+							close();
+						}}
 					>
 						<span
 							className=" sidebarIndicator"
@@ -201,7 +221,10 @@ const Sidebar = () => {
 
 					<div
 						className=" sidebarRow"
-						onClick={() => toggleActiveSidebaritem(6)}
+						onClick={() => {
+							toggleActiveSidebaritem(6);
+							close();
+						}}
 					>
 						<span
 							className=" sidebarIndicator"
@@ -227,7 +250,10 @@ const Sidebar = () => {
 
 						<div
 							className="ml-3 sidebarRow"
-							onClick={() => toggleActiveSidebaritem(7)}
+							onClick={() => {
+								toggleActiveSidebaritem(7);
+								close();
+							}}
 						>
 							<Image src={settingsIcon} alt="settings" />
 							<span

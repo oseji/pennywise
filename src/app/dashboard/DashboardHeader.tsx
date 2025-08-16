@@ -1,10 +1,14 @@
-import Image from "next/image";
+"use client";
 
-// import searchIcon from "../../assets/dashboard/search.svg";
+import Image from "next/image";
+import { useNotificationStore } from "@/store/useNotificationStore";
+
 import bellIcon from "../../assets/dashboard/notification-bing.svg";
 import avatarIcon from "../../assets/dashboard/avatar.svg";
 
 const DashboardHeader = () => {
+	const { toggle } = useNotificationStore();
+
 	return (
 		<div className="fixed top-0 left-0 z-30 flex flex-row items-center justify-between w-full px-4 py-4 bg-white shadow md:px-12">
 			<div className="flex flex-row items-center justify-center gap-4 text-xl font-bold md:text-2xl ">
@@ -20,6 +24,7 @@ const DashboardHeader = () => {
 					src={bellIcon}
 					alt="notification icon"
 					className="cursor-pointer "
+					onClick={toggle}
 				/>
 				<Image src={avatarIcon} alt="avatar icon" />
 			</div>

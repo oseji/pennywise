@@ -121,10 +121,8 @@ const ExpensesPage = () => {
 
 			// add notification
 			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: `${Number(
-					amountInput
-				)} was added to the ${categoryInput} category under expenses`,
-				category: "Expenses",
+				notification: ` was added to the Expenses under the category of `,
+				category: categoryInput,
 				amount: Number(amountInput),
 				createdAt: serverTimestamp(),
 			});

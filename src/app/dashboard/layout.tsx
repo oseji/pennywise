@@ -1,5 +1,6 @@
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
+import Notifications from "./Notifications";
 
 export const metadata = {
 	title: "Pennywise | Dashboard",
@@ -15,8 +16,10 @@ export default function DashboardLayout({
 		<div className="flex flex-row w-full max-h-screen ">
 			<Sidebar />
 
-			<main className="w-full min-h-screen overflow-y-scroll ">
+			<main className="relative w-full min-h-screen overflow-y-scroll">
 				<DashboardHeader />
+
+				<Notifications />
 
 				{children}
 			</main>
