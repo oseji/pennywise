@@ -31,6 +31,13 @@ const ChartCategories: React.FC<CategoryListProps> = ({
 }) => {
 	if (!summary || !summary.categories) return null;
 
+	// ✅ create a color mapping based on the original order
+	const colorMap: Record<string, string> = {};
+	summary.categories.forEach((cat, i) => {
+		colorMap[cat.name] = colors[i % colors.length];
+	});
+
+	// then sort categories by percentage
 	const sortedCategories = [...summary.categories].sort(
 		(a, b) => b.percentage - a.percentage
 	);
@@ -44,26 +51,32 @@ const ChartCategories: React.FC<CategoryListProps> = ({
 	);
 
 	return (
-		<div>
-			{topCategories.map((element, index) => (
+		<div className="w-full ">
+			{topCategories.map((element) => (
 				<div
-					className="flex flex-row items-center justify-start w-full gap-2"
-					key={index}
+					className="flex flex-row items-center w-full gap-2"
+					key={element.name}
 				>
 					<div
 						className="w-5 h-5 rounded-md"
-						style={{ backgroundColor: colors[index % colors.length] }}
+						style={{ backgroundColor: colorMap[element.name] }}
 					></div>
-					<span>{element.name}</span> <span>{element.percentage}%</span>
+
+					<div className="flex flex-row items-center justify-between w-full">
+						<span className="capitalize ">{element.name}</span>
+
+						<span className="font-semibold ">{element.percentage}%</span>
+					</div>
 				</div>
 			))}
 
 			{otherCategories.length > 0 && (
 				<div className="flex flex-row items-center justify-start w-full gap-2">
 					<div
-						className="w-5 h-5"
+						className="w-5 h-5 rounded-md"
+						// give "Others" its own color, using the next available color slot
 						style={{
-							backgroundColor: colors[topCategories.length % colors.length],
+							backgroundColor: colors[sortedCategories.length % colors.length],
 						}}
 					></div>
 					<span>Others</span> <span>{otherTotal.toFixed(2)}%</span>
