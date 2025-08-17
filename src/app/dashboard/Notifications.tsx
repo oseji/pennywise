@@ -82,11 +82,11 @@ const Notifications = () => {
 
 	return (
 		<div
-			className={`fixed z-50 p-4 rounded-lg shadow bg-white/50 top-24 right-5 backdrop-blur-lg w-[60%] transition-all ease-in-out duration-500 ${
+			className={`fixed z-50 p-4 rounded-lg shadow bg-white/80 top-24 right-10 backdrop-blur-xl w-full md:w-[60%] lg:w-[50%] xl:w-[40%]  transition-all ease-in-out duration-500 ${
 				isOpen ? "" : "notificationsToggled"
 			}`}
 		>
-			<div className="flex flex-row items-center justify-between ">
+			<div className=" notificationsHeaderContainer">
 				<h1 className=" text-[#2D6A4F] md:text-xl font-bold capitalize mb-4">
 					Notifications
 				</h1>
@@ -99,9 +99,12 @@ const Notifications = () => {
 				</p>
 			</div>
 
-			<ul className="flex flex-col gap-5 ">
+			<ul className=" notificationsContainer">
 				{notificationsData.map((data, index) => (
-					<li key={index} className="flex flex-col gap-1 ">
+					<li
+						key={index}
+						className="flex flex-col gap-1 p-2 bg-white rounded-lg shadow"
+					>
 						<p className="text-xs font-semibold ">{data.date}</p>
 
 						<p className="">

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useNotificationStore } from "@/store/useNotificationStore";
 
-import bellIcon from "../../assets/dashboard/notification-bing.svg";
+import bellIcon from "../../assets/dashboard/icons8-notification.svg";
 import avatarIcon from "../../assets/dashboard/avatar.svg";
 
 const DashboardHeader = () => {
@@ -23,7 +23,7 @@ const DashboardHeader = () => {
 				<Image
 					src={bellIcon}
 					alt="notification icon"
-					className="cursor-pointer "
+					className="cursor-pointer h-7"
 					onClick={toggle}
 				/>
 				<Image src={avatarIcon} alt="avatar icon" />

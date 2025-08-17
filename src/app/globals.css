@@ -117,3 +117,31 @@ input[type="number"] {
 .budgetCategoriesHeadingText {
 	@apply text-xl font-bold capitalize md:text-2xl;
 }
+
+/* notifications */
+.notificationsHeaderContainer {
+	@apply fixed flex flex-row items-center justify-between w-[95%] top-4 left-1/2 -translate-x-1/2 bg-white;
+}
+
+.notificationsContainer {
+	@apply flex flex-col gap-5 mt-12 max-h-[70dvh] md:max-h-[60dvh] overflow-y-scroll;
+}
+
+.notificationsContainer::-webkit-scrollbar {
+	width: 6px; /* hides scrollbar */
+	background: transparent; /* avoids background color */
+}
+
+.notificationsContainer::-webkit-scrollbar-thumb {
+	background: #888; /* scrollbar thumb color */
+	border-radius: 9999px; /* fully rounded for thin pill look */
+}
+
+.notificationsContainer::-webkit-scrollbar-thumb:hover {
+	background: #555; /* darker on hover */
+}
+
+/* Hide scrollbar buttons (arrows) */
+.notificationsContainer::-webkit-scrollbar-button {
+	display: none;
+}
