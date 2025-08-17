@@ -25,10 +25,6 @@ input[type="number"] {
 	@apply mb-2 font-semibold capitalize;
 }
 
-.hideAlertModal {
-	@apply -translate-y-96;
-}
-
 .hidePasswordError {
 	@apply scale-0;
 }
@@ -40,10 +36,6 @@ input[type="number"] {
 
 .isNotPaid {
 	@apply translate-x-0;
-}
-
-.hideIncomeModal {
-	@apply hidden;
 }
 
 .notificationsToggled {
@@ -116,6 +108,18 @@ input[type="number"] {
 
 .budgetCategoriesHeadingText {
 	@apply text-xl font-bold capitalize md:text-2xl;
+}
+
+.hideAlertModal {
+	@apply -translate-y-96;
+}
+
+.hideIncomeModal {
+	@apply hidden;
+}
+
+.hideDeleteModal {
+	@apply hidden;
 }
 
 /* notifications */

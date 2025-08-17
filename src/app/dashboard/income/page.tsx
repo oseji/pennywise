@@ -4,7 +4,9 @@ import Pagination from "@/utils/Pagination";
 
 import { db, auth } from "@/firebase/firebase";
 import {
-	addDoc,
+	doc,
+	setDoc,
+	deleteDoc,
 	collection,
 	getDocs,
 	serverTimestamp,
@@ -17,7 +19,7 @@ import { formatFetchError } from "@/utils/formatFetchError";
 import { formatAddDocError } from "@/utils/formatAddDocError";
 import { getPaginationRange } from "@/utils/getPaginationRange";
 
-import editIcon from "../../../assets/dashboard/edit icon.svg";
+// import editIcon from "../../../assets/dashboard/edit icon.svg";
 import deleteIcon from "../../../assets/dashboard/delete icon.svg";
 import toast from "react-hot-toast";
 
@@ -26,12 +28,14 @@ type tableDataType = {
 	narration: string;
 	amount: number;
 	category: string;
+	id: string;
 }[];
 
 const IncomeScreen = () => {
 	const user = auth.currentUser;
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+	const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
 	const [incomeData, setIncomeData] = useState<tableDataType>([]);
 	const totalIncome = incomeData.reduce((sum, entry) => sum + entry.amount, 0);
 
@@ -40,7 +44,11 @@ const IncomeScreen = () => {
 	const [narrationInput, setNarrationInput] = useState<string>("");
 
 	const modalRef = useRef<HTMLDivElement>(null);
+	const deleteModalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+	const [selectedIdForDeletion, setSelectedIdForDeletion] =
+		useState<string>("");
 
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = 4;
@@ -79,6 +87,7 @@ const IncomeScreen = () => {
 					narration: data.narration || "",
 					category: data.category,
 					amount: Number(data.amount) || 0,
+					id: data.id,
 				};
 			});
 
@@ -108,20 +117,17 @@ const IncomeScreen = () => {
 		setIsLoading(true);
 
 		try {
-			await addDoc(collection(db, `users/${user.uid}/incomeData`), {
+			const newDocRef = doc(collection(db, `users/${user.uid}/incomeData`));
+
+			await setDoc(newDocRef, {
+				id: newDocRef.id,
 				narration: narrationInput,
 				category: categoryInput,
 				amount: Number(incomeInput),
 				createdAt: serverTimestamp(),
 			});
 
-			// add notification
-			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: ` was added to Income under the category of `,
-				category: categoryInput,
-				amount: Number(incomeInput),
-				createdAt: serverTimestamp(),
-			});
+			console.log("Doc ID:", newDocRef.id);
 
 			toast.success("Income added successfully");
 			setIsModalOpen(false);
@@ -139,6 +145,27 @@ const IncomeScreen = () => {
 		}
 	};
 
+	const deleteIncome = async (id: string) => {
+		if (!user) return;
+
+		setIsDeletionLoading(true);
+
+		try {
+			await deleteDoc(doc(db, `users/${user.uid}/incomeData/${id}`));
+			toast.success("Income deleted successfully");
+
+			const updatedData = await fetchIncomeData(user.uid);
+			setIncomeData(updatedData ?? []);
+		} catch (err) {
+			console.error("Error deleting document:", err);
+			toast.error("Error deleting income");
+		} finally {
+			setSelectedIdForDeletion("");
+			setIsDeleteModalOpen(false);
+			setIsDeletionLoading(false);
+		}
+	};
+
 	// fetch income data
 	useEffect(() => {
 		const getData = async () => {
@@ -151,7 +178,7 @@ const IncomeScreen = () => {
 		console.log(incomeData);
 	}, []);
 
-	// toggle modal
+	// toggle income input modal
 	useEffect(() => {
 		if (isModalOpen) {
 			modalRef.current?.classList.remove("hideIncomeModal");
@@ -161,6 +188,17 @@ const IncomeScreen = () => {
 			modalRef.current?.classList.add("hideIncomeModal");
 		}
 	}, [isModalOpen]);
+
+	// toggle income deletion modal
+	useEffect(() => {
+		if (isDeleteModalOpen) {
+			deleteModalRef.current?.classList.remove("hideDeleteModal");
+		}
+
+		if (!isDeleteModalOpen) {
+			deleteModalRef.current?.classList.add("hideDeleteModal");
+		}
+	}, [isDeleteModalOpen]);
 
 	return (
 		<div className="relative dashboardScreen">
@@ -187,7 +225,7 @@ const IncomeScreen = () => {
 					</div>
 				) : (
 					<div>
-						<div className="overflow-x-scroll text-sm">
+						<div className="overflow-x-scroll text-sm lg:overflow-hidden">
 							<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
 								<p className="text-center ">date | time</p>
 								<p className=" text-start">narration</p>
@@ -210,15 +248,19 @@ const IncomeScreen = () => {
 										</div>
 
 										<div className="flex flex-row items-center justify-center gap-4 ">
-											<Image
+											{/* <Image
 												src={editIcon}
 												alt="edit icon"
 												className="transition ease-in-out cursor-pointer hover:scale-110"
-											/>
+											/> */}
 											<Image
 												src={deleteIcon}
 												alt="delete icon"
 												className="transition ease-in-out cursor-pointer hover:scale-110"
+												onClick={() => {
+													setSelectedIdForDeletion(element.id);
+													setIsDeleteModalOpen(true);
+												}}
 											/>
 										</div>
 									</div>
@@ -325,6 +367,44 @@ const IncomeScreen = () => {
 							)}
 						</button>
 					</form>
+				</div>
+			</div>
+
+			{/* Delete Confirmation Modal */}
+			<div
+				className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideDeleteModal"
+				ref={deleteModalRef}
+			>
+				{/* Overlay */}
+				<div
+					className="absolute inset-0 bg-black opacity-50 cursor-pointer"
+					onClick={() => setIsDeleteModalOpen(!isDeleteModalOpen)}
+				></div>
+
+				{/* Modal Content */}
+				<div className={`inputModals`}>
+					<p className="mb-5">Are you sure you want to delete this entry?</p>
+
+					<div className="flex flex-row items-center justify-center gap-5 ">
+						<button
+							className="px-4 py-2 text-white transition duration-200 ease-in-out bg-red-500 rounded-lg w-28 hover:scale-110"
+							onClick={() => {
+								deleteIncome(selectedIdForDeletion);
+							}}
+						>
+							{isDeletionLoading ? (
+								<div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin " />
+							) : (
+								"Delete"
+							)}
+						</button>
+						<button
+							className="px-4 py-2 text-white transition duration-200 ease-in-out bg-gray-500 rounded-lg w-28 hover:scale-110"
+							onClick={() => setIsDeleteModalOpen(!isDeleteModalOpen)}
+						>
+							Cancel
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
