@@ -311,7 +311,7 @@ const BudgetScreen = () => {
 				totals[category][subCategory].expenses.push(expense);
 			});
 
-			toast.success("Expenses and sub-category totals fetched");
+			// toast.success("Expenses and sub-category totals fetched");
 
 			return {
 				expenses: expenseList,

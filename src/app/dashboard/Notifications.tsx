@@ -117,7 +117,7 @@ const Notifications = () => {
 								{""}
 							</span>
 
-							<span className="font-semibold ">{data.category}</span>
+							<span className="font-semibold capitalize">{data.category}</span>
 						</p>
 					</li>
 				))}

@@ -151,7 +151,6 @@ const ExpensesPage = () => {
 		const fetchSubCategories = async () => {
 			if (!user?.uid || !selectedCategory) return;
 
-			// Map UI label to Firestore collection key
 			const categoryKey =
 				selectedCategory === "planned payments"
 					? "plannedPayments"
