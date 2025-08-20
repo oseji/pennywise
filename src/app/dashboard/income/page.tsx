@@ -91,7 +91,7 @@ const IncomeScreen = () => {
 				};
 			});
 
-			toast.success("Income data fetched successfully");
+			// toast.success("Income data fetched successfully");
 
 			return incomeList;
 		} catch (err) {
@@ -129,7 +129,7 @@ const IncomeScreen = () => {
 
 			console.log("Doc ID:", newDocRef.id);
 
-			toast.success("Income added successfully");
+			toast.success(`${Number(incomeInput).toLocaleString()} added to Income`);
 			setIsModalOpen(false);
 
 			const updatedData = await fetchIncomeData(user.uid);
@@ -219,20 +219,20 @@ const IncomeScreen = () => {
 					+ Add income
 				</button>
 
-				{isDataLoading ? (
-					<div>
-						<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
-					</div>
-				) : (
-					<div>
-						<div className="overflow-x-scroll text-sm lg:overflow-hidden">
-							<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
-								<p className="text-center ">date | time</p>
-								<p className=" text-start">narration</p>
-								<p className="text-center ">amount</p>
-								<p className="text-center ">action</p>
-							</div>
+				<div>
+					<div className="overflow-x-scroll text-sm lg:overflow-hidden">
+						<div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
+							<p className="text-center ">date | time</p>
+							<p className=" text-start">narration</p>
+							<p className="text-center ">amount</p>
+							<p className="text-center ">action</p>
+						</div>
 
+						{isDataLoading ? (
+							<div className=" min-h-[45dvh] flex flex-col items-center justify-center">
+								<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
+							</div>
+						) : (
 							<div className=" p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[45dvh] shadow">
 								{currentItems.map((element, index) => (
 									<div className="grid grid-cols-4 py-4" key={index}>
@@ -266,16 +266,16 @@ const IncomeScreen = () => {
 									</div>
 								))}
 							</div>
-						</div>
-
-						<Pagination
-							currentPage={currentPage}
-							totalPages={totalPages}
-							paginationRange={paginationRange}
-							onPageChange={setCurrentPage}
-						/>
+						)}
 					</div>
-				)}
+
+					<Pagination
+						currentPage={currentPage}
+						totalPages={totalPages}
+						paginationRange={paginationRange}
+						onPageChange={setCurrentPage}
+					/>
+				</div>
 			</div>
 
 			{/* Add Income Modal */}

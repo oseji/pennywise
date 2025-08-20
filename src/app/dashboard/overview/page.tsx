@@ -28,6 +28,8 @@ type CategorySummary = {
 const Dashboard = () => {
 	const user = auth.currentUser;
 
+	const [isLoading, setisLoading] = useState<boolean>(true);
+
 	const [incomeSummary, setIncomeSummary] = useState<userData>({
 		total: 0,
 		categories: [],
@@ -74,6 +76,8 @@ const Dashboard = () => {
 		expense: userData;
 		budget: userData;
 	}> => {
+		setisLoading(true);
+
 		if (!userId) {
 			return {
 				income: { total: 0, categories: [] },
@@ -124,6 +128,8 @@ const Dashboard = () => {
 				expense: { total: 0, categories: [] },
 				budget: { total: 0, categories: [] },
 			};
+		} finally {
+			setisLoading(false);
 		}
 	};
 
@@ -147,109 +153,115 @@ const Dashboard = () => {
 	}, [incomeSummary, expenseSummary, budgetSummary]);
 
 	return (
-		<div className="dashboardScreen">
-			<h1 className="dashboardHeading">dashboard</h1>
+		<div className={`dashboardScreen`}>
+			<h1 className="relative dashboardHeading">dashboard</h1>
 
-			<div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
-				<div className=" chartBox">
-					<div className="chartBoxHeadingGroup">
-						<h1>Income</h1>
+			{isLoading ? (
+				<div className=" min-h-[70dvh] flex flex-col items-center justify-center">
+					<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
+				</div>
+			) : (
+				<div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
+					<div className=" chartBox">
+						<div className="chartBoxHeadingGroup">
+							<h1>Income</h1>
 
-						<span>{incomeSummary.total.toLocaleString()}</span>
+							<span>{incomeSummary.total.toLocaleString()}</span>
+						</div>
+
+						<PieChart width={200} height={200}>
+							<Pie
+								data={incomeChartData}
+								cx="50%"
+								cy="50%"
+								innerRadius={60}
+								outerRadius={80}
+								fill="#8884d8"
+								paddingAngle={1}
+								dataKey="value"
+								className="outline-none"
+							>
+								{incomeChartData.map((entry, index) => (
+									<Cell
+										key={`cell-${entry.name}`}
+										fill={COLORS[index % COLORS.length]}
+									/>
+								))}
+							</Pie>
+						</PieChart>
+
+						<div className="flex flex-row justify-start w-full mt-auto">
+							<ChartCategories summary={incomeSummary} limit={5} />
+						</div>
 					</div>
 
-					<PieChart width={200} height={200}>
-						<Pie
-							data={incomeChartData}
-							cx="50%"
-							cy="50%"
-							innerRadius={60}
-							outerRadius={80}
-							fill="#8884d8"
-							paddingAngle={1}
-							dataKey="value"
-							className="outline-none"
-						>
-							{incomeChartData.map((entry, index) => (
-								<Cell
-									key={`cell-${entry.name}`}
-									fill={COLORS[index % COLORS.length]}
-								/>
-							))}
-						</Pie>
-					</PieChart>
+					<div className=" chartBox">
+						<div className="chartBoxHeadingGroup">
+							<h1>Expenditure</h1>
 
-					<div className="flex flex-row justify-start w-full mt-auto">
-						<ChartCategories summary={incomeSummary} limit={5} />
+							<span>{expenseSummary.total.toLocaleString()}</span>
+						</div>
+
+						<PieChart width={200} height={200}>
+							<Pie
+								data={expensesChartData}
+								cx="50%"
+								cy="50%"
+								innerRadius={60}
+								outerRadius={80}
+								fill="#8884d8"
+								paddingAngle={1}
+								dataKey="value"
+								className="outline-none"
+							>
+								{expensesChartData.map((entry, index) => (
+									<Cell
+										key={`cell-${entry.name}`}
+										fill={COLORS[index % COLORS.length]}
+									/>
+								))}
+							</Pie>
+						</PieChart>
+
+						<div className="flex flex-row justify-start w-full mt-auto ">
+							<ChartCategories summary={expenseSummary} limit={5} />
+						</div>
+					</div>
+
+					<div className=" chartBox">
+						<div className="chartBoxHeadingGroup">
+							<h1>Savings</h1>
+
+							<span>{budgetSummary.total.toLocaleString()}</span>
+						</div>
+
+						<PieChart width={200} height={200}>
+							<Pie
+								data={budgetChartData}
+								cx="50%"
+								cy="50%"
+								innerRadius={60}
+								outerRadius={80}
+								fill="#8884d8"
+								paddingAngle={1}
+								dataKey="value"
+								className="outline-none"
+							>
+								{budgetChartData.map((entry, index) => (
+									<Cell
+										key={`cell-${entry.name}`}
+										fill={COLORS[index % COLORS.length]}
+									/>
+								))}
+							</Pie>
+						</PieChart>
+
+						<div className="flex flex-row justify-start w-full mt-auto">
+							<ChartCategories summary={budgetSummary} limit={5} />
+						</div>
 					</div>
 				</div>
-
-				<div className=" chartBox">
-					<div className="chartBoxHeadingGroup">
-						<h1>Expenditure</h1>
-
-						<span>{expenseSummary.total.toLocaleString()}</span>
-					</div>
-
-					<PieChart width={200} height={200}>
-						<Pie
-							data={expensesChartData}
-							cx="50%"
-							cy="50%"
-							innerRadius={60}
-							outerRadius={80}
-							fill="#8884d8"
-							paddingAngle={1}
-							dataKey="value"
-							className="outline-none"
-						>
-							{expensesChartData.map((entry, index) => (
-								<Cell
-									key={`cell-${entry.name}`}
-									fill={COLORS[index % COLORS.length]}
-								/>
-							))}
-						</Pie>
-					</PieChart>
-
-					<div className="flex flex-row justify-start w-full mt-auto ">
-						<ChartCategories summary={expenseSummary} limit={5} />
-					</div>
-				</div>
-
-				<div className=" chartBox">
-					<div className="chartBoxHeadingGroup">
-						<h1>Savings</h1>
-
-						<span>{budgetSummary.total.toLocaleString()}</span>
-					</div>
-
-					<PieChart width={200} height={200}>
-						<Pie
-							data={budgetChartData}
-							cx="50%"
-							cy="50%"
-							innerRadius={60}
-							outerRadius={80}
-							fill="#8884d8"
-							paddingAngle={1}
-							dataKey="value"
-							className="outline-none"
-						>
-							{budgetChartData.map((entry, index) => (
-								<Cell
-									key={`cell-${entry.name}`}
-									fill={COLORS[index % COLORS.length]}
-								/>
-							))}
-						</Pie>
-					</PieChart>
-
-					<div className="flex flex-row justify-start w-full mt-auto">
-						<ChartCategories summary={budgetSummary} limit={5} />
-					</div>
-				</div>
-			</div>
+			)}
 		</div>
 	);
 };

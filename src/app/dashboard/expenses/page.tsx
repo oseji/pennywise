@@ -83,7 +83,7 @@ const ExpensesPage = () => {
 				};
 			});
 
-			toast.success("Expenses data fetched successfully");
+			// toast.success("Expenses data fetched successfully");
 
 			return expenseList;
 		} catch (err) {
@@ -127,7 +127,9 @@ const ExpensesPage = () => {
 				createdAt: serverTimestamp(),
 			});
 
-			toast.success("Expense added successfully");
+			toast.success(
+				`${Number(amountInput).toLocaleString()} added to Expenses`
+			);
 
 			setIsModalOpen(false);
 
@@ -258,40 +260,47 @@ const ExpensesPage = () => {
 						<p>amount</p>
 					</div>
 
-					<div className="p-3 mt-5 bg-white rounded-lg shadow-md min-h-[40dvh]">
-						<div className="flex flex-row items-center justify-between border-b border-slate-200">
-							<p className=" text-[#2D6A4F] font-semibold">DAY</p>
-
-							<button
-								className=" text-[#004FFF] font-semibold"
-								onClick={() => {
-									setIsModalOpen(!isModalOpen);
-								}}
-							>
-								{isDataLoading ? (
-									<div className="w-5 h-5 mx-auto capitalize border-2 border-blue-500 rounded-full border-t-transparent animate-spin" />
-								) : (
-									"+ Add"
-								)}
-							</button>
+					{isDataLoading ? (
+						<div className=" min-h-[40dvh] flex flex-col items-center justify-center">
+							<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
 						</div>
+					) : (
+						<div className="p-3 mt-5 bg-white rounded-lg shadow-md min-h-[40dvh]">
+							<div className="flex flex-row items-center justify-between border-b border-slate-200">
+								<p className=" text-[#2D6A4F] font-semibold">DAY</p>
 
-						{currentItems.map((element, index) => (
-							<div className="grid grid-cols-4 " key={index}>
-								<div className="pt-2 capitalize ">
-									<p>{element.category}</p>
-									<p className=" text-xs font-bold text-[#2D6A4F]">
-										{element.subCategory}
-									</p>
-								</div>
-
-								<p className="pt-2 ">{element.narration}</p>
-								<p className="pt-2 ">{element.date}</p>
-								<p className="pt-2 ">{element.amount.toLocaleString()}</p>
-								<p className="pt-2 "></p>
+								<button
+									className=" text-[#004FFF] font-semibold"
+									onClick={() => {
+										setIsModalOpen(!isModalOpen);
+									}}
+								>
+									{/* {isDataLoading ? (
+										<div className="w-5 h-5 mx-auto capitalize border-2 border-blue-500 rounded-full border-t-transparent animate-spin" />
+									) : (
+										"+ Add"
+									)} */}
+									+Add
+								</button>
 							</div>
-						))}
-					</div>
+
+							{currentItems.map((element, index) => (
+								<div className="grid grid-cols-4 " key={index}>
+									<div className="pt-2 capitalize ">
+										<p>{element.category}</p>
+										<p className=" text-xs font-bold text-[#2D6A4F]">
+											{element.subCategory}
+										</p>
+									</div>
+
+									<p className="pt-2 ">{element.narration}</p>
+									<p className="pt-2 ">{element.date}</p>
+									<p className="pt-2 ">{element.amount.toLocaleString()}</p>
+									<p className="pt-2 "></p>
+								</div>
+							))}
+						</div>
+					)}
 
 					<Pagination
 						currentPage={currentPage}

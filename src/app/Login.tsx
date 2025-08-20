@@ -88,6 +88,7 @@ const Login = () => {
 
 						<span>Pennywise</span>
 					</div>
+
 					<p className="mb-4 text-center ">Welcome back to Pennywise</p>
 					<div className="flex flex-col gap-4 ">
 						<div className=" inputLabelGroup">
