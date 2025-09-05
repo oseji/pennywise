@@ -55,7 +55,7 @@ const ExpensesPage = () => {
 	const paginationRange = getPaginationRange(currentPage, totalPages);
 
 	const fetchExpenses = async (userId: string) => {
-		if (!user) setIsDataLoading(true);
+		setIsDataLoading(true);
 
 		try {
 			const incomeReference = collection(db, `users/${userId}/expenseData`);
@@ -191,9 +191,7 @@ const ExpensesPage = () => {
 			}
 		};
 		getData();
-
-		console.log(expenseData);
-	}, []);
+	}, [user?.uid]);
 
 	// toggle modal
 	useEffect(() => {

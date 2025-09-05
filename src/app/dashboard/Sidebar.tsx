@@ -23,6 +23,7 @@ const Sidebar = () => {
 	const { close } = useNotificationStore();
 
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [showComingSoon, setShowComingSoon] = useState<boolean>(false);
 
 	const sideBarItems = useRef<(HTMLSpanElement | null)[]>([]);
 	const sideBarTexts = useRef<(HTMLSpanElement | null)[]>([]);
@@ -169,31 +170,34 @@ const Sidebar = () => {
 						</div>
 					</Link>
 
-					<Link href={"/dashboard/savings"}>
-						<div
-							className=" sidebarRow"
-							onClick={() => {
-								toggleActiveSidebaritem(4);
-								close();
+					<div
+						className=" sidebarRow"
+						onMouseEnter={() => setShowComingSoon(true)}
+						onMouseLeave={() => setShowComingSoon(false)}
+
+						// onClick={() => {
+						// 	toggleActiveSidebaritem(4);
+						// 	close();
+						// }}
+					>
+						<span
+							className=" sidebarIndicator"
+							ref={(el) => {
+								sideBarItems.current[4] = el;
+							}}
+						></span>
+						<Image src={savingsIcon} alt="savings" />
+						<span
+							className={` sidebarText ${
+								showComingSoon ? " scale-105 text-[#2D6A4F] font-semibold" : ""
+							}`}
+							ref={(el) => {
+								sideBarTexts.current[4] = el;
 							}}
 						>
-							<span
-								className=" sidebarIndicator"
-								ref={(el) => {
-									sideBarItems.current[4] = el;
-								}}
-							></span>
-							<Image src={savingsIcon} alt="savings" />
-							<span
-								className=" sidebarText"
-								ref={(el) => {
-									sideBarTexts.current[4] = el;
-								}}
-							>
-								savings
-							</span>
-						</div>
-					</Link>
+							{showComingSoon ? "Coming soon" : "savings"}
+						</span>
+					</div>
 
 					<div
 						className=" sidebarRow"
