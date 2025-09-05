@@ -22,7 +22,6 @@ type budgetDataType = {
 	description: string | null;
 	amount: number | null;
 	setLimit: number;
-	frequency: string | null;
 	date: string;
 }[];
 
@@ -68,8 +67,6 @@ const BudgetScreen = () => {
 		useState<string>("");
 	const [plannedPaymentsAmountInput, setPlannedPaymentsAmountInput] =
 		useState<string>("");
-	const [plannedPaymentsFrequencyInput, setPlannedPaymentsFrequencyInput] =
-		useState<string>("");
 
 	// others
 	const [othersCategoryInput, setOthersCategoryInput] = useState<string>("");
@@ -82,6 +79,19 @@ const BudgetScreen = () => {
 		useState<budgetDataType>([]);
 	const [dailyNeedsData, setDailyNeedsData] = useState<budgetDataType>([]);
 	const [othersData, setOthersData] = useState<budgetDataType>([]);
+
+	// expenses
+	const [expenses, setExpenses] = useState<{
+		totalsByCategory: CategoryTotals;
+	} | null>();
+
+	// helper for bar color
+	const getBarColor = (percent: number) => {
+		if (percent < 25) return "bg-green-500";
+		if (percent < 50) return "bg-blue-500";
+		if (percent < 75) return "bg-yellow-400";
+		return "bg-red-500";
+	};
 
 	const addCategory = async (
 		selectedCategory: "daily needs" | "planned payments" | "others"
@@ -131,8 +141,7 @@ const BudgetScreen = () => {
 		if (selectedModal === "planned payments") {
 			if (
 				!plannedPaymentsCategoryInput.trim() ||
-				!plannedPaymentsAmountInput.trim() ||
-				!plannedPaymentsFrequencyInput.trim()
+				!plannedPaymentsAmountInput.trim()
 			) {
 				toast.error(
 					"All fields are required and amount must be a valid number"
@@ -174,11 +183,6 @@ const BudgetScreen = () => {
 							: selectedCategory === "others"
 							? Number(othersLimitInput)
 							: null,
-
-					frequency:
-						selectedCategory === "planned payments"
-							? plannedPaymentsFrequencyInput
-							: null,
 				}
 			);
 
@@ -197,7 +201,6 @@ const BudgetScreen = () => {
 			setDailyNeedsLimitInput("");
 			setPlannedPaymentsCategoryInput("");
 			setPlannedPaymentsAmountInput("");
-			setPlannedPaymentsFrequencyInput("");
 			setOthersCategoryInput("");
 			setOthersDescriptionInput("");
 			setOthersLimitInput("");
@@ -235,7 +238,6 @@ const BudgetScreen = () => {
 						description: data.description || "",
 						amount: Number(data.amount) || 0,
 						setLimit: Number(data.setLimit) || 0,
-						frequency: data.frequency || "",
 					};
 				});
 			};
@@ -314,7 +316,6 @@ const BudgetScreen = () => {
 			// toast.success("Expenses and sub-category totals fetched");
 
 			return {
-				expenses: expenseList,
 				totalsByCategory: totals,
 			};
 		} catch (err) {
@@ -325,15 +326,31 @@ const BudgetScreen = () => {
 		}
 	};
 
+	const getTotalForSubCategory = (
+		category: string,
+		subCategory: string
+	): number => {
+		return expenses?.totalsByCategory[category]?.[subCategory]?.totalSpent ?? 0;
+	};
+
 	// fetch budget data
 	useEffect(() => {
-		if (user) {
-			fetchBudgetData(user.uid);
-			fetchExpensesWithTotals(user.uid);
-		}
+		if (!user) return;
 
+		fetchBudgetData(user.uid);
+
+		(async () => {
+			const result = await fetchExpensesWithTotals(user.uid);
+			if (result) {
+				setExpenses(result); // store both expenses + totals
+			}
+		})();
+	}, [user?.uid]);
+
+	useEffect(() => {
+		console.log(expenses);
 		console.log(isExpensesLoading);
-	}, [user]);
+	}, [expenses]);
 
 	// toggle modal
 	useEffect(() => {
@@ -389,33 +406,54 @@ const BudgetScreen = () => {
 						</thead>
 
 						<tbody>
-							{dailyNeedsData.map((element, index) => (
-								<tr className="border-b border-slate-200" key={index}>
-									<td className="py-4 ">
-										<div className="flex flex-col gap-2">
-											<p className="capitalize ">{element.category}</p>
-											<p className="text-xs">
-												<span className="text-[#52B788]">Description: </span>
-												<span className="italic">{element.description}</span>
-											</p>
-										</div>
-									</td>
+							{dailyNeedsData.map((element, index) => {
+								const totalSpent = getTotalForSubCategory(
+									"daily needs",
+									element.category
+								);
 
-									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
-									<td className="py-4 ">120000</td>
-									<td className="flex flex-row items-center gap-8 py-4 ">
-										<div className="w-64 h-3 rounded-full bg-slate-100">
-											<div className=" bg-red-400 rounded-full h-3 w-[40%]"></div>
-										</div>
+								const percentage = element.setLimit
+									? (totalSpent / element.setLimit) * 100
+									: 0;
 
-										<Image
-											src={editIcon}
-											alt=" edit icon"
-											className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
-										/>
-									</td>
-								</tr>
-							))}
+								return (
+									<tr className="border-b border-slate-200" key={index}>
+										<td className="py-4">
+											<div className="flex flex-col gap-2">
+												<p className="capitalize">{element.category}</p>
+												<p className="text-xs">
+													<span className="text-[#52B788]">Description: </span>
+													<span className="italic">{element.description}</span>
+												</p>
+											</div>
+										</td>
+
+										<td className="py-4">
+											{element.setLimit.toLocaleString()}
+										</td>
+										<td className="py-4">{totalSpent.toLocaleString()}</td>
+
+										<td className="flex flex-row items-center gap-8 py-4">
+											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+												<div
+													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+														percentage
+													)}`}
+													style={{ width: `${Math.min(percentage, 100)}%` }}
+												>
+													{percentage.toFixed(1)}%
+												</div>
+											</div>
+
+											<Image
+												src={editIcon}
+												alt="edit icon"
+												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+											/>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>
@@ -444,19 +482,51 @@ const BudgetScreen = () => {
 						<thead className="capitalize">
 							<tr>
 								<th className="text-start">category</th>
-								<th className="text-start">amount</th>
-								<th className="text-start">frequency</th>
+								<th className="text-start">set limit</th>
+								<th className="text-start">amount spent</th>
+								<th className="text-start">status</th>
 							</tr>
 						</thead>
 
 						<tbody>
-							{plannedPaymentsData.map((element, index) => (
-								<tr className="border-b border-slate-200" key={index}>
-									<td className="py-4 capitalize ">{element.category}</td>
-									<td className="py-4 ">{element.amount?.toLocaleString()}</td>
-									<td className="py-4 capitalize ">{element.frequency}</td>
-								</tr>
-							))}
+							{plannedPaymentsData.map((element, index) => {
+								const totalSpent = getTotalForSubCategory(
+									"planned payments",
+									element.category
+								);
+
+								// avoid null amount
+								const percentage = element.amount
+									? (totalSpent / element.amount) * 100
+									: 0;
+
+								return (
+									<tr className="border-b border-slate-200" key={index}>
+										<td className="py-4 capitalize">{element.category}</td>
+										<td className="py-4">{element.amount?.toLocaleString()}</td>
+										<td className="py-4">{totalSpent.toLocaleString()}</td>
+
+										<td className="flex flex-row items-center gap-8 py-4">
+											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+												<div
+													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+														percentage
+													)}`}
+													style={{ width: `${Math.min(percentage, 100)}%` }}
+												>
+													{percentage.toFixed(1)}%
+												</div>
+											</div>
+
+											<Image
+												src={editIcon}
+												alt="edit icon"
+												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+											/>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>
@@ -506,33 +576,54 @@ const BudgetScreen = () => {
 						</thead>
 
 						<tbody>
-							{othersData.map((element, index) => (
-								<tr className="border-b border-slate-200" key={index}>
-									<td className="py-4 ">
-										<div className="flex flex-col gap-2">
-											<p className="capitalize ">{element.category}</p>
-											<p className="text-xs">
-												<span className="text-[#52B788]">Description: </span>
-												<span className="italic">{element.description}</span>
-											</p>
-										</div>
-									</td>
+							{othersData.map((element, index) => {
+								const totalSpent = getTotalForSubCategory(
+									"others",
+									element.category
+								);
 
-									<td className="py-4 ">{element.setLimit.toLocaleString()}</td>
-									<td className="py-4 ">120000</td>
-									<td className="flex flex-row items-center gap-8 py-4 ">
-										<div className="w-64 h-3 rounded-full bg-slate-100">
-											<div className=" bg-yellow-400 rounded-full h-3 w-[40%]"></div>
-										</div>
+								const percentage = element.setLimit
+									? (totalSpent / element.setLimit) * 100
+									: 0;
 
-										<Image
-											src={editIcon}
-											alt=" edit icon"
-											className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
-										/>
-									</td>
-								</tr>
-							))}
+								return (
+									<tr className="border-b border-slate-200" key={index}>
+										<td className="py-4">
+											<div className="flex flex-col gap-2">
+												<p className="capitalize">{element.category}</p>
+												<p className="text-xs">
+													<span className="text-[#52B788]">Description: </span>
+													<span className="italic">{element.description}</span>
+												</p>
+											</div>
+										</td>
+
+										<td className="py-4">
+											{element.setLimit.toLocaleString()}
+										</td>
+										<td className="py-4">{totalSpent.toLocaleString()}</td>
+
+										<td className="flex flex-row items-center gap-8 py-4">
+											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+												<div
+													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+														percentage
+													)}`}
+													style={{ width: `${Math.min(percentage, 100)}%` }}
+												>
+													{percentage.toFixed(1)}%
+												</div>
+											</div>
+
+											<Image
+												src={editIcon}
+												alt="edit icon"
+												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+											/>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>
@@ -697,46 +788,19 @@ const BudgetScreen = () => {
 						{selectedModal === "planned payments" ? (
 							<div className="inputLabelGroup">
 								<label htmlFor="set-amount" className="inputLabel">
-									Amount
+									Set limit
 								</label>
 								<input
 									type="number"
 									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-									name="set-amount"
-									id="set-amount"
-									placeholder="Set amount"
+									name="set-plannedPayment-limit"
+									id="set-plannedPayment-limit"
+									placeholder="Set Limit"
 									value={plannedPaymentsAmountInput}
 									onChange={(e) =>
 										setPlannedPaymentsAmountInput(e.target.value)
 									}
 								/>
-							</div>
-						) : (
-							""
-						)}
-
-						{selectedModal === "planned payments" ? (
-							<div className="inputLabelGroup">
-								<label htmlFor="set-frequency" className="inputLabel">
-									frequency
-								</label>
-
-								<select
-									name="set-frequency"
-									id="set-frequency"
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-									value={plannedPaymentsFrequencyInput}
-									onChange={(e) =>
-										setPlannedPaymentsFrequencyInput(e.target.value)
-									}
-								>
-									<option value="" disabled>
-										Select a category
-									</option>
-									<option value="daily">Daily</option>
-									<option value="monthly">Monthly</option>
-									<option value="yearly">Yearly</option>
-								</select>
 							</div>
 						) : (
 							""
