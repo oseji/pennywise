@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase/firebase";
@@ -174,6 +175,7 @@ const Sidebar = () => {
 						className=" sidebarRow"
 						onMouseEnter={() => setShowComingSoon(true)}
 						onMouseLeave={() => setShowComingSoon(false)}
+						onClick={() => toast("This feature is coming soon!")}
 
 						// onClick={() => {
 						// 	toggleActiveSidebaritem(4);

@@ -149,3 +149,20 @@ input[type="number"] {
 .notificationsContainer::-webkit-scrollbar-button {
 	display: none;
 }
+
+/* budget */
+.progressBarContainer {
+	@apply flex flex-row items-center gap-8 py-4;
+}
+
+.progressBarBody {
+	@apply relative w-64 h-5 overflow-hidden rounded-full bg-slate-100;
+}
+
+.progressBarTracker {
+	@apply flex items-center justify-center h-5 text-xs font-medium text-white rounded-full;
+}
+
+.budgetEditIcon {
+	@apply transition-all duration-200 ease-in-out cursor-pointer hover:scale-110;
+}

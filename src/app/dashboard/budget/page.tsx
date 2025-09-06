@@ -433,10 +433,10 @@ const BudgetScreen = () => {
 										</td>
 										<td className="py-4">{totalSpent.toLocaleString()}</td>
 
-										<td className="flex flex-row items-center gap-8 py-4">
-											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+										<td className="progressBarContainer">
+											<div className="progressBarBody">
 												<div
-													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+													className={`h-5 flex items-center justify-center text-xs rounded-full font-medium text-white ${getBarColor(
 														percentage
 													)}`}
 													style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -448,7 +448,7 @@ const BudgetScreen = () => {
 											<Image
 												src={editIcon}
 												alt="edit icon"
-												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+												className="budgetEditIcon"
 											/>
 										</td>
 									</tr>
@@ -506,10 +506,10 @@ const BudgetScreen = () => {
 										<td className="py-4">{element.amount?.toLocaleString()}</td>
 										<td className="py-4">{totalSpent.toLocaleString()}</td>
 
-										<td className="flex flex-row items-center gap-8 py-4">
-											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+										<td className="progressBarContainer">
+											<div className="progressBarBody">
 												<div
-													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+													className={`progressBarTracker ${getBarColor(
 														percentage
 													)}`}
 													style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -521,7 +521,7 @@ const BudgetScreen = () => {
 											<Image
 												src={editIcon}
 												alt="edit icon"
-												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+												className="budgetEditIcon"
 											/>
 										</td>
 									</tr>
@@ -603,10 +603,10 @@ const BudgetScreen = () => {
 										</td>
 										<td className="py-4">{totalSpent.toLocaleString()}</td>
 
-										<td className="flex flex-row items-center gap-8 py-4">
-											<div className="relative w-64 h-6 overflow-hidden rounded-full bg-slate-100">
+										<td className="progressBarContainer">
+											<div className="progressBarBody">
 												<div
-													className={`h-6 flex items-center justify-center text-xs font-medium text-white ${getBarColor(
+													className={`progressBarTracker ${getBarColor(
 														percentage
 													)}`}
 													style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -618,7 +618,7 @@ const BudgetScreen = () => {
 											<Image
 												src={editIcon}
 												alt="edit icon"
-												className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
+												className="budgetEditIcon"
 											/>
 										</td>
 									</tr>
