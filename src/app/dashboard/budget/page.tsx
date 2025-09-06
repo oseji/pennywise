@@ -253,7 +253,7 @@ const BudgetScreen = () => {
 			setPlannedPaymentsData(plannedPayments);
 			setOthersData(others);
 
-			toast.success("Budget categories fetched successfully");
+			// toast.success("Budget categories fetched successfully");
 		} catch (err) {
 			const message = formatFetchError(err);
 			console.log(err);
@@ -368,265 +368,279 @@ const BudgetScreen = () => {
 			<div>
 				<h1 className="dashboardHeading">budget</h1>
 
-				{/* daily needs */}
-				<div className=" budgetCategories">
-					<div className="budgetCategoriesHeading">
-						<h1 className=" budgetCategoriesHeadingText">daily needs</h1>
-
-						<button
-							className=" dailyNeedsAddButton"
-							onClick={() => {
-								setIsModalOpen(!isModalOpen);
-								setSelectedModal("daily needs");
-							}}
-						>
-							{selectedModal === "daily needs" && dataLoading ? (
-								<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
-							) : (
-								"+ New Category"
-							)}
-						</button>
+				{dataLoading ? (
+					<div className=" min-h-[70dvh] flex flex-col items-center justify-center">
+						<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
 					</div>
+				) : (
+					<div>
+						{/* daily needs */}
+						<div className=" budgetCategories">
+							<div className="budgetCategoriesHeading">
+								<h1 className=" budgetCategoriesHeadingText">daily needs</h1>
 
-					<table className="w-full mt-4 border-separate table-fixed border-spacing-x-4">
-						<colgroup>
-							<col className=" w-72" />
-							<col className="w-32" />
-							<col className="w-32" />
-							<col className="w-60" />
-						</colgroup>
+								<button
+									className=" dailyNeedsAddButton"
+									onClick={() => {
+										setIsModalOpen(!isModalOpen);
+										setSelectedModal("daily needs");
+									}}
+								>
+									+ New Category
+								</button>
+							</div>
 
-						<thead className="capitalize">
-							<tr>
-								<th className="text-start">category</th>
-								<th className="text-start">set limit</th>
-								<th className="text-start">amount spent</th>
-								<th className="text-start">status</th>
-							</tr>
-						</thead>
+							<table className="w-full mt-4 border-separate table-fixed border-spacing-x-4">
+								<colgroup>
+									<col className=" w-72" />
+									<col className="w-32" />
+									<col className="w-32" />
+									<col className="w-60" />
+								</colgroup>
 
-						<tbody>
-							{dailyNeedsData.map((element, index) => {
-								const totalSpent = getTotalForSubCategory(
-									"daily needs",
-									element.category
-								);
-
-								const percentage = element.setLimit
-									? (totalSpent / element.setLimit) * 100
-									: 0;
-
-								return (
-									<tr className="border-b border-slate-200" key={index}>
-										<td className="py-4">
-											<div className="flex flex-col gap-2">
-												<p className="capitalize">{element.category}</p>
-												<p className="text-xs">
-													<span className="text-[#52B788]">Description: </span>
-													<span className="italic">{element.description}</span>
-												</p>
-											</div>
-										</td>
-
-										<td className="py-4">
-											{element.setLimit.toLocaleString()}
-										</td>
-										<td className="py-4">{totalSpent.toLocaleString()}</td>
-
-										<td className="progressBarContainer">
-											<div className="progressBarBody">
-												<div
-													className={`h-5 flex items-center justify-center text-xs rounded-full font-medium text-white ${getBarColor(
-														percentage
-													)}`}
-													style={{ width: `${Math.min(percentage, 100)}%` }}
-												>
-													{percentage.toFixed(1)}%
-												</div>
-											</div>
-
-											<Image
-												src={editIcon}
-												alt="edit icon"
-												className="budgetEditIcon"
-											/>
-										</td>
+								<thead className="capitalize">
+									<tr>
+										<th className="text-start">category</th>
+										<th className="text-start">set limit</th>
+										<th className="text-start">amount spent</th>
+										<th className="text-start">status</th>
 									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</div>
+								</thead>
 
-				{/* planned payments */}
-				<div className="budgetCategories">
-					<div className="budgetCategoriesHeading">
-						<h1 className="budgetCategoriesHeadingText ">planned payments</h1>
+								<tbody>
+									{dailyNeedsData.map((element, index) => {
+										const totalSpent = getTotalForSubCategory(
+											"daily needs",
+											element.category
+										);
 
-						<button
-							className=" dailyNeedsAddButton"
-							onClick={() => {
-								setIsModalOpen(!isModalOpen);
-								setSelectedModal("planned payments");
-							}}
-						>
-							{selectedModal === "planned payments" && dataLoading ? (
-								<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
-							) : (
-								"+ New Category"
-							)}
-						</button>
-					</div>
+										const percentage = element.setLimit
+											? (totalSpent / element.setLimit) * 100
+											: 0;
 
-					<table className="w-full mt-4 table-fixed">
-						<thead className="capitalize">
-							<tr>
-								<th className="text-start">category</th>
-								<th className="text-start">set limit</th>
-								<th className="text-start">amount spent</th>
-								<th className="text-start">status</th>
-							</tr>
-						</thead>
+										return (
+											<tr className="border-b border-slate-200" key={index}>
+												<td className="py-4">
+													<div className="flex flex-col gap-2">
+														<p className="capitalize">{element.category}</p>
+														<p className="text-xs">
+															<span className="text-[#52B788]">
+																Description:{" "}
+															</span>
+															<span className="italic">
+																{element.description}
+															</span>
+														</p>
+													</div>
+												</td>
 
-						<tbody>
-							{plannedPaymentsData.map((element, index) => {
-								const totalSpent = getTotalForSubCategory(
-									"planned payments",
-									element.category
-								);
+												<td className="py-4">
+													{element.setLimit.toLocaleString()}
+												</td>
+												<td className="py-4">{totalSpent.toLocaleString()}</td>
 
-								// avoid null amount
-								const percentage = element.amount
-									? (totalSpent / element.amount) * 100
-									: 0;
+												<td className="progressBarContainer">
+													<div className="progressBarBody">
+														<div
+															className={`h-5 flex items-center justify-center text-xs rounded-full font-medium text-white ${getBarColor(
+																percentage
+															)}`}
+															style={{
+																width: `${Math.min(percentage, 100)}%`,
+															}}
+														>
+															{percentage.toFixed(1)}%
+														</div>
+													</div>
 
-								return (
-									<tr className="border-b border-slate-200" key={index}>
-										<td className="py-4 capitalize">{element.category}</td>
-										<td className="py-4">{element.amount?.toLocaleString()}</td>
-										<td className="py-4">{totalSpent.toLocaleString()}</td>
-
-										<td className="progressBarContainer">
-											<div className="progressBarBody">
-												<div
-													className={`progressBarTracker ${getBarColor(
-														percentage
-													)}`}
-													style={{ width: `${Math.min(percentage, 100)}%` }}
-												>
-													{percentage.toFixed(1)}%
-												</div>
-											</div>
-
-											<Image
-												src={editIcon}
-												alt="edit icon"
-												className="budgetEditIcon"
-											/>
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</div>
-
-				{/* others */}
-				<div className="budgetCategories">
-					<div className="pb-3 border-b border-slate-200">
-						<div className="budgetCategoriesHeading">
-							<h1 className="budgetCategoriesHeadingText ">others</h1>
-
-							<button
-								className=" dailyNeedsAddButton"
-								onClick={() => {
-									setIsModalOpen(!isModalOpen);
-									setSelectedModal("others");
-								}}
-							>
-								{selectedModal === "others" && dataLoading ? (
-									<div className="w-5 h-5 border-2 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto capitalize" />
-								) : (
-									"+ New Entry"
-								)}
-							</button>
+													<Image
+														src={editIcon}
+														alt="edit icon"
+														className="budgetEditIcon"
+													/>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
 						</div>
 
-						<p className="text-sm ">
-							Includes expenditures that do not fit into pre existing
-							categories.
-						</p>
-					</div>
+						{/* planned payments */}
+						<div className="budgetCategories">
+							<div className="budgetCategoriesHeading">
+								<h1 className="budgetCategoriesHeadingText ">
+									planned payments
+								</h1>
 
-					<table className="w-full mt-4 table-fixed">
-						<colgroup>
-							<col className="w-72" />
-							<col className="w-32" />
-							<col className="w-32" />
-							<col className="w-64" />
-						</colgroup>
+								<button
+									className=" dailyNeedsAddButton"
+									onClick={() => {
+										setIsModalOpen(!isModalOpen);
+										setSelectedModal("planned payments");
+									}}
+								>
+									+ New Category
+								</button>
+							</div>
 
-						<thead className="capitalize">
-							<tr>
-								<th className="text-start">category</th>
-								<th className="text-start">set limit</th>
-								<th className="text-start">amount spent</th>
-								<th className="text-start">status</th>
-							</tr>
-						</thead>
-
-						<tbody>
-							{othersData.map((element, index) => {
-								const totalSpent = getTotalForSubCategory(
-									"others",
-									element.category
-								);
-
-								const percentage = element.setLimit
-									? (totalSpent / element.setLimit) * 100
-									: 0;
-
-								return (
-									<tr className="border-b border-slate-200" key={index}>
-										<td className="py-4">
-											<div className="flex flex-col gap-2">
-												<p className="capitalize">{element.category}</p>
-												<p className="text-xs">
-													<span className="text-[#52B788]">Description: </span>
-													<span className="italic">{element.description}</span>
-												</p>
-											</div>
-										</td>
-
-										<td className="py-4">
-											{element.setLimit.toLocaleString()}
-										</td>
-										<td className="py-4">{totalSpent.toLocaleString()}</td>
-
-										<td className="progressBarContainer">
-											<div className="progressBarBody">
-												<div
-													className={`progressBarTracker ${getBarColor(
-														percentage
-													)}`}
-													style={{ width: `${Math.min(percentage, 100)}%` }}
-												>
-													{percentage.toFixed(1)}%
-												</div>
-											</div>
-
-											<Image
-												src={editIcon}
-												alt="edit icon"
-												className="budgetEditIcon"
-											/>
-										</td>
+							<table className="w-full mt-4 table-fixed">
+								<thead className="capitalize">
+									<tr>
+										<th className="text-start">category</th>
+										<th className="text-start">set limit</th>
+										<th className="text-start">amount spent</th>
+										<th className="text-start">status</th>
 									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</div>
+								</thead>
+
+								<tbody>
+									{plannedPaymentsData.map((element, index) => {
+										const totalSpent = getTotalForSubCategory(
+											"planned payments",
+											element.category
+										);
+
+										// avoid null amount
+										const percentage = element.amount
+											? (totalSpent / element.amount) * 100
+											: 0;
+
+										return (
+											<tr className="border-b border-slate-200" key={index}>
+												<td className="py-4 capitalize">{element.category}</td>
+												<td className="py-4">
+													{element.amount?.toLocaleString()}
+												</td>
+												<td className="py-4">{totalSpent.toLocaleString()}</td>
+
+												<td className="progressBarContainer">
+													<div className="progressBarBody">
+														<div
+															className={`progressBarTracker ${getBarColor(
+																percentage
+															)}`}
+															style={{
+																width: `${Math.min(percentage, 100)}%`,
+															}}
+														>
+															{percentage.toFixed(1)}%
+														</div>
+													</div>
+
+													<Image
+														src={editIcon}
+														alt="edit icon"
+														className="budgetEditIcon"
+													/>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+
+						{/* others */}
+						<div className="budgetCategories">
+							<div className="pb-3 border-b border-slate-200">
+								<div className="budgetCategoriesHeading">
+									<h1 className="budgetCategoriesHeadingText ">others</h1>
+
+									<button
+										className=" dailyNeedsAddButton"
+										onClick={() => {
+											setIsModalOpen(!isModalOpen);
+											setSelectedModal("others");
+										}}
+									>
+										+ New Category
+									</button>
+								</div>
+
+								<p className="text-sm ">
+									Includes expenditures that do not fit into pre existing
+									categories.
+								</p>
+							</div>
+
+							<table className="w-full mt-4 table-fixed">
+								<colgroup>
+									<col className="w-72" />
+									<col className="w-32" />
+									<col className="w-32" />
+									<col className="w-64" />
+								</colgroup>
+
+								<thead className="capitalize">
+									<tr>
+										<th className="text-start">category</th>
+										<th className="text-start">set limit</th>
+										<th className="text-start">amount spent</th>
+										<th className="text-start">status</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									{othersData.map((element, index) => {
+										const totalSpent = getTotalForSubCategory(
+											"others",
+											element.category
+										);
+
+										const percentage = element.setLimit
+											? (totalSpent / element.setLimit) * 100
+											: 0;
+
+										return (
+											<tr className="border-b border-slate-200" key={index}>
+												<td className="py-4">
+													<div className="flex flex-col gap-2">
+														<p className="capitalize">{element.category}</p>
+														<p className="text-xs">
+															<span className="text-[#52B788]">
+																Description:{" "}
+															</span>
+															<span className="italic">
+																{element.description}
+															</span>
+														</p>
+													</div>
+												</td>
+
+												<td className="py-4">
+													{element.setLimit.toLocaleString()}
+												</td>
+												<td className="py-4">{totalSpent.toLocaleString()}</td>
+
+												<td className="progressBarContainer">
+													<div className="progressBarBody">
+														<div
+															className={`progressBarTracker ${getBarColor(
+																percentage
+															)}`}
+															style={{
+																width: `${Math.min(percentage, 100)}%`,
+															}}
+														>
+															{percentage.toFixed(1)}%
+														</div>
+													</div>
+
+													<Image
+														src={editIcon}
+														alt="edit icon"
+														className="budgetEditIcon"
+													/>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Modals */}

@@ -90,6 +90,7 @@ const Login = () => {
 					</div>
 
 					<p className="mb-4 text-center ">Welcome back to Pennywise</p>
+
 					<div className="flex flex-col gap-4 ">
 						<div className=" inputLabelGroup">
 							<label htmlFor="email" className=" inputLabel">
@@ -121,7 +122,7 @@ const Login = () => {
 
 								<span
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-									className="underline cursor-pointer "
+									className="cursor-pointer "
 								>
 									{isPasswordVisible ? "Hide" : "Show"}
 								</span>
@@ -153,10 +154,6 @@ const Login = () => {
 							"Login"
 						)}
 					</button>
-
-					{/* <Link href={"/dashboard"}>
-					
-					</Link> */}
 
 					<p className="text-center ">
 						Don’t have an account ?{" "}

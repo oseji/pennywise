@@ -98,18 +98,6 @@ input[type="number"] {
 	@apply relative z-20 p-4 bg-white rounded-lg shadow-lg md:p-8 w-[90%] sm:w-96;
 }
 
-.budgetCategories {
-	@apply w-full px-4 py-4 mb-6 bg-white rounded-lg shadow-md md:py-10 md:px-6;
-}
-
-.budgetCategoriesHeading {
-	@apply flex flex-col justify-between gap-2 pb-3 border-b md:flex-row md:items-center md:gap-0 border-slate-200;
-}
-
-.budgetCategoriesHeadingText {
-	@apply text-xl font-bold capitalize md:text-2xl;
-}
-
 .hideAlertModal {
 	@apply -translate-y-96;
 }
@@ -151,6 +139,18 @@ input[type="number"] {
 }
 
 /* budget */
+.budgetCategories {
+	@apply w-full px-4 py-4 mb-6 bg-white rounded-lg shadow-md md:py-10 md:px-6;
+}
+
+.budgetCategoriesHeading {
+	@apply flex flex-col justify-between gap-2 pb-3 border-b md:flex-row md:items-center md:gap-0 border-slate-200;
+}
+
+.budgetCategoriesHeadingText {
+	@apply text-xl font-bold capitalize md:text-2xl;
+}
+
 .progressBarContainer {
 	@apply flex flex-row items-center gap-8 py-4;
 }
