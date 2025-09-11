@@ -25,6 +25,12 @@ type CategorySummary = {
 	totalAmount: number;
 };
 
+type BudgetDoc = {
+	amount?: number;
+	setLimit?: number;
+	category?: string;
+};
+
 const Dashboard = () => {
 	const user = auth.currentUser;
 
@@ -74,7 +80,6 @@ const Dashboard = () => {
 	): Promise<{
 		income: userData;
 		expense: userData;
-		budget: userData;
 	}> => {
 		setisLoading(true);
 
@@ -82,7 +87,6 @@ const Dashboard = () => {
 			return {
 				income: { total: 0, categories: [] },
 				expense: { total: 0, categories: [] },
-				budget: { total: 0, categories: [] },
 			};
 		}
 
@@ -119,31 +123,82 @@ const Dashboard = () => {
 		try {
 			const income = await summarize("incomeData");
 			const expense = await summarize("expenseData");
-			const budget = await summarize("budgetData");
-			return { income, expense, budget };
+			return { income, expense };
 		} catch (err) {
 			toast.error(formatFetchError(err));
 			return {
 				income: { total: 0, categories: [] },
 				expense: { total: 0, categories: [] },
-				budget: { total: 0, categories: [] },
 			};
 		} finally {
 			setisLoading(false);
 		}
 	};
 
+	const fetchBudgetData = async (userId: string): Promise<userData> => {
+		if (!userId) return { total: 0, categories: [] };
+
+		try {
+			const budgetCategories = ["others", "plannedPayments", "dailyNeeds"];
+
+			let total = 0;
+			const categories: CategorySummary[] = [];
+
+			for (const cat of budgetCategories) {
+				// 👇 fetch from subcollection "data"
+				const ref = collection(db, `users/${userId}/budgetData/${cat}/data`);
+				const snap = await getDocs(ref);
+
+				let catTotal = 0;
+				snap.docs.forEach((doc) => {
+					const d = doc.data() as BudgetDoc;
+
+					// Use the right field depending on what exists
+					const value = d.amount ?? d.setLimit ?? 0;
+
+					catTotal += Number(value) || 0;
+				});
+
+				total += catTotal;
+
+				categories.push({
+					name: cat,
+					totalAmount: catTotal,
+					percentage: 0, // placeholder, fixed below
+				});
+			}
+
+			// now calculate percentages
+			const finalCategories = categories.map((c) => ({
+				...c,
+				percentage: total
+					? parseFloat(((c.totalAmount / total) * 100).toFixed(2))
+					: 0,
+			}));
+
+			return { total, categories: finalCategories };
+		} catch (err) {
+			toast.error(formatFetchError(err));
+			return { total: 0, categories: [] };
+		}
+	};
+
 	useEffect(() => {
 		const load = async () => {
 			if (!user?.uid) return;
+
 			const data = await fetchUserDataSummary(user.uid);
-			if (data) {
+			const budget = await fetchBudgetData(user.uid);
+
+			if (data && budget) {
 				setIncomeSummary(data.income);
 				setExpenseSummary(data.expense);
-				setBudgetSummary(data.budget);
+				setBudgetSummary(budget);
 			}
 		};
 		load();
+
+		console.log(budgetSummary);
 	}, [user?.uid]);
 
 	useEffect(() => {
@@ -230,7 +285,7 @@ const Dashboard = () => {
 
 					<div className=" chartBox">
 						<div className="chartBoxHeadingGroup">
-							<h1>Savings</h1>
+							<h1>Budget</h1>
 
 							<span>{budgetSummary.total.toLocaleString()}</span>
 						</div>

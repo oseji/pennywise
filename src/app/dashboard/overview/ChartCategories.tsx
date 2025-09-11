@@ -31,13 +31,11 @@ const ChartCategories: React.FC<CategoryListProps> = ({
 }) => {
 	if (!summary || !summary.categories) return null;
 
-	// ✅ create a color mapping based on the original order
 	const colorMap: Record<string, string> = {};
 	summary.categories.forEach((cat, i) => {
 		colorMap[cat.name] = colors[i % colors.length];
 	});
 
-	// then sort categories by percentage
 	const sortedCategories = [...summary.categories].sort(
 		(a, b) => b.percentage - a.percentage
 	);
