@@ -145,7 +145,7 @@ const Dashboard = () => {
 			const categories: CategorySummary[] = [];
 
 			for (const cat of budgetCategories) {
-				// 👇 fetch from subcollection "data"
+				//fetch from subcollection "data"
 				const ref = collection(db, `users/${userId}/budgetData/${cat}/data`);
 				const snap = await getDocs(ref);
 
@@ -164,11 +164,10 @@ const Dashboard = () => {
 				categories.push({
 					name: cat,
 					totalAmount: catTotal,
-					percentage: 0, // placeholder, fixed below
+					percentage: 0, // placeholder
 				});
 			}
 
-			// now calculate percentages
 			const finalCategories = categories.map((c) => ({
 				...c,
 				percentage: total
@@ -245,6 +244,8 @@ const Dashboard = () => {
 							</Pie>
 						</PieChart>
 
+						<p>This chart shows the sources of your total income.</p>
+
 						<div className="flex flex-row justify-start w-full mt-auto">
 							<ChartCategories summary={incomeSummary} limit={5} />
 						</div>
@@ -278,6 +279,10 @@ const Dashboard = () => {
 							</Pie>
 						</PieChart>
 
+						<p>
+							This chart breaks down how your total spending is categorized.
+						</p>
+
 						<div className="flex flex-row justify-start w-full mt-auto ">
 							<ChartCategories summary={expenseSummary} limit={5} />
 						</div>
@@ -310,6 +315,8 @@ const Dashboard = () => {
 								))}
 							</Pie>
 						</PieChart>
+
+						<p>This chart illustrates how your total budget is allocated.</p>
 
 						<div className="flex flex-row justify-start w-full mt-auto">
 							<ChartCategories summary={budgetSummary} limit={5} />
