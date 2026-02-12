@@ -5,6 +5,13 @@ import { useState } from "react";
 const SettingsPage = () => {
 	const [currency, setCurrency] = useState<string>("");
 
+	const Toggle = () => (
+		<label className="relative inline-flex items-center cursor-pointer">
+			<input type="checkbox" className="sr-only peer" />
+			<div className="h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-[#2D6A4F] peer-checked:after:translate-x-5 transition-colors duration-200"></div>
+		</label>
+	);
+
 	return (
 		<div className=" dashboardScreen">
 			<h1 className="dashboardHeading">settings</h1>
@@ -16,7 +23,7 @@ const SettingsPage = () => {
 						<p>Allow Pennywise send transaction notifications and updates.</p>
 					</div>
 
-					<div>toggle</div>
+					<Toggle />
 				</div>
 
 				<div className="settingsRow">
@@ -50,7 +57,7 @@ const SettingsPage = () => {
 						</p>
 					</div>
 
-					<div>toggle</div>
+					<Toggle />
 				</div>
 
 				<div className="settingsRow">
@@ -59,7 +66,7 @@ const SettingsPage = () => {
 						<p>Temporarily or permanently suspend Pennywise account.</p>
 					</div>
 
-					<div>toggle</div>
+					<Toggle />
 				</div>
 
 				<div className="settingsRow">
