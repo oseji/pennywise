@@ -28,6 +28,8 @@ const Sidebar = () => {
         useState<boolean>(false);
     const [showProfileComingSoon, setShowProfileComingSoon] =
         useState<boolean>(false);
+    const [showHistoryComingSoon, setShowHistoryComingSoon] =
+        useState<boolean>(false);
 
     const sideBarItems = useRef<(HTMLSpanElement | null)[]>([]);
     const sideBarTexts = useRef<(HTMLSpanElement | null)[]>([]);
@@ -180,7 +182,7 @@ const Sidebar = () => {
                         className=" sidebarRow"
                         onMouseEnter={() => setShowSavingsComingSoon(true)}
                         onMouseLeave={() => setShowSavingsComingSoon(false)}
-                        onClick={() => toast("This feature is coming soon!")}
+                        onClick={() => toast("Savings feature is coming soon!")}
 
                         // onClick={() => {
                         // 	toggleActiveSidebaritem(4);
@@ -212,7 +214,7 @@ const Sidebar = () => {
                         className=" sidebarRow"
                         onMouseEnter={() => setShowProfileComingSoon(true)}
                         onMouseLeave={() => setShowProfileComingSoon(false)}
-                        onClick={() => toast("This feature is coming soon!")}
+                        onClick={() => toast("Profile feature is coming soon!")}
 
                         // onClick={() => {
                         // 	toggleActiveSidebaritem(5);
@@ -236,16 +238,22 @@ const Sidebar = () => {
                                 sideBarTexts.current[5] = el;
                             }}
                         >
-                            profile
+                            {showProfileComingSoon
+                                ? "Coming soon"
+                                : "profile"}{" "}
                         </span>
                     </div>
 
                     <div
                         className=" sidebarRow"
-                        onClick={() => {
-                            toggleActiveSidebaritem(6);
-                            close();
-                        }}
+                        onMouseEnter={() => setShowHistoryComingSoon(true)}
+                        onMouseLeave={() => setShowHistoryComingSoon(false)}
+                        onClick={() => toast("History feature is coming soon!")}
+
+                        // onClick={() => {
+                        //     toggleActiveSidebaritem(6);
+                        //     close();
+                        // }}
                     >
                         <span
                             className=" sidebarIndicator"
@@ -255,12 +263,18 @@ const Sidebar = () => {
                         ></span>
                         <Image src={historyIcon} alt="history" />
                         <span
-                            className=" sidebarText"
+                            className={` sidebarText ${
+                                showHistoryComingSoon
+                                    ? " scale-105 text-[#2D6A4F] font-semibold"
+                                    : ""
+                            }`}
                             ref={(el) => {
                                 sideBarTexts.current[6] = el;
                             }}
                         >
-                            history
+                            {showHistoryComingSoon
+                                ? "Coming soon"
+                                : "history"}{" "}
                         </span>
                     </div>
                 </div>
