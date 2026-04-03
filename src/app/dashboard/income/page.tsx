@@ -55,7 +55,7 @@ const IncomeScreen = () => {
         useState<string>("");
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 4;
+    const itemsPerPage = 6;
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -255,7 +255,7 @@ const IncomeScreen = () => {
                                 <div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
                             </div>
                         ) : (
-                            <div className=" p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[45dvh] shadow">
+                            <div className=" p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[50dvh] shadow">
                                 {currentItems.map((element, index) => (
                                     <div
                                         className="grid grid-cols-4 py-4"
