@@ -6,7 +6,9 @@ import { useNotificationStore } from "@/store/useNotificationStore";
 
 import { db, auth } from "@/firebase/firebase";
 import { getDocs, query, orderBy, collection } from "firebase/firestore";
+
 import toast from "react-hot-toast";
+import { X } from "lucide-react";
 
 type notificationDataType = {
 	date: string;
@@ -87,16 +89,18 @@ const Notifications = () => {
 			}`}
 		>
 			<div className=" notificationsHeaderContainer">
-				<h1 className=" text-[#2D6A4F] md:text-xl font-bold capitalize mb-4">
+				<h1 className=" text-[#2D6A4F] md:text-xl font-bold capitalize">
 					Notifications
 				</h1>
 
-				<p
+				{/* <p
 					className="text-sm font-semibold underline transition-all duration-200 ease-in-out cursor-pointer hover:scale-110"
 					onClick={close}
 				>
 					Close
-				</p>
+				</p> */}
+
+				<X className="w-5 h-5 cursor-pointer hover:scale-125 transition ease-in-out duration-300" onClick={close} />
 			</div>
 
 			<ul className=" notificationsContainer">
