@@ -44,18 +44,18 @@ input[type="number"] {
 
 /* sidebar */
 .sidebarRow {
-    @apply flex flex-row items-center w-auto gap-2 capitalize transition-all duration-200 ease-in-out cursor-pointer md:w-full;
+    @apply flex flex-row items-center w-auto gap-2 capitalize transition-all duration-200 ease-in-out cursor-pointer lg:w-full;
 }
 
 .sidebarIndicator {
-    @apply p-0.5 h-5 md:h-8 bg-slate-200 rounded-xl;
+    @apply p-0.5 h-5 lg:h-8 bg-slate-200 rounded-xl;
 }
 .sidebarIndicatorActive {
-    @apply p-0.5 h-5 md:h-8 bg-[#2D6A4F] rounded-xl;
+    @apply p-0.5 h-5 lg:h-8 bg-[#2D6A4F] rounded-xl;
 }
 
 .sidebarText {
-    @apply hidden transition-all duration-200 ease-in-out cursor-pointer md:block md:visible;
+    @apply hidden transition-all duration-200 ease-in-out cursor-pointer lg:block lg:visible;
 }
 
 .activeSidebarText {
@@ -112,7 +112,7 @@ input[type="number"] {
 
 /* notifications */
 .notificationsHeaderContainer {
-    @apply fixed flex flex-row items-center justify-between w-[95%] top-4 left-1/2 -translate-x-1/2 bg-white;
+    @apply flex flex-row items-center justify-between w-full bg-transparent;
 }
 
 .notificationsContainer {

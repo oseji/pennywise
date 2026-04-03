@@ -242,8 +242,8 @@ const IncomeScreen = () => {
                 </button>
 
                 <div>
-                    <div className="overflow-x-scroll text-sm lg:overflow-hidden">
-                        <div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
+                    <div className="overflow-x-auto text-sm">
+                        <div className="min-w-[720px] w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-4 text-white rounded-lg mt-5 font-bold">
                             <p className="text-center ">date | time</p>
                             <p className=" text-start">narration</p>
                             <p className="text-center ">amount</p>
@@ -255,7 +255,7 @@ const IncomeScreen = () => {
                                 <div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
                             </div>
                         ) : (
-                            <div className=" p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[50dvh] shadow">
+                            <div className="min-w-[720px] p-2 md:p-4 mt-4 bg-white rounded-lg min-h-[50dvh] shadow">
                                 {currentItems.map((element, index) => (
                                     <div
                                         className="grid grid-cols-4 py-4"

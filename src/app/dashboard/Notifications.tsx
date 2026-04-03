@@ -84,11 +84,11 @@ const Notifications = () => {
 
 	return (
 		<div
-			className={`fixed z-50 p-4 rounded-lg shadow bg-white/80 top-24 right-10 backdrop-blur-xl w-full md:w-[60%] lg:w-[50%] xl:w-[40%]  transition-all ease-in-out duration-500 ${
+			className={`fixed z-50 p-4 rounded-lg shadow bg-white/80 top-24 left-2 right-2 md:left-auto md:right-10 backdrop-blur-xl w-full md:w-[60%] lg:w-[50%] xl:w-[40%] transition-all ease-in-out duration-500 ${
 				isOpen ? "" : "notificationsToggled"
 			}`}
 		>
-			<div className=" notificationsHeaderContainer">
+			<div className="notificationsHeaderContainer">
 				<h1 className=" text-[#2D6A4F] md:text-xl font-bold capitalize">
 					Notifications
 				</h1>
@@ -100,7 +100,10 @@ const Notifications = () => {
 					Close
 				</p> */}
 
-				<X className="w-5 h-5 cursor-pointer hover:scale-125 transition ease-in-out duration-300" onClick={close} />
+				<X
+					className="w-5 h-5 cursor-pointer hover:scale-125 transition ease-in-out duration-300"
+					onClick={close}
+				/>
 			</div>
 
 			<ul className=" notificationsContainer">

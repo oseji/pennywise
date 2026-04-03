@@ -2,7 +2,7 @@ import Dashboard from "./overview/page";
 
 const DashboardPage = () => {
 	return (
-		<div className="relative flex flex-row min-w-full">
+		<div className="w-full">
 			<Dashboard />
 		</div>
 	);

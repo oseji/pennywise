@@ -14,11 +14,11 @@ const ForgotPassword = () => {
 	};
 
 	return (
-		<div className="  max-h-[100dvh] h-[100dvh]  relative">
-			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
+		<div className="relative min-h-dvh">
+			<div className="bg-white w-full flex flex-col items-center justify-center min-h-dvh py-10">
 				<form
 					action=""
-					className=" rounded-lg px-10 py-8 shadow-lg w-[90%] md:w-[50%] lg:w-[500px]"
+					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
 					onClick={(e) => e.preventDefault()}
 				>
 					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl">
@@ -71,7 +71,7 @@ const ForgotPassword = () => {
 
 			{/* alert modal */}
 			<div
-				className={`absolute top-5 left-1/2 -translate-x-1/2 text-center rounded-lg opacity-90 bg-white shadow-xl w-80 flex flex-col gap-4 p-9 transition ease-in-out duration-300  ${
+				className={`absolute top-5 left-1/2 -translate-x-1/2 text-center rounded-lg opacity-90 bg-white shadow-xl w-[92%] max-w-80 flex flex-col gap-4 p-9 transition ease-in-out duration-300 ${
 					hide ? "hideAlertModal" : ""
 				}`}
 				ref={alertModalRef}

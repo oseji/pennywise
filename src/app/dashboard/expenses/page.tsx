@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Pagination from "@/utils/Pagination";
-// import Image from "next/image";
+import Image from "next/image";
 import { auth, db } from "@/firebase/firebase";
 import {
     addDoc,
@@ -10,6 +10,8 @@ import {
     serverTimestamp,
     query,
     orderBy,
+    deleteDoc,
+    doc,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
@@ -17,6 +19,7 @@ import { formatAddDocError } from "@/utils/formatAddDocError";
 import { getPaginationRange } from "@/utils/getPaginationRange";
 
 // import searchIcon from "../../../assets/dashboard/search.svg";
+import deleteIcon from "../../../assets/dashboard/delete icon.svg";
 
 type expenseDataType = {
     category: string;
@@ -24,6 +27,7 @@ type expenseDataType = {
     amount: number;
     narration: string;
     date: string;
+    id: string;
 }[];
 
 const ExpensesPage = () => {
@@ -33,6 +37,11 @@ const ExpensesPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+    const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
+    const deleteModalRef = useRef<HTMLDivElement>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+    const [selectedIdForDeletion, setSelectedIdForDeletion] =
+        useState<string>("");
 
     const [expenseData, setExpenseData] = useState<expenseDataType>([]);
 
@@ -58,11 +67,11 @@ const ExpensesPage = () => {
         setIsDataLoading(true);
 
         try {
-            const incomeReference = collection(
+            const expenseReference = collection(
                 db,
                 `users/${userId}/expenseData`,
             );
-            const q = query(incomeReference, orderBy("createdAt", "desc"));
+            const q = query(expenseReference, orderBy("createdAt", "desc"));
 
             const querySnapshot = await getDocs(q);
 
@@ -83,6 +92,7 @@ const ExpensesPage = () => {
                         }) || "",
                     narration: data.narration || "",
                     amount: Number(data.amount) || 0,
+                    id: doc.id,
                 };
             });
 
@@ -153,6 +163,30 @@ const ExpensesPage = () => {
         }
     };
 
+    const deleteExpense = async (expenseId: string) => {
+        if (!user) return;
+
+        setIsDeletionLoading(true);
+
+        try {
+            await deleteDoc(
+                doc(db, `users/${user.uid}/expenseData/${expenseId}`),
+            );
+
+            const updatedData = await fetchExpenses(user.uid);
+            setExpenseData(updatedData ?? []);
+
+            toast.success("Expense entry deleted successfully");
+        } catch (err) {
+            console.log(`error deleting expense: ${err}`);
+            toast.error(`${formatAddDocError(err)}`);
+        } finally {
+            setSelectedIdForDeletion("");
+            setIsDeleteModalOpen(false);
+            setIsDeletionLoading(false);
+        }
+    };
+
     // fetch sub categories on category change
     useEffect(() => {
         const fetchSubCategories = async () => {
@@ -212,6 +246,17 @@ const ExpensesPage = () => {
         }
     }, [isModalOpen]);
 
+    // toggle deletion modal
+    useEffect(() => {
+        if (isDeleteModalOpen) {
+            deleteModalRef.current?.classList.remove("hideDeleteModal");
+        }
+
+        if (!isDeleteModalOpen) {
+            deleteModalRef.current?.classList.add("hideDeleteModal");
+        }
+    }, [isDeleteModalOpen]);
+
     return (
         <div className="relative dashboardScreen">
             <div>
@@ -265,11 +310,13 @@ const ExpensesPage = () => {
                 </form> */}
 
                 <div>
-                    <div className=" w-full grid grid-cols-4 capitalize bg-[#2D6A4F] p-3 text-white rounded-lg mt-5">
+                    <div className="overflow-x-auto text-sm">
+                        <div className="min-w-[820px] w-full grid grid-cols-5 capitalize bg-[#2D6A4F] p-3 text-white rounded-lg mt-5">
                         <p>category</p>
                         <p>narration</p>
                         <p>time</p>
                         <p>amount</p>
+                        <p className="text-center">action</p>
                     </div>
 
                     {isDataLoading ? (
@@ -277,7 +324,7 @@ const ExpensesPage = () => {
                             <div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
                         </div>
                     ) : (
-                        <div className="p-3 mt-5 bg-white rounded-lg shadow-md min-h-[65dvh]">
+                        <div className="min-w-[820px] p-3 mt-5 bg-white rounded-lg shadow-md min-h-[65dvh]">
                             <div className="flex flex-row items-center justify-between pb-3 border-b border-slate-200">
                                 <p className=" text-[#2D6A4F] font-semibold">
                                     DAY
@@ -299,7 +346,7 @@ const ExpensesPage = () => {
                             </div>
 
                             {currentItems.map((element, index) => (
-                                <div className="grid grid-cols-4 " key={index}>
+                                <div className="grid grid-cols-5 " key={index}>
                                     <div className="pt-2 capitalize ">
                                         <p>{element.category}</p>
                                         <p className=" text-xs font-bold text-[#2D6A4F]">
@@ -312,11 +359,24 @@ const ExpensesPage = () => {
                                     <p className="pt-2 ">
                                         {element.amount.toLocaleString()}
                                     </p>
-                                    <p className="pt-2 "></p>
+                                    <div className="flex flex-row items-center justify-center pt-2 ">
+                                        <Image
+                                            src={deleteIcon}
+                                            alt="delete icon"
+                                            className="transition ease-in-out cursor-pointer hover:scale-110"
+                                            onClick={() => {
+                                                setSelectedIdForDeletion(
+                                                    element.id,
+                                                );
+                                                setIsDeleteModalOpen(true);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
+                    </div>
 
                     <Pagination
                         currentPage={currentPage}
@@ -447,6 +507,48 @@ const ExpensesPage = () => {
                             )}
                         </button>
                     </form>
+                </div>
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideDeleteModal"
+                ref={deleteModalRef}
+            >
+                {/* Overlay */}
+                <div
+                    className="absolute inset-0 bg-black opacity-50 cursor-pointer"
+                    onClick={() => setIsDeleteModalOpen(!isDeleteModalOpen)}
+                ></div>
+
+                {/* Modal Content */}
+                <div className={`inputModals`}>
+                    <p className="mb-5">
+                        Are you sure you want to delete this entry?
+                    </p>
+
+                    <div className="flex flex-row items-center justify-center gap-5 ">
+                        <button
+                            className="px-4 py-2 text-white transition duration-200 ease-in-out bg-red-500 rounded-lg w-28 hover:scale-110"
+                            onClick={() => {
+                                deleteExpense(selectedIdForDeletion);
+                            }}
+                        >
+                            {isDeletionLoading ? (
+                                <div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin " />
+                            ) : (
+                                "Delete"
+                            )}
+                        </button>
+                        <button
+                            className="px-4 py-2 text-white transition duration-200 ease-in-out bg-gray-500 rounded-lg w-28 hover:scale-110"
+                            onClick={() =>
+                                setIsDeleteModalOpen(!isDeleteModalOpen)
+                            }
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

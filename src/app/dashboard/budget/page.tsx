@@ -390,7 +390,8 @@ const BudgetScreen = () => {
 								</button>
 							</div>
 
-							<table className="w-full mt-4 border-separate table-fixed border-spacing-x-4">
+							<div className="w-full overflow-x-auto">
+							<table className="min-w-[900px] w-full mt-4 border-separate border-spacing-x-4">
 								<colgroup>
 									<col className=" w-72" />
 									<col className="w-32" />
@@ -464,6 +465,7 @@ const BudgetScreen = () => {
 									})}
 								</tbody>
 							</table>
+							</div>
 						</div>
 
 						{/* planned payments */}
@@ -484,7 +486,8 @@ const BudgetScreen = () => {
 								</button>
 							</div>
 
-							<table className="w-full mt-4 table-fixed">
+							<div className="w-full overflow-x-auto">
+							<table className="min-w-[900px] w-full mt-4">
 								<thead className="capitalize">
 									<tr>
 										<th className="text-start">category</th>
@@ -539,6 +542,7 @@ const BudgetScreen = () => {
 									})}
 								</tbody>
 							</table>
+							</div>
 						</div>
 
 						{/* others */}
@@ -564,7 +568,8 @@ const BudgetScreen = () => {
 								</p>
 							</div>
 
-							<table className="w-full mt-4 table-fixed">
+							<div className="w-full overflow-x-auto">
+							<table className="min-w-[900px] w-full mt-4">
 								<colgroup>
 									<col className="w-72" />
 									<col className="w-32" />
@@ -638,6 +643,7 @@ const BudgetScreen = () => {
 									})}
 								</tbody>
 							</table>
+							</div>
 						</div>
 					</div>
 				)}

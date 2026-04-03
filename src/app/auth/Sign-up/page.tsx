@@ -73,10 +73,10 @@ const SignUp = () => {
 	};
 
 	return (
-		<div className=" flex flex-col lg:flex-row lg:justify-between items-center max-h-[100dvh] h-[100dvh] text-xs">
-			<div className=" bg-white w-full flex flex-col items-center justify-center h-[100dvh] min-h-[100dvh]">
+		<div className="flex flex-col items-center min-h-dvh text-xs lg:flex-row lg:justify-between">
+			<div className="bg-white w-full flex flex-col items-center justify-center min-h-dvh py-10">
 				<form
-					className=" rounded-lg px-10 py-8 shadow-lg w-[90%] md:w-[50%] lg:w-[500px]"
+					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
 					onSubmit={(e) => {
 						e.preventDefault();
 						console.log(signUpInfo);
@@ -238,7 +238,7 @@ const SignUp = () => {
 			<Image
 				src={loginImage2}
 				alt="Login Image"
-				className=" hidden lg:block  h-[100dvh] min-h-[100dvh]"
+				className="hidden lg:block h-dvh min-h-dvh object-cover"
 			/>
 		</div>
 	);

@@ -34,29 +34,31 @@ const SavingsPage = () => {
 					</button>
 				</div>
 
-				{/* table header */}
-				<div className=" p-4 rounded-lg bg-slate-200 text-[#2D6A4F] capitalize font-semibold grid grid-cols-5 mt-6">
-					<p>purpose</p>
-					<p>frequency</p>
-					<p>amount</p>
-					<p>target date</p>
-					<p>progress</p>
-				</div>
+				<div className="overflow-x-auto text-sm">
+					{/* table header */}
+					<div className="min-w-[820px] p-4 rounded-lg bg-slate-200 text-[#2D6A4F] capitalize font-semibold grid grid-cols-5 mt-6">
+						<p>purpose</p>
+						<p>frequency</p>
+						<p>amount</p>
+						<p>target date</p>
+						<p>progress</p>
+					</div>
 
-				{/* table content */}
-				<div className="grid grid-cols-5 px-4 pt-5 ">
-					<p>
-						<span>1. </span>
-						<span className="capitalize ">emergency</span>
-					</p>
+					{/* table content */}
+					<div className="min-w-[820px] grid grid-cols-5 px-4 pt-5 ">
+						<p>
+							<span>1. </span>
+							<span className="capitalize ">emergency</span>
+						</p>
 
-					<p className="capitalize ">monthly</p>
+						<p className="capitalize ">monthly</p>
 
-					<p>100,000</p>
+						<p>100,000</p>
 
-					<p>dec, 2023</p>
+						<p>dec, 2023</p>
 
-					<p>progresssssssssssssssssssssssssssss</p>
+						<p className="truncate">progresssssssssssssssssssssssssssss</p>
+					</div>
 				</div>
 
 				<div className="flex flex-row items-center justify-between mt-10 text-sm ">

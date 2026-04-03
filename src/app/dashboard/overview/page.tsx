@@ -215,7 +215,7 @@ const Dashboard = () => {
 					<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
 				</div>
 			) : (
-				<div className="flex flex-col items-center gap-10 md:flex-row md:justify-between">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 					<div className=" chartBox">
 						<div className="chartBoxHeadingGroup">
 							<h1>Income</h1>

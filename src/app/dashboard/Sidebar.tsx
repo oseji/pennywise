@@ -8,6 +8,7 @@ import { auth } from "@/firebase/firebase";
 import { signOut } from "firebase/auth";
 import { formatLogoutError } from "@/utils/formatLogoutError";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { Ellipsis, LogOut, Settings, X } from "lucide-react";
 
 import dashboardIcon from "../../assets/sidebar/dashboard.svg";
 import incomeIcon from "../../assets/sidebar/income.svg";
@@ -24,6 +25,7 @@ const Sidebar = () => {
     const { close } = useNotificationStore();
 
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [showSavingsComingSoon, setShowSavingsComingSoon] =
         useState<boolean>(false);
     const [showProfileComingSoon, setShowProfileComingSoon] =
@@ -67,10 +69,10 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="w-auto p-4 mt-20 md:p-6 md:w-64">
-            <div className="flex flex-col items-start gap-10 ">
-                <div className="flex flex-col w-full gap-4">
-                    <h1 className="hidden mb-2 text-slate-400 md:block">
+        <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-white border-t border-slate-200 lg:static lg:border-0 lg:bg-transparent lg:w-64 lg:p-6 lg:mt-20">
+            <div className="flex flex-row items-center justify-around w-full lg:flex-col lg:items-start lg:justify-start lg:gap-10">
+                <div className="flex flex-row items-center justify-around w-full gap-3 lg:flex-col lg:items-start lg:justify-start lg:gap-4">
+                    <h1 className="hidden mb-2 text-slate-400 lg:block">
                         Overview
                     </h1>
 
@@ -179,7 +181,7 @@ const Sidebar = () => {
                     </Link>
 
                     <div
-                        className=" sidebarRow"
+                        className="sidebarRow lg:flex"
                         onMouseEnter={() => setShowSavingsComingSoon(true)}
                         onMouseLeave={() => setShowSavingsComingSoon(false)}
                         onClick={() => toast("Savings feature is coming soon!")}
@@ -211,7 +213,7 @@ const Sidebar = () => {
                     </div>
 
                     <div
-                        className=" sidebarRow"
+                        className="sidebarRow lg:flex"
                         onMouseEnter={() => setShowProfileComingSoon(true)}
                         onMouseLeave={() => setShowProfileComingSoon(false)}
                         onClick={() => toast("Profile feature is coming soon!")}
@@ -245,7 +247,7 @@ const Sidebar = () => {
                     </div>
 
                     <div
-                        className=" sidebarRow"
+                        className="sidebarRow lg:flex"
                         onMouseEnter={() => setShowHistoryComingSoon(true)}
                         onMouseLeave={() => setShowHistoryComingSoon(false)}
                         onClick={() => toast("History feature is coming soon!")}
@@ -279,9 +281,19 @@ const Sidebar = () => {
                     </div>
                 </div>
 
+                {/* Mobile "More" menu (last item) */}
+                <button
+                    type="button"
+                    className="flex flex-row items-center justify-center w-auto gap-2 lg:hidden"
+                    onClick={() => setIsMoreOpen(true)}
+                    aria-label="Open menu"
+                >
+                    <Ellipsis className="w-6 h-6 text-slate-700" />
+                </button>
+
                 <Link href={"/dashboard/settings"}>
-                    <div className="flex flex-col gap-4 ">
-                        <h1 className="hidden mb-2 text-slate-400 md:block">
+                    <div className="hidden lg:flex lg:flex-col lg:gap-4">
+                        <h1 className="hidden mb-2 text-slate-400 lg:block">
                             Others
                         </h1>
 
@@ -309,6 +321,54 @@ const Sidebar = () => {
                         </div>
                     </div>
                 </Link>
+            </div>
+
+            {/* Mobile More sheet */}
+            <div
+                className={`fixed inset-0 z-50 lg:hidden ${
+                    isMoreOpen ? "flex" : "hidden"
+                } items-end justify-center`}
+            >
+                <div
+                    className="absolute inset-0 bg-black/40"
+                    onClick={() => setIsMoreOpen(false)}
+                />
+
+                <div className="relative z-10 w-full max-w-md p-4 bg-white rounded-t-2xl shadow-xl">
+                    <div className="flex flex-row items-center justify-between pb-3 border-b border-slate-200">
+                        <p className="font-semibold">Menu</p>
+                        <button
+                            type="button"
+                            onClick={() => setIsMoreOpen(false)}
+                            aria-label="Close menu"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col gap-3 pt-4">
+                        <Link
+                            href={"/dashboard/settings"}
+                            onClick={() => setIsMoreOpen(false)}
+                            className="flex flex-row items-center gap-3 p-3 border rounded-lg border-slate-200"
+                        >
+                            <Settings className="w-5 h-5 text-slate-700" />
+                            <span className="font-medium">Settings</span>
+                        </Link>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsMoreOpen(false);
+                                logout();
+                            }}
+                            className="flex flex-row items-center gap-3 p-3 text-white bg-red-500 rounded-lg"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span className="font-medium">Logout</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
