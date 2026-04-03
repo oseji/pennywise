@@ -171,13 +171,14 @@ const IncomeScreen = () => {
 
         try {
             await deleteDoc(doc(db, `users/${user.uid}/incomeData/${id}`));
-            toast.success("Income deleted successfully");
 
             const updatedData = await fetchIncomeData(user.uid);
             setIncomeData(updatedData ?? []);
+
+            toast.success("Income entry deleted successfully");
         } catch (err) {
             console.error("Error deleting document:", err);
-            toast.error("Error deleting income");
+            toast.error("Error deleting income entry");
         } finally {
             setSelectedIdForDeletion("");
             setIsDeleteModalOpen(false);
