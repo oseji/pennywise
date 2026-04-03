@@ -16,7 +16,7 @@ const Pagination: React.FC<PaginationProps> = ({
     onPageChange,
 }) => {
     return (
-        <div className="flex justify-center gap-10 mt-4">
+        <div className="flex flex-row items-center justify-center gap-10 mt-4">
             {/* Previous Button */}
             <button
                 onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
@@ -41,7 +41,7 @@ const Pagination: React.FC<PaginationProps> = ({
                             className={`px-4 py-1 rounded-lg ${
                                 currentPage === page
                                     ? "bg-[#2D6A4F] text-white"
-                                    : "bg-gray-200"
+                                    : "bg-gray-200 dark:bg-slate-700 dark:text-slate-100"
                             }`}
                         >
                             {page}

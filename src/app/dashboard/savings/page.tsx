@@ -1,168 +1,187 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
+import { AccessibleDialog } from "@/components/AccessibleDialog";
+import { formatMoney } from "@/utils/formatMoney";
+import { usePreferencesStore } from "@/store/usePreferencesStore";
 
 const SavingsPage = () => {
-	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const currency = usePreferencesStore((s) => s.currency);
 
-	// toggle modal
-	useEffect(() => {
-		if (isModalOpen) {
-			modalRef.current?.classList.remove("hideIncomeModal");
-		}
-
-		if (!isModalOpen) {
-			modalRef.current?.classList.add("hideIncomeModal");
-		}
-	}, [isModalOpen]);
+	const demoAmount = 100_000;
 
 	return (
 		<div className="relative dashboardScreen">
 			<div>
 				<h1 className="dashboardHeading">savings</h1>
 
-				<div className="flex flex-row items-center justify-between capitalize ">
-					<h2 className="text-xl font-bold ">savings target</h2>
+				<div className="flex flex-row items-center justify-between capitalize">
+					<h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+						Savings target
+					</h2>
 
 					<button
-						className=" capitalize text-white rounded-lg px-4 py-2 bg-[#2D6A4F]"
-						onClick={() => {
-							setIsModalOpen(!isModalOpen);
-						}}
+						type="button"
+						className="rounded-lg bg-[#2D6A4F] px-4 py-2 font-semibold capitalize text-white transition hover:opacity-95"
+						onClick={() => setIsModalOpen(true)}
 					>
 						new target
 					</button>
 				</div>
 
-				<div className="overflow-x-auto text-sm">
-					{/* table header */}
-					<div className="min-w-[820px] p-4 rounded-lg bg-slate-200 text-[#2D6A4F] capitalize font-semibold grid grid-cols-5 mt-6">
-						<p>purpose</p>
-						<p>frequency</p>
-						<p>amount</p>
-						<p>target date</p>
-						<p>progress</p>
-					</div>
+				<p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+					Savings targets will sync to your account in a future update. Below is
+					a sample layout.
+				</p>
 
-					{/* table content */}
-					<div className="min-w-[820px] grid grid-cols-5 px-4 pt-5 ">
-						<p>
-							<span>1. </span>
-							<span className="capitalize ">emergency</span>
+				{/* Mobile card */}
+				<div className="mt-6 md:hidden">
+					<div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+						<p className="text-xs font-semibold uppercase tracking-wide text-[#2D6A4F] dark:text-[#95D5B2]">
+							Sample
 						</p>
-
-						<p className="capitalize ">monthly</p>
-
-						<p>100,000</p>
-
-						<p>dec, 2023</p>
-
-						<p className="truncate">progresssssssssssssssssssssssssssss</p>
+						<p className="mt-1 capitalize text-slate-900 dark:text-slate-100">
+							emergency
+						</p>
+						<p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+							Monthly · Target {formatMoney(demoAmount, currency)}
+						</p>
+						<p className="mt-1 text-xs text-slate-500">Dec 2023</p>
+						<div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+							<div className="h-full w-[45%] rounded-full bg-[#2D6A4F]" />
+						</div>
 					</div>
 				</div>
 
-				<div className="flex flex-row items-center justify-between mt-10 text-sm ">
-					<div className="flex flex-row items-end gap-4 ">
-						<div className="w-5 h-5 p-1 bg-green-500 "></div>
-						<p>Savings on track</p>
+				{/* Desktop table */}
+				<div className="mt-6 hidden text-sm md:block">
+					<div className="overflow-x-auto rounded-t-xl">
+						<div className="dataTableHeader grid min-w-[820px] grid-cols-5">
+							<p className="tableStickyCell">purpose</p>
+							<p>frequency</p>
+							<p>amount</p>
+							<p>target date</p>
+							<p>progress</p>
+						</div>
+					</div>
+					<div className="dataTableSurface min-w-[820px] px-4 pb-6 pt-5">
+						<div className="grid grid-cols-5 gap-2 border-b border-slate-100 py-3 dark:border-slate-700">
+							<p className="tableStickyCell text-slate-900 dark:text-slate-100">
+								<span className="mr-1">1.</span>
+								<span className="capitalize">emergency</span>
+							</p>
+							<p className="capitalize text-slate-700 dark:text-slate-300">
+								monthly
+							</p>
+							<p className="tabular-nums text-slate-900 dark:text-slate-100">
+								{formatMoney(demoAmount, currency)}
+							</p>
+							<p className="text-slate-600 dark:text-slate-400">Dec, 2023</p>
+							<p className="truncate text-slate-600 dark:text-slate-400">
+								45% toward goal
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div className="mt-10 flex flex-col gap-4 text-sm md:flex-row md:items-center md:justify-between">
+					<div className="flex flex-row items-end gap-3">
+						<div className="h-5 w-5 shrink-0 rounded bg-green-500" />
+						<p className="text-slate-700 dark:text-slate-300">Savings on track</p>
 					</div>
 
-					<div className="flex flex-row items-end gap-4 ">
-						<div className="w-5 h-5 p-1 bg-yellow-500 "></div>
-						<p>1 payment behind</p>
+					<div className="flex flex-row items-end gap-3">
+						<div className="h-5 w-5 shrink-0 rounded bg-yellow-500" />
+						<p className="text-slate-700 dark:text-slate-300">1 payment behind</p>
 					</div>
 
-					<div className="flex flex-row items-end gap-4 ">
-						<div className="w-5 h-5 p-1 bg-red-500 "></div>
-						<p>Multiple payments behind</p>
+					<div className="flex flex-row items-end gap-3">
+						<div className="h-5 w-5 shrink-0 rounded bg-red-500" />
+						<p className="text-slate-700 dark:text-slate-300">
+							Multiple payments behind
+						</p>
 					</div>
 				</div>
 			</div>
 
-			{/* Add savings Modal */}
-			<div
-				className="fixed inset-0 z-50 flex items-center justify-center hideIncomeModal"
-				ref={modalRef}
+			<AccessibleDialog
+				open={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				title="Add savings target"
+				titleId="savings-dialog-title"
 			>
-				{/* Overlay */}
-				<div
-					className="absolute inset-0 bg-black cursor-pointer opacity-90"
-					onClick={() => setIsModalOpen(!isModalOpen)}
-				></div>
+				<form
+					className="flex flex-col gap-2"
+					onSubmit={(e) => {
+						e.preventDefault();
+						setIsModalOpen(false);
+					}}
+				>
+					<div className="inputLabelGroup">
+						<label htmlFor="savings-purpose" className="inputLabel">
+							Savings purpose
+						</label>
+						<input
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							type="text"
+							name="narration"
+							id="savings-purpose"
+							placeholder="e.g. Emergency fund"
+						/>
+					</div>
 
-				{/* Modal Content */}
-				<div className={`inputModals`}>
-					<h2 className="mb-6 text-2xl font-bold">Add Savings Target</h2>
+					<div className="inputLabelGroup">
+						<label htmlFor="frequency" className="inputLabel">
+							Frequency
+						</label>
+						<select
+							name="frequency"
+							id="frequency"
+							className="rounded-lg border border-slate-200 bg-white p-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							defaultValue=""
+						>
+							<option value="" disabled>
+								Select frequency
+							</option>
+							<option value="Daily">Daily</option>
+							<option value="Monthly">Monthly</option>
+							<option value="Yearly">Yearly</option>
+						</select>
+					</div>
 
-					<form
-						className="flex flex-col gap-2"
-						onSubmit={(e) => {
-							e.preventDefault();
-						}}
+					<div className="inputLabelGroup">
+						<label htmlFor="target-amount" className="inputLabel">
+							Target amount
+						</label>
+						<input
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							type="number"
+							name="amount"
+							id="target-amount"
+							placeholder="Enter target amount"
+						/>
+					</div>
+
+					<div className="inputLabelGroup">
+						<label htmlFor="target-date" className="inputLabel">
+							Target date
+						</label>
+						<input
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							type="date"
+							name="date"
+							id="target-date"
+						/>
+					</div>
+
+					<button
+						type="submit"
+						className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95"
 					>
-						<div className="inputLabelGroup">
-							<label htmlFor="narration" className="inputLabel">
-								Savings purpose
-							</label>
-							<input
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-								type="text"
-								name="narration"
-								id="narration"
-								placeholder="Enter Narration"
-							/>
-						</div>
-
-						<div className="inputLabelGroup">
-							<label htmlFor="frequency" className="inputLabel">
-								Frequency
-							</label>
-							<select
-								name="frequency"
-								id="frequency"
-								className="p-2 border rounded-l border-slate-200 focus:outline-0"
-							>
-								<option value="" disabled>
-									Enter frequency
-								</option>
-								<option value="Daily">Daily</option>
-								<option value="Monthly">Monthly</option>
-								<option value="Yearly">Yearly</option>
-							</select>
-						</div>
-
-						<div className="inputLabelGroup">
-							<label htmlFor="amount" className="inputLabel">
-								Target Amount
-							</label>
-							<input
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-								type="number"
-								name="amount"
-								id="amount"
-								placeholder="Enter target amount"
-							/>
-						</div>
-
-						<div className="inputLabelGroup">
-							<label htmlFor="amount" className="inputLabel">
-								Target date
-							</label>
-							<input
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-								type="date"
-								name="date"
-								id="date"
-								placeholder="Enter target date"
-							/>
-						</div>
-
-						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
-							Add
-						</button>
-					</form>
-				</div>
-			</div>
+						Add
+					</button>
+				</form>
+			</AccessibleDialog>
 		</div>
 	);
 };

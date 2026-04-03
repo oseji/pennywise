@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 
 import { auth, db } from "@/firebase/firebase";
@@ -16,6 +16,10 @@ import { formatFetchError } from "@/utils/formatFetchError";
 
 import editIcon from "../../../assets/dashboard/edit icon.svg";
 import { formatAddDocError } from "@/utils/formatAddDocError";
+import { AccessibleDialog } from "@/components/AccessibleDialog";
+import { EmptyState } from "@/components/EmptyState";
+import { formatMoney } from "@/utils/formatMoney";
+import { usePreferencesStore } from "@/store/usePreferencesStore";
 
 type budgetDataType = {
 	category: string;
@@ -44,12 +48,10 @@ type CategoryTotals = {
 
 const BudgetScreen = () => {
 	const user = auth.currentUser;
+	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [dataLoading, setDataLoading] = useState<boolean>(false);
-	const [isExpensesLoading, setIsExpensesLoading] = useState<boolean>(false);
-
-	const modalRef = useRef<HTMLDivElement>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [selectedModal, setSelectedModal] = useState<
 		"daily needs" | "planned payments" | "others"
@@ -191,7 +193,6 @@ const BudgetScreen = () => {
 			fetchBudgetData(user.uid);
 			setIsModalOpen(false);
 		} catch (err) {
-			console.log(`error adding entry: ${err}`);
 			toast.error(`${formatAddDocError(err)}`);
 		} finally {
 			setIsLoading(false);
@@ -256,7 +257,6 @@ const BudgetScreen = () => {
 			// toast.success("Budget categories fetched successfully");
 		} catch (err) {
 			const message = formatFetchError(err);
-			console.log(err);
 			toast.error(`${message}`);
 		} finally {
 			setDataLoading(false);
@@ -264,8 +264,6 @@ const BudgetScreen = () => {
 	};
 
 	const fetchExpensesWithTotals = async (userId: string) => {
-		if (!user) setIsExpensesLoading(true);
-
 		try {
 			const expenseRef = collection(db, `users/${userId}/expenseData`);
 			const q = query(expenseRef, orderBy("createdAt", "desc"));
@@ -321,8 +319,6 @@ const BudgetScreen = () => {
 		} catch (err) {
 			const message = formatFetchError(err);
 			toast.error(`${message}`);
-		} finally {
-			setIsExpensesLoading(false);
 		}
 	};
 
@@ -345,23 +341,14 @@ const BudgetScreen = () => {
 				setExpenses(result); // store both expenses + totals
 			}
 		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount / uid only
 	}, [user?.uid]);
 
-	useEffect(() => {
-		console.log(expenses);
-		console.log(isExpensesLoading);
-	}, [expenses]);
-
-	// toggle modal
-	useEffect(() => {
-		if (isModalOpen) {
-			modalRef.current?.classList.remove("hideIncomeModal");
-		}
-
-		if (!isModalOpen) {
-			modalRef.current?.classList.add("hideIncomeModal");
-		}
-	}, [isModalOpen]);
+	const modalTitle = useMemo(() => {
+		if (selectedModal === "daily needs") return "Add daily needs";
+		if (selectedModal === "planned payments") return "Add planned payments";
+		return "Add others";
+	}, [selectedModal]);
 
 	return (
 		<div className="relative dashboardScreen">
@@ -369,8 +356,13 @@ const BudgetScreen = () => {
 				<h1 className="dashboardHeading">budget</h1>
 
 				{dataLoading ? (
-					<div className=" min-h-[70dvh] flex flex-col items-center justify-center">
-						<div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
+					<div className="flex min-h-[70dvh] flex-col gap-6 py-8">
+						{[0, 1, 2].map((k) => (
+							<div
+								key={k}
+								className="h-48 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800"
+							/>
+						))}
 					</div>
 				) : (
 					<div>
@@ -401,7 +393,7 @@ const BudgetScreen = () => {
 
 								<thead className="capitalize">
 									<tr>
-										<th className="text-start">category</th>
+										<th className="tableStickyCell text-start">category</th>
 										<th className="text-start">set limit</th>
 										<th className="text-start">amount spent</th>
 										<th className="text-start">status</th>
@@ -409,7 +401,17 @@ const BudgetScreen = () => {
 								</thead>
 
 								<tbody>
-									{dailyNeedsData.map((element, index) => {
+									{dailyNeedsData.length === 0 ? (
+										<tr>
+											<td colSpan={4} className="py-10">
+												<EmptyState
+													title="No daily needs categories"
+													description="Create a category to set spending limits."
+												/>
+											</td>
+										</tr>
+									) : (
+										dailyNeedsData.map((element, index) => {
 										const totalSpent = getTotalForSubCategory(
 											"daily needs",
 											element.category
@@ -420,12 +422,12 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200" key={index}>
-												<td className="py-4">
+											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+												<td className="tableStickyCell py-4">
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-[#52B788]">
+															<span className="text-[#52B788] dark:text-[#95D5B2]">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -435,10 +437,12 @@ const BudgetScreen = () => {
 													</div>
 												</td>
 
-												<td className="py-4">
-													{element.setLimit.toLocaleString()}
+												<td className="py-4 tabular-nums">
+													{formatMoney(element.setLimit, currency)}
 												</td>
-												<td className="py-4">{totalSpent.toLocaleString()}</td>
+												<td className="py-4 tabular-nums">
+													{formatMoney(totalSpent, currency)}
+												</td>
 
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
@@ -462,7 +466,8 @@ const BudgetScreen = () => {
 												</td>
 											</tr>
 										);
-									})}
+									})
+									)}
 								</tbody>
 							</table>
 							</div>
@@ -490,7 +495,7 @@ const BudgetScreen = () => {
 							<table className="min-w-[900px] w-full mt-4">
 								<thead className="capitalize">
 									<tr>
-										<th className="text-start">category</th>
+										<th className="tableStickyCell text-start">category</th>
 										<th className="text-start">set limit</th>
 										<th className="text-start">amount spent</th>
 										<th className="text-start">status</th>
@@ -498,7 +503,17 @@ const BudgetScreen = () => {
 								</thead>
 
 								<tbody>
-									{plannedPaymentsData.map((element, index) => {
+									{plannedPaymentsData.length === 0 ? (
+										<tr>
+											<td colSpan={4} className="py-10">
+												<EmptyState
+													title="No planned payments"
+													description="Add a category and limit to track bills and subscriptions."
+												/>
+											</td>
+										</tr>
+									) : (
+										plannedPaymentsData.map((element, index) => {
 										const totalSpent = getTotalForSubCategory(
 											"planned payments",
 											element.category
@@ -510,12 +525,16 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200" key={index}>
-												<td className="py-4 capitalize">{element.category}</td>
-												<td className="py-4">
-													{element.amount?.toLocaleString()}
+											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+												<td className="tableStickyCell py-4 capitalize">{element.category}</td>
+												<td className="py-4 tabular-nums">
+													{element.amount != null
+														? formatMoney(element.amount, currency)
+														: "—"}
 												</td>
-												<td className="py-4">{totalSpent.toLocaleString()}</td>
+												<td className="py-4 tabular-nums">
+													{formatMoney(totalSpent, currency)}
+												</td>
 
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
@@ -539,7 +558,8 @@ const BudgetScreen = () => {
 												</td>
 											</tr>
 										);
-									})}
+									})
+									)}
 								</tbody>
 							</table>
 							</div>
@@ -579,7 +599,7 @@ const BudgetScreen = () => {
 
 								<thead className="capitalize">
 									<tr>
-										<th className="text-start">category</th>
+										<th className="tableStickyCell text-start">category</th>
 										<th className="text-start">set limit</th>
 										<th className="text-start">amount spent</th>
 										<th className="text-start">status</th>
@@ -587,7 +607,17 @@ const BudgetScreen = () => {
 								</thead>
 
 								<tbody>
-									{othersData.map((element, index) => {
+									{othersData.length === 0 ? (
+										<tr>
+											<td colSpan={4} className="py-10">
+												<EmptyState
+													title="No “others” categories"
+													description="Use this section for spending outside your main buckets."
+												/>
+											</td>
+										</tr>
+									) : (
+										othersData.map((element, index) => {
 										const totalSpent = getTotalForSubCategory(
 											"others",
 											element.category
@@ -598,12 +628,12 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200" key={index}>
-												<td className="py-4">
+											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+												<td className="tableStickyCell py-4">
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-[#52B788]">
+															<span className="text-[#52B788] dark:text-[#95D5B2]">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -613,10 +643,12 @@ const BudgetScreen = () => {
 													</div>
 												</td>
 
-												<td className="py-4">
-													{element.setLimit.toLocaleString()}
+												<td className="py-4 tabular-nums">
+													{formatMoney(element.setLimit, currency)}
 												</td>
-												<td className="py-4">{totalSpent.toLocaleString()}</td>
+												<td className="py-4 tabular-nums">
+													{formatMoney(totalSpent, currency)}
+												</td>
 
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
@@ -640,7 +672,8 @@ const BudgetScreen = () => {
 												</td>
 											</tr>
 										);
-									})}
+									})
+									)}
 								</tbody>
 							</table>
 							</div>
@@ -649,35 +682,12 @@ const BudgetScreen = () => {
 				)}
 			</div>
 
-			{/* Modals */}
-			<div
-				className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideIncomeModal"
-				ref={modalRef}
+			<AccessibleDialog
+				open={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				title={modalTitle}
+				titleId="budget-modal-title"
 			>
-				{/* Overlay */}
-				<div
-					className="absolute inset-0 bg-black opacity-50 cursor-pointer"
-					onClick={() => setIsModalOpen(!isModalOpen)}
-				></div>
-
-				{/* Modal Content */}
-				<div className={`inputModals`}>
-					{selectedModal === "daily needs" ? (
-						<h2 className="mb-6 text-2xl font-bold">Add Daily Needs</h2>
-					) : (
-						""
-					)}
-					{selectedModal === "planned payments" ? (
-						<h2 className="mb-6 text-2xl font-bold">Add Planned Payments</h2>
-					) : (
-						""
-					)}
-					{selectedModal === "others" ? (
-						<h2 className="mb-6 text-2xl font-bold">Add Others</h2>
-					) : (
-						""
-					)}
-
 					<form
 						className="flex flex-col gap-2"
 						onSubmit={(e) => {
@@ -826,16 +836,19 @@ const BudgetScreen = () => {
 							""
 						)}
 
-						<button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
+						<button
+							type="submit"
+							className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+							disabled={isLoading}
+						>
 							{isLoading ? (
-								<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
+								<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
 							) : (
 								"Add"
 							)}
 						</button>
 					</form>
-				</div>
-			</div>
+			</AccessibleDialog>
 		</div>
 	);
 };

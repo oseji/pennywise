@@ -1,558 +1,551 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Pagination from "@/utils/Pagination";
 import Image from "next/image";
 import { auth, db } from "@/firebase/firebase";
 import {
-    addDoc,
-    getDocs,
-    collection,
-    serverTimestamp,
-    query,
-    orderBy,
-    deleteDoc,
-    doc,
+	addDoc,
+	getDocs,
+	collection,
+	serverTimestamp,
+	query,
+	orderBy,
+	deleteDoc,
+	doc,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { formatAddDocError } from "@/utils/formatAddDocError";
 import { getPaginationRange } from "@/utils/getPaginationRange";
+import { AccessibleDialog } from "@/components/AccessibleDialog";
+import { EmptyState } from "@/components/EmptyState";
+import { formatMoney } from "@/utils/formatMoney";
+import { usePreferencesStore } from "@/store/usePreferencesStore";
 
-// import searchIcon from "../../../assets/dashboard/search.svg";
 import deleteIcon from "../../../assets/dashboard/delete icon.svg";
 
 type expenseDataType = {
-    category: string;
-    subCategory: string;
-    amount: number;
-    narration: string;
-    date: string;
-    id: string;
+	category: string;
+	subCategory: string;
+	amount: number;
+	narration: string;
+	date: string;
+	id: string;
 }[];
 
 const ExpensesPage = () => {
-    const user = auth.currentUser;
-
-    const modalRef = useRef<HTMLDivElement>(null);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
-    const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
-    const deleteModalRef = useRef<HTMLDivElement>(null);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-    const [selectedIdForDeletion, setSelectedIdForDeletion] =
-        useState<string>("");
-
-    const [expenseData, setExpenseData] = useState<expenseDataType>([]);
-
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [subCategories, setSubCategories] = useState<string[]>([]);
-
-    const [categoryInput, setCategoriesInput] = useState<string>("");
-    const [subCategoryInput, setSubCategoryInput] = useState<string>("");
-    const [narrationInput, setNarrationInput] = useState<string>("");
-    const [amountInput, setAmountInput] = useState<string>("");
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 9;
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = expenseData.slice(indexOfFirstItem, indexOfLastItem);
-
-    const totalPages = Math.ceil(expenseData.length / itemsPerPage);
-    const paginationRange = getPaginationRange(currentPage, totalPages);
-
-    const fetchExpenses = async (userId: string) => {
-        setIsDataLoading(true);
-
-        try {
-            const expenseReference = collection(
-                db,
-                `users/${userId}/expenseData`,
-            );
-            const q = query(expenseReference, orderBy("createdAt", "desc"));
-
-            const querySnapshot = await getDocs(q);
-
-            const expenseList = querySnapshot.docs.map((doc) => {
-                const data = doc.data();
-
-                return {
-                    category: data.category,
-                    subCategory: data.subCategory,
-                    date:
-                        data.createdAt?.toDate().toLocaleString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                        }) || "",
-                    narration: data.narration || "",
-                    amount: Number(data.amount) || 0,
-                    id: doc.id,
-                };
-            });
-
-            // toast.success("Expenses data fetched successfully");
-
-            return expenseList;
-        } catch (err) {
-            const message = formatFetchError(err);
-            toast.error(`${message}`);
-        } finally {
-            setIsDataLoading(false);
-        }
-    };
-
-    const addExpense = async () => {
-        if (!user) return;
-
-        if (
-            !categoryInput.trim() ||
-            !subCategoryInput.trim() ||
-            !narrationInput.trim() ||
-            isNaN(Number(amountInput)) ||
-            Number(amountInput) <= 0
-        ) {
-            toast.error(
-                "All fields are required and amount must be a valid number",
-            );
-            return;
-        }
-
-        setIsLoading(true);
-
-        try {
-            await addDoc(collection(db, `users/${user.uid}/expenseData`), {
-                category: categoryInput,
-                subCategory: subCategoryInput,
-                narration: narrationInput,
-                amount: Number(amountInput),
-                createdAt: serverTimestamp(),
-            });
-
-            // add notification
-            await addDoc(collection(db, `users/${user.uid}/notifications`), {
-                notification: ` was added to the Expenses under the category of `,
-                category: categoryInput,
-                amount: Number(amountInput),
-                createdAt: serverTimestamp(),
-            });
-
-            toast.success(
-                `${Number(amountInput).toLocaleString()} added to Expenses`,
-            );
-
-            setIsModalOpen(false);
-
-            const updatedData = await fetchExpenses(user.uid);
-            setExpenseData(updatedData ?? []);
-        } catch (err) {
-            console.log(`error adding expense: ${err}`);
-            toast.error(`${formatAddDocError(err)}`);
-        } finally {
-            setIsLoading(false);
-
-            setCategoriesInput("");
-            setSubCategoryInput("");
-            setNarrationInput("");
-            setAmountInput("");
-        }
-    };
-
-    const deleteExpense = async (expenseId: string) => {
-        if (!user) return;
-
-        setIsDeletionLoading(true);
-
-        try {
-            await deleteDoc(
-                doc(db, `users/${user.uid}/expenseData/${expenseId}`),
-            );
-
-            const updatedData = await fetchExpenses(user.uid);
-            setExpenseData(updatedData ?? []);
-
-            toast.success("Expense entry deleted successfully");
-        } catch (err) {
-            console.log(`error deleting expense: ${err}`);
-            toast.error(`${formatAddDocError(err)}`);
-        } finally {
-            setSelectedIdForDeletion("");
-            setIsDeleteModalOpen(false);
-            setIsDeletionLoading(false);
-        }
-    };
-
-    // fetch sub categories on category change
-    useEffect(() => {
-        const fetchSubCategories = async () => {
-            if (!user?.uid || !selectedCategory) return;
-
-            const categoryKey =
-                selectedCategory === "planned payments"
-                    ? "plannedPayments"
-                    : selectedCategory === "daily needs"
-                      ? "dailyNeeds"
-                      : selectedCategory === "others"
-                        ? "others"
-                        : "";
-
-            if (!categoryKey) return;
-
-            const querySnapshot = await getDocs(
-                collection(
-                    db,
-                    `users/${user.uid}/budgetData/${categoryKey}/data`,
-                ),
-            );
-
-            const fetchedCategories = new Set<string>();
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.category) {
-                    fetchedCategories.add(data.category);
-                }
-            });
-
-            setSubCategories(Array.from(fetchedCategories));
-        };
-
-        fetchSubCategories();
-    }, [selectedCategory, user?.uid]);
-
-    // fetch expense data on mount
-    useEffect(() => {
-        const getData = async () => {
-            if (user) {
-                setExpenseData((await fetchExpenses(user.uid)) ?? []);
-            }
-        };
-        getData();
-    }, [user?.uid]);
-
-    // toggle modal
-    useEffect(() => {
-        if (isModalOpen) {
-            modalRef.current?.classList.remove("hideIncomeModal");
-        }
-
-        if (!isModalOpen) {
-            modalRef.current?.classList.add("hideIncomeModal");
-        }
-    }, [isModalOpen]);
-
-    // toggle deletion modal
-    useEffect(() => {
-        if (isDeleteModalOpen) {
-            deleteModalRef.current?.classList.remove("hideDeleteModal");
-        }
-
-        if (!isDeleteModalOpen) {
-            deleteModalRef.current?.classList.add("hideDeleteModal");
-        }
-    }, [isDeleteModalOpen]);
-
-    return (
-        <div className="relative dashboardScreen">
-            <div>
-                <h1 className="dashboardHeading">expenses</h1>
-
-                {/* <h3 className="mt-5 mb-2 font-semibold">Search Transaction</h3>
-
-                <form
-                    className="flex flex-col items-start gap-4 md:items-end md:flex-row "
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                    }}
-                >
-                    <div className=" inputLabelGroup">
-                        <label
-                            htmlFor="from-date-picker"
-                            className="text-sm inputLabel"
-                        >
-                            from
-                        </label>
-
-                        <input
-                            type="date"
-                            name="from-date-picker"
-                            id="from-date-picker"
-                            placeholder="From"
-                            className="p-2 border rounded-lg border-slate-200"
-                        />
-                    </div>
-
-                    <div className=" inputLabelGroup">
-                        <label
-                            htmlFor="to-date-picker"
-                            className="text-sm inputLabel"
-                        >
-                            to
-                        </label>
-
-                        <input
-                            type="date"
-                            name="to-date-picker"
-                            id="to-date-picker"
-                            placeholder="To"
-                            className="p-2 border rounded-lg border-slate-200"
-                        />
-                    </div>
-
-                    <button className=" rounded-lg bg-[#2D6A4F] px-4 py-2 md:ml-5 mb-0.5 transition-all duration-200 ease-in-out hover:scale-110">
-                        <Image src={searchIcon} alt="search button" />
-                    </button>
-                </form> */}
-
-                <div>
-                    <div className="overflow-x-auto text-sm">
-                        <div className="min-w-[820px] w-full grid grid-cols-5 capitalize bg-[#2D6A4F] p-3 text-white rounded-lg mt-5">
-                        <p>category</p>
-                        <p>narration</p>
-                        <p>time</p>
-                        <p>amount</p>
-                        <p className="text-center">action</p>
-                    </div>
-
-                    {isDataLoading ? (
-                        <div className=" min-h-[40dvh] flex flex-col items-center justify-center">
-                            <div className="w-16 h-16 mx-auto capitalize border-4 border-[#2D6A4F] rounded-full border-t-transparent animate-spin" />
-                        </div>
-                    ) : (
-                        <div className="min-w-[820px] p-3 mt-5 bg-white rounded-lg shadow-md min-h-[65dvh]">
-                            <div className="flex flex-row items-center justify-between pb-3 border-b border-slate-200">
-                                <p className=" text-[#2D6A4F] font-semibold">
-                                    DAY
-                                </p>
-
-                                <button
-                                    className=" text-white font-semibold bg-[#2D6A4F] px-4 py-2 rounded-lg transition ease-in-out duration-200 hover:scale-110"
-                                    onClick={() => {
-                                        setIsModalOpen(!isModalOpen);
-                                    }}
-                                >
-                                    {/* {isDataLoading ? (
-										<div className="w-5 h-5 mx-auto capitalize border-2 border-blue-500 rounded-full border-t-transparent animate-spin" />
-									) : (
-										"+ Add"
-									)} */}
-                                    +Add
-                                </button>
-                            </div>
-
-                            {currentItems.map((element, index) => (
-                                <div className="grid grid-cols-5 " key={index}>
-                                    <div className="pt-2 capitalize ">
-                                        <p>{element.category}</p>
-                                        <p className=" text-xs font-bold text-[#2D6A4F]">
-                                            {element.subCategory}
-                                        </p>
-                                    </div>
-
-                                    <p className="pt-2 ">{element.narration}</p>
-                                    <p className="pt-2 ">{element.date}</p>
-                                    <p className="pt-2 ">
-                                        {element.amount.toLocaleString()}
-                                    </p>
-                                    <div className="flex flex-row items-center justify-center pt-2 ">
-                                        <Image
-                                            src={deleteIcon}
-                                            alt="delete icon"
-                                            className="transition ease-in-out cursor-pointer hover:scale-110"
-                                            onClick={() => {
-                                                setSelectedIdForDeletion(
-                                                    element.id,
-                                                );
-                                                setIsDeleteModalOpen(true);
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    </div>
-
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        paginationRange={paginationRange}
-                        onPageChange={setCurrentPage}
-                    />
-                </div>
-            </div>
-
-            {/* Add expense Modal */}
-            <div
-                className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideIncomeModal"
-                ref={modalRef}
-            >
-                {/* Overlay */}
-                <div
-                    className="absolute inset-0 bg-black opacity-50 cursor-pointer"
-                    onClick={() => setIsModalOpen(!isModalOpen)}
-                ></div>
-
-                {/* Modal Content */}
-                <div className={`inputModals`}>
-                    <h2 className="mb-6 text-2xl font-bold">Add Expenditure</h2>
-
-                    <form
-                        className="flex flex-col gap-2"
-                        onSubmit={(e) => {
-                            e.preventDefault();
-
-                            addExpense();
-                        }}
-                    >
-                        <div className="inputLabelGroup">
-                            <label htmlFor="category" className="inputLabel">
-                                Category
-                            </label>
-                            <select
-                                name="category"
-                                id="category"
-                                className="p-2 border rounded-l border-slate-200 focus:outline-0"
-                                value={categoryInput}
-                                onChange={(e) => {
-                                    setCategoriesInput(e.target.value);
-
-                                    setSelectedCategory(e.target.value);
-                                }}
-                            >
-                                <option value="" disabled>
-                                    Enter category
-                                </option>
-                                <option value="planned payments">
-                                    Planned Payments
-                                </option>
-                                <option value="daily needs">Daily Needs</option>
-                                <option value="others">Others</option>
-                            </select>
-                        </div>
-
-                        <div className=" inputLabelGroup">
-                            <label htmlFor="subcategory" className="inputLabel">
-                                Sub Category
-                            </label>
-
-                            <select
-                                name="subcategory"
-                                id="subcategory"
-                                className="px-4 py-2 capitalize border rounded-lg border-slate-200 focus:outline-0"
-                                // size={5}
-                                value={subCategoryInput}
-                                onChange={(e) => {
-                                    setSubCategoryInput(e.target.value);
-                                }}
-                            >
-                                <option value="" disabled>
-                                    Select a sub category
-                                </option>
-
-                                {subCategories.map((element, index) => (
-                                    <option
-                                        value={element}
-                                        key={index}
-                                        className="capitalize "
-                                    >
-                                        {element}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="inputLabelGroup">
-                            <label htmlFor="narration" className="inputLabel">
-                                Narration
-                            </label>
-                            <input
-                                className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-                                type="text"
-                                name="narration"
-                                id="narration"
-                                placeholder="Enter Narration"
-                                value={narrationInput}
-                                onChange={(e) =>
-                                    setNarrationInput(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        <div className="inputLabelGroup">
-                            <label htmlFor="amount" className="inputLabel">
-                                Amount
-                            </label>
-                            <input
-                                className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
-                                type="number"
-                                name="amount"
-                                id="amount"
-                                placeholder="Enter amount"
-                                value={amountInput}
-                                onChange={(e) => setAmountInput(e.target.value)}
-                            />
-                        </div>
-
-                        <button className=" w-full py-2 rounded-lg text-white font-semibold bg-[#2D6A4F] mt-4 transition ease-in-out duration-200 hover:scale-110">
-                            {isLoading ? (
-                                <div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
-                            ) : (
-                                "Add"
-                            )}
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {/* Delete Confirmation Modal */}
-            <div
-                className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hideDeleteModal"
-                ref={deleteModalRef}
-            >
-                {/* Overlay */}
-                <div
-                    className="absolute inset-0 bg-black opacity-50 cursor-pointer"
-                    onClick={() => setIsDeleteModalOpen(!isDeleteModalOpen)}
-                ></div>
-
-                {/* Modal Content */}
-                <div className={`inputModals`}>
-                    <p className="mb-5">
-                        Are you sure you want to delete this entry?
-                    </p>
-
-                    <div className="flex flex-row items-center justify-center gap-5 ">
-                        <button
-                            className="px-4 py-2 text-white transition duration-200 ease-in-out bg-red-500 rounded-lg w-28 hover:scale-110"
-                            onClick={() => {
-                                deleteExpense(selectedIdForDeletion);
-                            }}
-                        >
-                            {isDeletionLoading ? (
-                                <div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin " />
-                            ) : (
-                                "Delete"
-                            )}
-                        </button>
-                        <button
-                            className="px-4 py-2 text-white transition duration-200 ease-in-out bg-gray-500 rounded-lg w-28 hover:scale-110"
-                            onClick={() =>
-                                setIsDeleteModalOpen(!isDeleteModalOpen)
-                            }
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+	const user = auth.currentUser;
+	const currency = usePreferencesStore((s) => s.currency);
+
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+	const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+	const [selectedIdForDeletion, setSelectedIdForDeletion] =
+		useState<string>("");
+
+	const [expenseData, setExpenseData] = useState<expenseDataType>([]);
+
+	const [selectedCategory, setSelectedCategory] = useState("");
+	const [subCategories, setSubCategories] = useState<string[]>([]);
+
+	const [categoryInput, setCategoriesInput] = useState<string>("");
+	const [subCategoryInput, setSubCategoryInput] = useState<string>("");
+	const [narrationInput, setNarrationInput] = useState<string>("");
+	const [amountInput, setAmountInput] = useState<string>("");
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 9;
+
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentItems = expenseData.slice(indexOfFirstItem, indexOfLastItem);
+
+	const totalPages = Math.ceil(expenseData.length / itemsPerPage);
+	const paginationRange = getPaginationRange(currentPage, totalPages);
+
+	const fetchExpenses = async (userId: string) => {
+		setIsDataLoading(true);
+
+		try {
+			const expenseReference = collection(db, `users/${userId}/expenseData`);
+			const q = query(expenseReference, orderBy("createdAt", "desc"));
+
+			const querySnapshot = await getDocs(q);
+
+			const expenseList = querySnapshot.docs.map((docSnap) => {
+				const data = docSnap.data();
+
+				return {
+					category: data.category,
+					subCategory: data.subCategory,
+					date:
+						data.createdAt?.toDate().toLocaleString("en-GB", {
+							day: "2-digit",
+							month: "short",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							hour12: true,
+						}) || "",
+					narration: data.narration || "",
+					amount: Number(data.amount) || 0,
+					id: docSnap.id,
+				};
+			});
+
+			return expenseList;
+		} catch (err) {
+			const message = formatFetchError(err);
+			toast.error(`${message}`);
+		} finally {
+			setIsDataLoading(false);
+		}
+	};
+
+	const addExpense = async () => {
+		if (!user) return;
+
+		if (
+			!categoryInput.trim() ||
+			!subCategoryInput.trim() ||
+			!narrationInput.trim() ||
+			isNaN(Number(amountInput)) ||
+			Number(amountInput) <= 0
+		) {
+			toast.error(
+				"All fields are required and amount must be a valid number"
+			);
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await addDoc(collection(db, `users/${user.uid}/expenseData`), {
+				category: categoryInput,
+				subCategory: subCategoryInput,
+				narration: narrationInput,
+				amount: Number(amountInput),
+				createdAt: serverTimestamp(),
+			});
+
+			await addDoc(collection(db, `users/${user.uid}/notifications`), {
+				notification: ` was added to the Expenses under the category of `,
+				category: categoryInput,
+				amount: Number(amountInput),
+				createdAt: serverTimestamp(),
+			});
+
+			toast.success(
+				`${formatMoney(Number(amountInput), currency)} added to Expenses`
+			);
+
+			setIsModalOpen(false);
+
+			const updatedData = await fetchExpenses(user.uid);
+			setExpenseData(updatedData ?? []);
+		} catch (err) {
+			toast.error(`${formatAddDocError(err)}`);
+		} finally {
+			setIsLoading(false);
+
+			setCategoriesInput("");
+			setSubCategoryInput("");
+			setNarrationInput("");
+			setAmountInput("");
+		}
+	};
+
+	const deleteExpense = async (expenseId: string) => {
+		if (!user) return;
+
+		setIsDeletionLoading(true);
+
+		try {
+			await deleteDoc(doc(db, `users/${user.uid}/expenseData/${expenseId}`));
+
+			const updatedData = await fetchExpenses(user.uid);
+			setExpenseData(updatedData ?? []);
+
+			toast.success("Expense entry deleted successfully");
+		} catch (err) {
+			toast.error(`${formatAddDocError(err)}`);
+		} finally {
+			setSelectedIdForDeletion("");
+			setIsDeleteModalOpen(false);
+			setIsDeletionLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		const fetchSubCategories = async () => {
+			if (!user?.uid || !selectedCategory) return;
+
+			const categoryKey =
+				selectedCategory === "planned payments"
+					? "plannedPayments"
+					: selectedCategory === "daily needs"
+						? "dailyNeeds"
+						: selectedCategory === "others"
+							? "others"
+							: "";
+
+			if (!categoryKey) return;
+
+			const querySnapshot = await getDocs(
+				collection(db, `users/${user.uid}/budgetData/${categoryKey}/data`)
+			);
+
+			const fetchedCategories = new Set<string>();
+
+			querySnapshot.forEach((docSnap) => {
+				const data = docSnap.data();
+				if (data.category) {
+					fetchedCategories.add(data.category);
+				}
+			});
+
+			setSubCategories(Array.from(fetchedCategories));
+		};
+
+		fetchSubCategories();
+	}, [selectedCategory, user?.uid]);
+
+	useEffect(() => {
+		const getData = async () => {
+			if (user) {
+				setExpenseData((await fetchExpenses(user.uid)) ?? []);
+			}
+		};
+		getData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount / uid only
+	}, [user?.uid]);
+
+	return (
+		<div className="relative dashboardScreen">
+			<div>
+				<h1 className="dashboardHeading">expenses</h1>
+
+				<div>
+					{/* Mobile list */}
+					<div className="mt-5 md:hidden">
+						<div className="mb-4 flex flex-row items-center justify-between">
+							<p className="text-sm font-semibold uppercase tracking-wide text-[#2D6A4F] dark:text-[#95D5B2]">
+								Entries
+							</p>
+							<button
+								type="button"
+								className="rounded-lg bg-[#2D6A4F] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
+								onClick={() => setIsModalOpen(true)}
+							>
+								+ Add
+							</button>
+						</div>
+
+						{isDataLoading ? (
+							<div className="space-y-3">
+								{[1, 2, 3, 4].map((i) => (
+									<div
+										key={i}
+										className="h-32 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-700"
+									/>
+								))}
+							</div>
+						) : currentItems.length === 0 ? (
+							<EmptyState
+								title="No expenses yet"
+								description="Log spending to see it listed here."
+							/>
+						) : (
+							<div className="space-y-3">
+								{currentItems.map((element) => (
+									<div
+										key={element.id}
+										className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+									>
+										<div className="flex flex-row items-start justify-between gap-2">
+											<div>
+												<p className="capitalize text-slate-900 dark:text-slate-100">
+													{element.category}
+												</p>
+												<p className="text-xs font-bold capitalize text-[#2D6A4F] dark:text-[#95D5B2]">
+													{element.subCategory}
+												</p>
+												<p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
+													{element.narration}
+												</p>
+												<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+													{element.date}
+												</p>
+											</div>
+											<div className="text-right">
+												<p className="font-semibold tabular-nums text-slate-900 dark:text-slate-100">
+													{formatMoney(element.amount, currency)}
+												</p>
+												<button
+													type="button"
+													className="mt-2 text-sm text-red-600 dark:text-red-400"
+													onClick={() => {
+														setSelectedIdForDeletion(element.id);
+														setIsDeleteModalOpen(true);
+													}}
+												>
+													Delete
+												</button>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+
+					{/* Desktop */}
+					<div className="mt-5 hidden text-sm md:block">
+						<div className="overflow-x-auto rounded-t-xl">
+							<div className="dataTableHeader grid min-w-[820px] w-full grid-cols-5">
+								<p className="tableStickyCell min-w-[140px] pl-2">category</p>
+								<p>narration</p>
+								<p>time</p>
+								<p>amount</p>
+								<p className="text-center">action</p>
+							</div>
+						</div>
+
+						{isDataLoading ? (
+							<div className="dataTableSurface min-h-[40dvh] space-y-3 p-4">
+								{[1, 2, 3, 4, 5, 6].map((i) => (
+									<div
+										key={i}
+										className="h-12 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-700"
+									/>
+								))}
+							</div>
+						) : (
+							<div className="dataTableSurface min-h-[65dvh] overflow-x-auto p-3">
+								<div className="flex flex-row items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
+									<p className="font-semibold text-[#2D6A4F] dark:text-[#95D5B2]">
+										Transactions
+									</p>
+
+									<button
+										type="button"
+										className="rounded-lg bg-[#2D6A4F] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
+										onClick={() => setIsModalOpen(true)}
+									>
+										+ Add
+									</button>
+								</div>
+
+								{currentItems.length === 0 ? (
+									<EmptyState
+										title="No expenses yet"
+										description="Log spending to see it listed here."
+									/>
+								) : (
+									<div className="min-w-[820px]">
+										{currentItems.map((element) => (
+											<div
+												className="grid grid-cols-5 border-b border-slate-100 py-3 last:border-0 dark:border-slate-700"
+												key={element.id}
+											>
+												<div className="tableStickyCell min-w-[140px] pl-2 pt-1 capitalize">
+													<p className="text-slate-900 dark:text-slate-100">
+														{element.category}
+													</p>
+													<p className="text-xs font-bold text-[#2D6A4F] dark:text-[#95D5B2]">
+														{element.subCategory}
+													</p>
+												</div>
+
+												<p className="pt-1 text-slate-800 dark:text-slate-200">
+													{element.narration}
+												</p>
+												<p className="pt-1 text-slate-600 dark:text-slate-400">
+													{element.date}
+												</p>
+												<p className="pt-1 tabular-nums font-medium text-slate-900 dark:text-slate-100">
+													{formatMoney(element.amount, currency)}
+												</p>
+												<div className="flex flex-row items-center justify-center pt-1">
+													<button
+														type="button"
+														className="rounded-lg p-1 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+														onClick={() => {
+															setSelectedIdForDeletion(element.id);
+															setIsDeleteModalOpen(true);
+														}}
+														aria-label="Delete expense"
+													>
+														<Image
+															src={deleteIcon}
+															alt=""
+															className="h-6 w-6 cursor-pointer transition ease-in-out hover:scale-110"
+														/>
+													</button>
+												</div>
+											</div>
+										))}
+									</div>
+								)}
+							</div>
+						)}
+					</div>
+
+					{totalPages > 1 && (
+						<Pagination
+							currentPage={currentPage}
+							totalPages={totalPages}
+							paginationRange={paginationRange}
+							onPageChange={setCurrentPage}
+						/>
+					)}
+				</div>
+			</div>
+
+			<AccessibleDialog
+				open={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				title="Add expenditure"
+				titleId="expense-add-dialog-title"
+			>
+				<form
+					className="flex flex-col gap-2"
+					onSubmit={(e) => {
+						e.preventDefault();
+						addExpense();
+					}}
+				>
+					<div className="inputLabelGroup">
+						<label htmlFor="expense-category" className="inputLabel">
+							Category
+						</label>
+						<select
+							name="category"
+							id="expense-category"
+							className="rounded-lg border border-slate-200 bg-white p-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							value={categoryInput}
+							onChange={(e) => {
+								setCategoriesInput(e.target.value);
+								setSelectedCategory(e.target.value);
+							}}
+						>
+							<option value="" disabled>
+								Enter category
+							</option>
+							<option value="planned payments">Planned Payments</option>
+							<option value="daily needs">Daily Needs</option>
+							<option value="others">Others</option>
+						</select>
+					</div>
+
+					<div className="inputLabelGroup">
+						<label htmlFor="subcategory" className="inputLabel">
+							Sub category
+						</label>
+
+						<select
+							name="subcategory"
+							id="subcategory"
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 capitalize text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							value={subCategoryInput}
+							onChange={(e) => {
+								setSubCategoryInput(e.target.value);
+							}}
+						>
+							<option value="" disabled>
+								Select a sub category
+							</option>
+
+							{subCategories.map((element, index) => (
+								<option value={element} key={index} className="capitalize">
+									{element}
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div className="inputLabelGroup">
+						<label htmlFor="narration" className="inputLabel">
+							Narration
+						</label>
+						<input
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							type="text"
+							name="narration"
+							id="narration"
+							placeholder="Enter narration"
+							value={narrationInput}
+							onChange={(e) => setNarrationInput(e.target.value)}
+						/>
+					</div>
+
+					<div className="inputLabelGroup">
+						<label htmlFor="amount" className="inputLabel">
+							Amount
+						</label>
+						<input
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							type="number"
+							name="amount"
+							id="amount"
+							placeholder="Enter amount"
+							value={amountInput}
+							onChange={(e) => setAmountInput(e.target.value)}
+						/>
+					</div>
+
+					<button
+						type="submit"
+						className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+						disabled={isLoading}
+					>
+						{isLoading ? (
+							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+						) : (
+							"Add"
+						)}
+					</button>
+				</form>
+			</AccessibleDialog>
+
+			<AccessibleDialog
+				open={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				title="Delete expense?"
+				titleId="expense-delete-dialog-title"
+			>
+				<p className="mb-5 text-slate-600 dark:text-slate-400">
+					This removes the expense permanently.
+				</p>
+
+				<div className="flex flex-row items-center justify-center gap-5">
+					<button
+						type="button"
+						className="w-28 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
+						onClick={() => {
+							deleteExpense(selectedIdForDeletion);
+						}}
+					>
+						{isDeletionLoading ? (
+							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+						) : (
+							"Delete"
+						)}
+					</button>
+					<button
+						type="button"
+						className="w-28 rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+						onClick={() => setIsDeleteModalOpen(false)}
+					>
+						Cancel
+					</button>
+				</div>
+			</AccessibleDialog>
+		</div>
+	);
 };
 
 export default ExpensesPage;
