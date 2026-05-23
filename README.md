@@ -12,7 +12,6 @@ Pennywise helps users track their income, expenses, savings, and budgets in one 
 - **Expenses** — log and manage spending entries with categories and sub-categories
 - **Income** — record income sources and amounts
 - **Budget** — set spending limits across three buckets (Daily Needs, Planned Payments, Others) and track actual vs. budgeted spend
-- **Savings** — monitor savings goals and progress
 - **Notifications** — in-app notification centre
 - **Settings** — currency preference and account settings
 - **Authentication** — sign up, log in, and forgot-password via Firebase Auth
