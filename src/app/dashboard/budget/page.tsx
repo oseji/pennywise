@@ -558,16 +558,11 @@ const BudgetScreen = () => {
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
 														<div
-															className={`h-5 flex items-center justify-center text-xs rounded-full font-medium text-white ${getBarColor(
-																percentage
-															)}`}
-															style={{
-																width: `${Math.min(percentage, 100)}%`,
-															}}
-														>
-															{percentage.toFixed(1)}%
-														</div>
+															className={`progressBarTracker ${getBarColor(percentage)}`}
+															style={{ width: `${Math.min(percentage, 100)}%` }}
+														/>
 													</div>
+													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
 													<div className="flex gap-2">
 														<button
@@ -676,16 +671,11 @@ const BudgetScreen = () => {
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
 														<div
-															className={`progressBarTracker ${getBarColor(
-																percentage
-															)}`}
-															style={{
-																width: `${Math.min(percentage, 100)}%`,
-															}}
-														>
-															{percentage.toFixed(1)}%
-														</div>
+															className={`progressBarTracker ${getBarColor(percentage)}`}
+															style={{ width: `${Math.min(percentage, 100)}%` }}
+														/>
 													</div>
+													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
 													<div className="flex gap-2">
 														<button
@@ -816,16 +806,11 @@ const BudgetScreen = () => {
 												<td className="progressBarContainer">
 													<div className="progressBarBody">
 														<div
-															className={`progressBarTracker ${getBarColor(
-																percentage
-															)}`}
-															style={{
-																width: `${Math.min(percentage, 100)}%`,
-															}}
-														>
-															{percentage.toFixed(1)}%
-														</div>
+															className={`progressBarTracker ${getBarColor(percentage)}`}
+															style={{ width: `${Math.min(percentage, 100)}%` }}
+														/>
 													</div>
+													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
 													<div className="flex gap-2">
 														<button
