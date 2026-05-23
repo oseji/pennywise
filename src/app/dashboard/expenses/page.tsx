@@ -49,6 +49,7 @@ const ExpensesPage = () => {
 
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [subCategories, setSubCategories] = useState<string[]>([]);
+	const [isSubCategoryLoading, setIsSubCategoryLoading] = useState<boolean>(false);
 
 	const [categoryInput, setCategoriesInput] = useState<string>("");
 	const [subCategoryInput, setSubCategoryInput] = useState<string>("");
@@ -132,7 +133,7 @@ const ExpensesPage = () => {
 			});
 
 			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: ` was added to the Expenses under the category of `,
+				notification: `${formatMoney(Number(amountInput), currency)} was added to Expenses under ${categoryInput} — ${subCategoryInput}`,
 				category: categoryInput,
 				amount: Number(amountInput),
 				createdAt: serverTimestamp(),
@@ -143,6 +144,7 @@ const ExpensesPage = () => {
 			);
 
 			setIsModalOpen(false);
+			setCurrentPage(1);
 
 			const updatedData = await fetchExpenses(user.uid);
 			setExpenseData(updatedData ?? []);
@@ -166,6 +168,7 @@ const ExpensesPage = () => {
 		try {
 			await deleteDoc(doc(db, `users/${user.uid}/expenseData/${expenseId}`));
 
+			setCurrentPage(1);
 			const updatedData = await fetchExpenses(user.uid);
 			setExpenseData(updatedData ?? []);
 
@@ -194,20 +197,27 @@ const ExpensesPage = () => {
 
 			if (!categoryKey) return;
 
-			const querySnapshot = await getDocs(
-				collection(db, `users/${user.uid}/budgetData/${categoryKey}/data`)
-			);
+			setIsSubCategoryLoading(true);
+			setSubCategories([]);
 
-			const fetchedCategories = new Set<string>();
+			try {
+				const querySnapshot = await getDocs(
+					collection(db, `users/${user.uid}/budgetData/${categoryKey}/data`)
+				);
 
-			querySnapshot.forEach((docSnap) => {
-				const data = docSnap.data();
-				if (data.category) {
-					fetchedCategories.add(data.category);
-				}
-			});
+				const fetchedCategories = new Set<string>();
 
-			setSubCategories(Array.from(fetchedCategories));
+				querySnapshot.forEach((docSnap) => {
+					const data = docSnap.data();
+					if (data.category) {
+						fetchedCategories.add(data.category);
+					}
+				});
+
+				setSubCategories(Array.from(fetchedCategories));
+			} finally {
+				setIsSubCategoryLoading(false);
+			}
 		};
 
 		fetchSubCategories();
@@ -398,6 +408,8 @@ const ExpensesPage = () => {
 						<Pagination
 							currentPage={currentPage}
 							totalPages={totalPages}
+							totalItems={expenseData.length}
+							itemsPerPage={itemsPerPage}
 							paginationRange={paginationRange}
 							onPageChange={setCurrentPage}
 						/>
@@ -449,14 +461,15 @@ const ExpensesPage = () => {
 						<select
 							name="subcategory"
 							id="subcategory"
-							className="rounded-lg border border-slate-200 bg-white px-4 py-2 capitalize text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+							className="rounded-lg border border-slate-200 bg-white px-4 py-2 capitalize text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100 disabled:opacity-60"
 							value={subCategoryInput}
 							onChange={(e) => {
 								setSubCategoryInput(e.target.value);
 							}}
+							disabled={isSubCategoryLoading}
 						>
 							<option value="" disabled>
-								Select a sub category
+								{isSubCategoryLoading ? "Loading subcategories..." : "Select a sub category"}
 							</option>
 
 							{subCategories.map((element, index) => (

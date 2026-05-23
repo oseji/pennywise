@@ -1,10 +1,22 @@
 "use client";
 
+import { useState } from "react";
+import { auth } from "@/firebase/firebase";
+import { sendPasswordResetEmail, deleteUser } from "firebase/auth";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
 import type { CurrencyCode } from "@/store/usePreferencesStore";
+import { AccessibleDialog } from "@/components/AccessibleDialog";
 
 const SettingsPage = () => {
-	const { currency, setCurrency, theme, setTheme } = usePreferencesStore();
+	const router = useRouter();
+	const { currency, setCurrency, theme, setTheme, notificationsEnabled, setNotificationsEnabled } =
+		usePreferencesStore();
+
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [isSendingReset, setIsSendingReset] = useState(false);
 
 	const Toggle = ({
 		checked,
@@ -29,6 +41,48 @@ const SettingsPage = () => {
 			<div className="h-6 w-11 rounded-full bg-gray-200 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-[#2D6A4F] peer-checked:after:translate-x-5 dark:bg-slate-600" />
 		</label>
 	);
+
+	const handleChangePassword = async () => {
+		const user = auth.currentUser;
+		if (!user?.email) {
+			toast.error("No email address found for this account.");
+			return;
+		}
+
+		setIsSendingReset(true);
+		try {
+			await sendPasswordResetEmail(auth, user.email);
+			toast.success(`Password reset email sent to ${user.email}`);
+		} catch {
+			toast.error("Failed to send password reset email. Please try again.");
+		} finally {
+			setIsSendingReset(false);
+		}
+	};
+
+	const handleDeleteAccount = async () => {
+		const user = auth.currentUser;
+		if (!user) return;
+
+		setIsDeleting(true);
+		try {
+			await deleteUser(user);
+			toast.success("Account deleted successfully.");
+			router.push("/");
+		} catch (err: unknown) {
+			const code = (err as { code?: string })?.code;
+			if (code === "auth/requires-recent-login") {
+				toast.error(
+					"For security, please sign out and sign back in before deleting your account."
+				);
+			} else {
+				toast.error("Failed to delete account. Please try again.");
+			}
+		} finally {
+			setIsDeleting(false);
+			setIsDeleteModalOpen(false);
+		}
+	};
 
 	return (
 		<div className="dashboardScreen">
@@ -57,13 +111,17 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading">notifications</h2>
+						<h2 className="settingsHeading">Notifications</h2>
 						<p className="text-slate-600 dark:text-slate-400">
-							Allow Pennywise send transaction notifications and updates.
+							Show transaction notifications in the dashboard.
 						</p>
 					</div>
 
-					<Toggle id="notif-toggle" checked={false} onChange={() => {}} />
+					<Toggle
+						id="notif-toggle"
+						checked={notificationsEnabled}
+						onChange={setNotificationsEnabled}
+					/>
 				</div>
 
 				<div className="settingsRow">
@@ -89,46 +147,86 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading">2-Factor authentication</h2>
+						<h2 className="settingsHeading">2-Factor Authentication</h2>
 						<p className="text-slate-600 dark:text-slate-400">
-							Set-up 2-factor authentication on pennywise account for extra
-							security
+							Extra login security for your account.
 						</p>
 					</div>
-
-					<Toggle id="2fa-toggle" checked={false} onChange={() => {}} />
-				</div>
-
-				<div className="settingsRow">
-					<div>
-						<h2 className="settingsHeading">Deactivate Account</h2>
-						<p className="text-slate-600 dark:text-slate-400">
-							Temporarily or permanently suspend Pennywise account.
-						</p>
-					</div>
-
-					<Toggle id="deactivate-toggle" checked={false} onChange={() => {}} />
+					<span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+						Coming soon
+					</span>
 				</div>
 
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading text-[#2E90FA]">Change Password</h2>
 						<p className="text-slate-600 dark:text-slate-400">
-							Change Pennywise account password
+							A reset link will be sent to your email address.
 						</p>
 					</div>
+					<button
+						type="button"
+						onClick={handleChangePassword}
+						disabled={isSendingReset}
+						className="rounded-lg border border-[#2E90FA] px-4 py-2 text-sm font-medium text-[#2E90FA] transition hover:bg-[#2E90FA]/10 disabled:opacity-60"
+					>
+						{isSendingReset ? "Sending…" : "Send reset email"}
+					</button>
 				</div>
 
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading text-[#F04438]">Delete Account</h2>
 						<p className="text-slate-600 dark:text-slate-400">
-							Permanently delete pennywise account along with all entered
-							details and transactions.
+							Permanently delete your Pennywise account and all data.
 						</p>
 					</div>
+					<button
+						type="button"
+						onClick={() => setIsDeleteModalOpen(true)}
+						className="rounded-lg border border-red-400 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50 dark:hover:bg-red-950"
+					>
+						Delete account
+					</button>
 				</div>
 			</div>
+
+			<AccessibleDialog
+				open={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				title="Delete account?"
+				titleId="settings-delete-account-title"
+			>
+				<p className="mb-2 text-slate-700 dark:text-slate-300">
+					This will permanently delete your Pennywise account and all associated
+					data. This cannot be undone.
+				</p>
+				<p className="mb-6 text-sm text-red-500">
+					Are you absolutely sure?
+				</p>
+
+				<div className="flex flex-row items-center justify-center gap-4">
+					<button
+						type="button"
+						className="w-32 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 disabled:opacity-60"
+						onClick={handleDeleteAccount}
+						disabled={isDeleting}
+					>
+						{isDeleting ? (
+							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+						) : (
+							"Yes, delete"
+						)}
+					</button>
+					<button
+						type="button"
+						className="w-32 rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+						onClick={() => setIsDeleteModalOpen(false)}
+					>
+						Cancel
+					</button>
+				</div>
+			</AccessibleDialog>
 		</div>
 	);
 };

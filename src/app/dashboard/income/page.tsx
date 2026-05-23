@@ -130,7 +130,7 @@ const IncomeScreen = () => {
 			});
 
 			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: ` was added to Income under the category of `,
+				notification: `${formatMoney(Number(incomeInput), currency)} was added to Income under ${categoryInput}`,
 				category: categoryInput,
 				amount: Number(incomeInput),
 				createdAt: serverTimestamp(),
@@ -140,6 +140,7 @@ const IncomeScreen = () => {
 				`${formatMoney(Number(incomeInput), currency)} added to Income`
 			);
 			setIsModalOpen(false);
+			setCurrentPage(1);
 
 			const updatedData = await fetchIncomeData(user.uid);
 			setIncomeData(updatedData ?? []);
@@ -161,13 +162,14 @@ const IncomeScreen = () => {
 		try {
 			await deleteDoc(doc(db, `users/${user.uid}/incomeData/${id}`));
 
+			setCurrentPage(1);
 			const updatedData = await fetchIncomeData(user.uid);
 			setIncomeData(updatedData ?? []);
 
 			toast.success("Income entry deleted successfully");
 		} catch (err) {
-			console.error("Error deleting document:", err);
-			toast.error("Error deleting income entry");
+			const message = formatAddDocError(err);
+			toast.error(message);
 		} finally {
 			setSelectedIdForDeletion("");
 			setIsDeleteModalOpen(false);
@@ -337,6 +339,8 @@ const IncomeScreen = () => {
 						<Pagination
 							currentPage={currentPage}
 							totalPages={totalPages}
+							totalItems={incomeData.length}
+							itemsPerPage={itemsPerPage}
 							paginationRange={paginationRange}
 							onPageChange={setCurrentPage}
 						/>

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import { formatAuthError } from "@/utils/formatAuthError";
+import { Eye, EyeOff } from "lucide-react";
 
 import loginImage2 from "../../../assets/onboarding/login screen image 2.svg";
 
@@ -54,7 +55,6 @@ const SignUp = () => {
 				password
 			);
 			const user = userCredentials.user;
-			console.log(`user created: ${user.uid}`);
 
 			// hide error message
 			passwordErrorRef.current?.classList.add("hidePasswordError");
@@ -79,18 +79,14 @@ const SignUp = () => {
 					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
 					onSubmit={(e) => {
 						e.preventDefault();
-						console.log(signUpInfo);
-						signUpAccount(signUpInfo.email, signUpInfo.confirmPassword);
 
-						if (
-							signUpInfo.password &&
-							signUpInfo.confirmPassword &&
-							signUpInfo.password !== signUpInfo.confirmPassword
-						) {
-							alert("passwords don't match");
-
+						if (signUpInfo.password !== signUpInfo.confirmPassword) {
+							setSignUpErrorMessage("Passwords don't match. Please try again.");
 							passwordErrorRef.current?.classList.remove("hidePasswordError");
+							return;
 						}
+
+						signUpAccount(signUpInfo.email, signUpInfo.password);
 					}}
 				>
 					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl ">
@@ -170,12 +166,14 @@ const SignUp = () => {
 									onChange={handleChange}
 								/>
 
-								<span
-									className="underline cursor-pointer "
+								<button
+									type="button"
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+									aria-label={isPasswordVisible ? "Hide password" : "Show password"}
 								>
-									{isPasswordVisible ? "Hide" : "Show"}
-								</span>
+									{isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
 							</div>
 						</div>
 
@@ -195,14 +193,14 @@ const SignUp = () => {
 									onChange={handleChange}
 								/>
 
-								<span
-									className="underline cursor-pointer "
-									onClick={() =>
-										setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-									}
+								<button
+									type="button"
+									onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+									aria-label={isConfirmPasswordVisible ? "Hide password" : "Show password"}
 								>
-									{isConfirmPasswordVisible ? "Hide" : "Show"}
-								</span>
+									{isConfirmPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
 							</div>
 						</div>
 					</div>

@@ -8,7 +8,7 @@ import { auth } from "@/firebase/firebase";
 import { signOut } from "firebase/auth";
 import { formatLogoutError } from "@/utils/formatLogoutError";
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { Ellipsis, LogOut, Settings, X } from "lucide-react";
+import { Menu, LogOut, Settings, X } from "lucide-react";
 
 import dashboardIcon from "../../assets/sidebar/dashboard.svg";
 import incomeIcon from "../../assets/sidebar/income.svg";
@@ -45,7 +45,7 @@ const Sidebar = () => {
             await signOut(auth);
             router.push("/");
         } catch (err) {
-            alert(formatLogoutError(err));
+            toast.error(formatLogoutError(err));
         }
     };
 
@@ -192,7 +192,7 @@ const Sidebar = () => {
                     onClick={() => setIsMoreOpen(true)}
                     aria-label="Open menu"
                 >
-                    <Ellipsis className="h-6 w-6 text-slate-700 dark:text-slate-200" />
+                    <Menu className="h-6 w-6 text-slate-700 dark:text-slate-200" />
                 </button>
 
                 <div className="hidden lg:flex lg:flex-col lg:gap-4">
@@ -245,7 +245,50 @@ const Sidebar = () => {
                         </button>
                     </div>
 
-                    <div className="flex flex-col gap-3 pt-4">
+                    <div className="flex flex-col gap-2 pt-4">
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                            Navigate
+                        </p>
+
+                        {[
+                            { href: "/dashboard/overview", label: "Dashboard" },
+                            { href: "/dashboard/income", label: "Income" },
+                            { href: "/dashboard/budget", label: "Budget" },
+                            { href: "/dashboard/expenses", label: "Expenses" },
+                        ].map(({ href, label }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                onClick={() => { setIsMoreOpen(false); close(); }}
+                                className="flex flex-row items-center gap-3 rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                            >
+                                <span className="font-medium text-slate-900 dark:text-slate-100">
+                                    {label}
+                                </span>
+                            </Link>
+                        ))}
+
+                        {["Savings", "Profile", "History"].map((label) => (
+                            <button
+                                key={label}
+                                type="button"
+                                onClick={() => {
+                                    setIsMoreOpen(false);
+                                    toast(`${label} feature is coming soon!`);
+                                }}
+                                className="flex flex-row items-center justify-between gap-3 rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                            >
+                                <span className="font-medium text-slate-900 dark:text-slate-100">
+                                    {label}
+                                </span>
+                                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+                                    Soon
+                                </span>
+                            </button>
+                        ))}
+
+                        <div className="mt-2 border-t border-slate-200 pt-3 dark:border-slate-700" />
+
                         <Link
                             href="/dashboard/settings"
                             onClick={() => setIsMoreOpen(false)}

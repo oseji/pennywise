@@ -10,6 +10,9 @@ import {
 	serverTimestamp,
 	query,
 	orderBy,
+	deleteDoc,
+	updateDoc,
+	doc,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
@@ -22,12 +25,22 @@ import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
 
 type budgetDataType = {
+	id: string;
 	category: string;
 	description: string | null;
 	amount: number | null;
 	setLimit: number;
 	date: string;
 }[];
+
+type EditingEntry = {
+	id: string;
+	budgetSection: "dailyNeeds" | "plannedPayments" | "others";
+	category: string;
+	description: string;
+	amount: string;
+	setLimit: string;
+};
 
 type Expense = {
 	category: string;
@@ -86,6 +99,17 @@ const BudgetScreen = () => {
 	const [expenses, setExpenses] = useState<{
 		totalsByCategory: CategoryTotals;
 	} | null>();
+
+	// edit & delete
+	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+	const [editingEntry, setEditingEntry] = useState<EditingEntry | null>(null);
+	const [deletingEntry, setDeletingEntry] = useState<{
+		id: string;
+		budgetSection: "dailyNeeds" | "plannedPayments" | "others";
+	} | null>(null);
+	const [isEditLoading, setIsEditLoading] = useState<boolean>(false);
+	const [isDeleteEntryLoading, setIsDeleteEntryLoading] = useState<boolean>(false);
 
 	// helper for bar color
 	const getBarColor = (percent: number) => {
@@ -150,6 +174,26 @@ const BudgetScreen = () => {
 				);
 				return;
 			}
+		}
+
+		// duplicate category validation
+		const newCategoryName =
+			selectedModal === "daily needs"
+				? dailyNeedsCategoryInput.trim().toLowerCase()
+				: selectedModal === "planned payments"
+				? plannedPaymentsCategoryInput.trim().toLowerCase()
+				: othersCategoryInput.trim().toLowerCase();
+
+		const dataArray =
+			selectedModal === "daily needs"
+				? dailyNeedsData
+				: selectedModal === "planned payments"
+				? plannedPaymentsData
+				: othersData;
+
+		if (dataArray.some((e) => e.category.toLowerCase() === newCategoryName)) {
+			toast.error(`A "${newCategoryName}" category already exists in ${selectedModal}`);
+			return;
 		}
 
 		setIsLoading(true);
@@ -222,10 +266,11 @@ const BudgetScreen = () => {
 				const q = query(ref, orderBy("createdAt", "desc"));
 				const snapshot = await getDocs(q);
 
-				return snapshot.docs.map((doc) => {
-					const data = doc.data();
+				return snapshot.docs.map((docSnap) => {
+					const data = docSnap.data();
 
 					return {
+						id: docSnap.id,
 						date:
 							data.createdAt?.toDate().toLocaleString("en-GB", {
 								day: "2-digit",
@@ -327,6 +372,72 @@ const BudgetScreen = () => {
 		subCategory: string
 	): number => {
 		return expenses?.totalsByCategory[category]?.[subCategory]?.totalSpent ?? 0;
+	};
+
+	const deleteEntry = async () => {
+		if (!user || !deletingEntry) return;
+
+		setIsDeleteEntryLoading(true);
+
+		try {
+			await deleteDoc(
+				doc(db, `users/${user.uid}/budgetData/${deletingEntry.budgetSection}/data/${deletingEntry.id}`)
+			);
+			toast.success("Entry deleted");
+			fetchBudgetData(user.uid);
+		} catch (err) {
+			toast.error(`${formatAddDocError(err)}`);
+		} finally {
+			setIsDeleteEntryLoading(false);
+			setIsDeleteConfirmOpen(false);
+			setDeletingEntry(null);
+		}
+	};
+
+	const updateEntry = async () => {
+		if (!user || !editingEntry) return;
+
+		setIsEditLoading(true);
+
+		try {
+			const ref = doc(
+				db,
+				`users/${user.uid}/budgetData/${editingEntry.budgetSection}/data/${editingEntry.id}`
+			);
+
+			const updates: Record<string, string | number> = {
+				category: editingEntry.category.trim(),
+			};
+
+			if (editingEntry.budgetSection === "plannedPayments") {
+				if (isNaN(Number(editingEntry.amount)) || Number(editingEntry.amount) <= 0) {
+					toast.error("Amount must be a valid positive number");
+					return;
+				}
+				updates.amount = Number(editingEntry.amount);
+			} else {
+				if (!editingEntry.description.trim()) {
+					toast.error("Description is required");
+					return;
+				}
+				if (isNaN(Number(editingEntry.setLimit)) || Number(editingEntry.setLimit) <= 0) {
+					toast.error("Limit must be a valid positive number");
+					return;
+				}
+				updates.description = editingEntry.description.trim();
+				updates.setLimit = Number(editingEntry.setLimit);
+			}
+
+			await updateDoc(ref, updates);
+			toast.success("Entry updated");
+			fetchBudgetData(user.uid);
+			setIsEditModalOpen(false);
+			setEditingEntry(null);
+		} catch (err) {
+			toast.error(`${formatAddDocError(err)}`);
+		} finally {
+			setIsEditLoading(false);
+		}
 	};
 
 	// fetch budget data
@@ -458,11 +569,37 @@ const BudgetScreen = () => {
 														</div>
 													</div>
 
-													<Image
-														src={editIcon}
-														alt="edit icon"
-														className="budgetEditIcon"
-													/>
+													<div className="flex gap-2">
+														<button
+															type="button"
+															className="budgetEditIcon opacity-70 hover:opacity-100"
+															aria-label="Edit entry"
+															onClick={() => {
+																setEditingEntry({
+																	id: element.id,
+																	budgetSection: "dailyNeeds",
+																	category: element.category,
+																	description: element.description ?? "",
+																	amount: "",
+																	setLimit: String(element.setLimit),
+																});
+																setIsEditModalOpen(true);
+															}}
+														>
+															<Image src={editIcon} alt="" />
+														</button>
+														<button
+															type="button"
+															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															aria-label="Delete entry"
+															onClick={() => {
+																setDeletingEntry({ id: element.id, budgetSection: "dailyNeeds" });
+																setIsDeleteConfirmOpen(true);
+															}}
+														>
+															✕
+														</button>
+													</div>
 												</td>
 											</tr>
 										);
@@ -550,11 +687,37 @@ const BudgetScreen = () => {
 														</div>
 													</div>
 
-													<Image
-														src={editIcon}
-														alt="edit icon"
-														className="budgetEditIcon"
-													/>
+													<div className="flex gap-2">
+														<button
+															type="button"
+															className="budgetEditIcon opacity-70 hover:opacity-100"
+															aria-label="Edit entry"
+															onClick={() => {
+																setEditingEntry({
+																	id: element.id,
+																	budgetSection: "plannedPayments",
+																	category: element.category,
+																	description: "",
+																	amount: element.amount != null ? String(element.amount) : "",
+																	setLimit: "",
+																});
+																setIsEditModalOpen(true);
+															}}
+														>
+															<Image src={editIcon} alt="" />
+														</button>
+														<button
+															type="button"
+															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															aria-label="Delete entry"
+															onClick={() => {
+																setDeletingEntry({ id: element.id, budgetSection: "plannedPayments" });
+																setIsDeleteConfirmOpen(true);
+															}}
+														>
+															✕
+														</button>
+													</div>
 												</td>
 											</tr>
 										);
@@ -664,11 +827,37 @@ const BudgetScreen = () => {
 														</div>
 													</div>
 
-													<Image
-														src={editIcon}
-														alt="edit icon"
-														className="budgetEditIcon"
-													/>
+													<div className="flex gap-2">
+														<button
+															type="button"
+															className="budgetEditIcon opacity-70 hover:opacity-100"
+															aria-label="Edit entry"
+															onClick={() => {
+																setEditingEntry({
+																	id: element.id,
+																	budgetSection: "others",
+																	category: element.category,
+																	description: element.description ?? "",
+																	amount: "",
+																	setLimit: String(element.setLimit),
+																});
+																setIsEditModalOpen(true);
+															}}
+														>
+															<Image src={editIcon} alt="" />
+														</button>
+														<button
+															type="button"
+															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															aria-label="Delete entry"
+															onClick={() => {
+																setDeletingEntry({ id: element.id, budgetSection: "others" });
+																setIsDeleteConfirmOpen(true);
+															}}
+														>
+															✕
+														</button>
+													</div>
 												</td>
 											</tr>
 										);
@@ -849,6 +1038,119 @@ const BudgetScreen = () => {
 						</button>
 					</form>
 			</AccessibleDialog>
+		{/* Edit entry modal */}
+		<AccessibleDialog
+			open={isEditModalOpen}
+			onClose={() => { setIsEditModalOpen(false); setEditingEntry(null); }}
+			title="Edit entry"
+			titleId="budget-edit-dialog-title"
+		>
+			{editingEntry && (
+				<form
+					className="flex flex-col gap-2"
+					onSubmit={(e) => {
+						e.preventDefault();
+						updateEntry();
+					}}
+				>
+					<div className="inputLabelGroup">
+						<label htmlFor="edit-category" className="inputLabel">Category</label>
+						<input
+							className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+							type="text"
+							id="edit-category"
+							placeholder="Category name"
+							value={editingEntry.category}
+							onChange={(e) => setEditingEntry({ ...editingEntry, category: e.target.value })}
+						/>
+					</div>
+
+					{editingEntry.budgetSection !== "plannedPayments" && (
+						<div className="inputLabelGroup">
+							<label htmlFor="edit-description" className="inputLabel">Description</label>
+							<textarea
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 max-h-32 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								id="edit-description"
+								placeholder="Description"
+								value={editingEntry.description}
+								onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}
+							/>
+						</div>
+					)}
+
+					{editingEntry.budgetSection === "plannedPayments" ? (
+						<div className="inputLabelGroup">
+							<label htmlFor="edit-amount" className="inputLabel">Amount</label>
+							<input
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								type="number"
+								id="edit-amount"
+								placeholder="Amount"
+								value={editingEntry.amount}
+								onChange={(e) => setEditingEntry({ ...editingEntry, amount: e.target.value })}
+							/>
+						</div>
+					) : (
+						<div className="inputLabelGroup">
+							<label htmlFor="edit-limit" className="inputLabel">Set Limit</label>
+							<input
+								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								type="number"
+								id="edit-limit"
+								placeholder="Spending limit"
+								value={editingEntry.setLimit}
+								onChange={(e) => setEditingEntry({ ...editingEntry, setLimit: e.target.value })}
+							/>
+						</div>
+					)}
+
+					<button
+						type="submit"
+						className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+						disabled={isEditLoading}
+					>
+						{isEditLoading ? (
+							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+						) : (
+							"Save changes"
+						)}
+					</button>
+				</form>
+			)}
+		</AccessibleDialog>
+
+		{/* Delete entry confirmation modal */}
+		<AccessibleDialog
+			open={isDeleteConfirmOpen}
+			onClose={() => { setIsDeleteConfirmOpen(false); setDeletingEntry(null); }}
+			title="Delete entry?"
+			titleId="budget-delete-dialog-title"
+		>
+			<p className="mb-5 text-slate-600 dark:text-slate-400">
+				This removes the budget entry permanently.
+			</p>
+
+			<div className="flex flex-row items-center justify-center gap-5">
+				<button
+					type="button"
+					className="w-28 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
+					onClick={deleteEntry}
+				>
+					{isDeleteEntryLoading ? (
+						<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+					) : (
+						"Delete"
+					)}
+				</button>
+				<button
+					type="button"
+					className="w-28 rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+					onClick={() => { setIsDeleteConfirmOpen(false); setDeletingEntry(null); }}
+				>
+					Cancel
+				</button>
+			</div>
+		</AccessibleDialog>
 		</div>
 	);
 };

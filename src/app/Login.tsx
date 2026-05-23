@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import { auth } from "@/firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { Eye, EyeOff } from "lucide-react";
 
 import loginImage from "../assets/onboarding/login screen image.svg";
 
@@ -52,7 +53,6 @@ const Login = () => {
 				password
 			);
 			const user = userCredential.user;
-			console.log("Logged in user:", user);
 			errorMessageRef.current?.classList.add("hidePasswordError");
 
 			if (user) {
@@ -120,12 +120,14 @@ const Login = () => {
 									onChange={(e) => setUserPassword(e.target.value)}
 								/>
 
-								<span
+								<button
+									type="button"
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-									className="cursor-pointer "
+									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+									aria-label={isPasswordVisible ? "Hide password" : "Show password"}
 								>
-									{isPasswordVisible ? "Hide" : "Show"}
-								</span>
+									{isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
 							</div>
 						</div>
 					</div>
