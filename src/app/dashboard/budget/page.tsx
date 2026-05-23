@@ -471,7 +471,7 @@ const BudgetScreen = () => {
 						{[0, 1, 2].map((k) => (
 							<div
 								key={k}
-								className="h-48 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800"
+								className="h-48 animate-pulse rounded-xl bg-zinc-200 dark:bg-dark-overlay"
 							/>
 						))}
 					</div>
@@ -533,12 +533,12 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
 												<td className="tableStickyCell py-4">
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-[#52B788] dark:text-[#95D5B2]">
+															<span className="text-brand-400 dark:text-green-400">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -662,7 +662,7 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
 												<td className="tableStickyCell py-4 capitalize">{element.category}</td>
 												<td className="py-4 tabular-nums">
 													{element.amount != null
@@ -730,7 +730,7 @@ const BudgetScreen = () => {
 
 						{/* others */}
 						<div className="budgetCategories">
-							<div className="pb-3 border-b border-slate-200">
+							<div className="pb-3 border-b border-zinc-200">
 								<div className="budgetCategoriesHeading">
 									<h1 className="budgetCategoriesHeadingText ">others</h1>
 
@@ -791,12 +791,12 @@ const BudgetScreen = () => {
 											: 0;
 
 										return (
-											<tr className="border-b border-slate-200 dark:border-slate-700" key={index}>
+											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
 												<td className="tableStickyCell py-4">
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-[#52B788] dark:text-[#95D5B2]">
+															<span className="text-brand-400 dark:text-green-400">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -891,7 +891,7 @@ const BudgetScreen = () => {
 									Category
 								</label>
 								<input
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
 									type="text"
 									name="category"
 									id="category"
@@ -924,7 +924,7 @@ const BudgetScreen = () => {
 									Description
 								</label>
 								<textarea
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 max-h-32"
+									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 max-h-32"
 									name="description"
 									id="description"
 									placeholder="Enter description"
@@ -956,7 +956,7 @@ const BudgetScreen = () => {
 									category
 								</label>
 								<input
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
 									type="text"
 									name="category"
 									id="category"
@@ -978,7 +978,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
 									name="set-limit"
 									id="set-limit"
 									placeholder="Set Limit"
@@ -1011,7 +1011,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0"
+									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
 									name="set-plannedPayment-limit"
 									id="set-plannedPayment-limit"
 									placeholder="Set Limit"
@@ -1027,7 +1027,7 @@ const BudgetScreen = () => {
 
 						<button
 							type="submit"
-							className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+							className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
 							disabled={isLoading}
 						>
 							{isLoading ? (
@@ -1056,7 +1056,7 @@ const BudgetScreen = () => {
 					<div className="inputLabelGroup">
 						<label htmlFor="edit-category" className="inputLabel">Category</label>
 						<input
-							className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+							className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
 							type="text"
 							id="edit-category"
 							placeholder="Category name"
@@ -1069,7 +1069,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-description" className="inputLabel">Description</label>
 							<textarea
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 max-h-32 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 max-h-32 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
 								id="edit-description"
 								placeholder="Description"
 								value={editingEntry.description}
@@ -1082,7 +1082,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-amount" className="inputLabel">Amount</label>
 							<input
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
 								type="number"
 								id="edit-amount"
 								placeholder="Amount"
@@ -1094,7 +1094,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-limit" className="inputLabel">Set Limit</label>
 							<input
-								className="px-4 py-2 border rounded-lg border-slate-200 focus:outline-0 bg-white dark:bg-slate-950 dark:border-slate-600 dark:text-slate-100"
+								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
 								type="number"
 								id="edit-limit"
 								placeholder="Spending limit"
@@ -1106,7 +1106,7 @@ const BudgetScreen = () => {
 
 					<button
 						type="submit"
-						className="mt-4 w-full rounded-lg bg-[#2D6A4F] py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+						className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
 						disabled={isEditLoading}
 					>
 						{isEditLoading ? (
@@ -1126,7 +1126,7 @@ const BudgetScreen = () => {
 			title="Delete entry?"
 			titleId="budget-delete-dialog-title"
 		>
-			<p className="mb-5 text-slate-600 dark:text-slate-400">
+			<p className="mb-5 text-zinc-600 dark:text-zinc-400">
 				This removes the budget entry permanently.
 			</p>
 
@@ -1144,7 +1144,7 @@ const BudgetScreen = () => {
 				</button>
 				<button
 					type="button"
-					className="w-28 rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+					className="w-28 rounded-lg bg-zinc-500 px-4 py-2 text-white transition hover:bg-zinc-600"
 					onClick={() => { setIsDeleteConfirmOpen(false); setDeletingEntry(null); }}
 				>
 					Cancel

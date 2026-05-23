@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Moon, Sun } from "lucide-react";
-import { Bell } from "lucide-react";
+import { Moon, Sun, Bell } from "lucide-react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
 
@@ -13,42 +12,53 @@ const DashboardHeader = () => {
 	const { theme, toggleTheme } = usePreferencesStore();
 
 	return (
-		<div className="fixed left-0 top-0 z-30 flex w-full flex-row items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 py-4 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 md:px-12">
-			<div className="flex flex-row items-center justify-center gap-4 text-xl font-bold md:text-2xl">
-				<span className="rounded-full bg-[#B7E4C7] px-4 py-2 text-[#40916C] dark:bg-[#2D6A4F] dark:text-[#D8F3DC]">
-					P
-				</span>
+		<header className="fixed left-0 top-0 z-30 flex w-full flex-row items-center justify-between
+		                   border-b border-zinc-200/70 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-xl
+		                   dark:border-dark-border dark:bg-dark-surface/90
+		                   md:px-10">
 
-				<span className="hidden text-slate-900 dark:text-slate-100 md:block">
+			{/* Brand */}
+			<div className="flex flex-row items-center gap-3">
+				<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 shadow-glow-green">
+					<span className="text-base font-black text-white tracking-tight">P</span>
+				</div>
+				<span className="hidden text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50 md:block">
 					Pennywise
 				</span>
 			</div>
 
-			<div className="flex flex-row items-center gap-2 md:gap-4">
+			{/* Actions */}
+			<div className="flex flex-row items-center gap-1 md:gap-2">
 				<button
 					type="button"
 					onClick={toggleTheme}
-					className="rounded-lg p-2 text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+					className="rounded-xl p-2.5 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900
+					           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
 					aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
 				>
 					{theme === "dark" ? (
-						<Sun className="h-6 w-6" aria-hidden />
+						<Sun className="h-5 w-5" aria-hidden />
 					) : (
-						<Moon className="h-6 w-6" aria-hidden />
+						<Moon className="h-5 w-5" aria-hidden />
 					)}
 				</button>
 
 				<button
 					type="button"
 					onClick={toggle}
-					className="rounded-lg p-1 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+					className="relative rounded-xl p-2.5 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900
+					           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
 					aria-label="Open notifications"
 				>
-					<Bell className="h-7 w-7" />
+					<Bell className="h-5 w-5" />
 				</button>
-				<Image src={avatarIcon} alt="" className="h-9 w-9" />
+
+				<div className="ml-1 flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl
+				                border-2 border-zinc-200 dark:border-dark-border">
+					<Image src={avatarIcon} alt="User avatar" className="h-full w-full" />
+				</div>
 			</div>
-		</div>
+		</header>
 	);
 };
 

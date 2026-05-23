@@ -4,7 +4,6 @@ import { ChangeEvent, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import { formatAuthError } from "@/utils/formatAuthError";
@@ -23,8 +22,7 @@ type SignUpInfo = {
 const SignUp = () => {
 	const passwordErrorRef = useRef<HTMLParagraphElement>(null);
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-	const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-		useState<boolean>(false);
+	const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -40,32 +38,19 @@ const SignUp = () => {
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
-		setSignUpInfo((prev) => ({
-			...prev,
-			[name as keyof SignUpInfo]: value,
-		}));
+		setSignUpInfo((prev) => ({ ...prev, [name as keyof SignUpInfo]: value }));
 	};
 
 	const signUpAccount = async (email: string, password: string) => {
 		setIsLoading(true);
 		try {
-			const userCredentials = await createUserWithEmailAndPassword(
-				auth,
-				email,
-				password
-			);
+			const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
 			const user = userCredentials.user;
-
-			// hide error message
 			passwordErrorRef.current?.classList.add("hidePasswordError");
-
-			if (user) {
-				router.push("/dashboard");
-			}
+			if (user) router.push("/dashboard");
 		} catch (err) {
 			const message = formatAuthError(err);
 			setSignUpErrorMessage(message);
-			// display error message
 			passwordErrorRef.current?.classList.remove("hidePasswordError");
 		} finally {
 			setIsLoading(false);
@@ -73,171 +58,145 @@ const SignUp = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center min-h-dvh text-xs lg:flex-row lg:justify-between">
-			<div className="bg-white w-full flex flex-col items-center justify-center min-h-dvh py-10">
-				<form
-					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
-					onSubmit={(e) => {
-						e.preventDefault();
-
-						if (signUpInfo.password !== signUpInfo.confirmPassword) {
-							setSignUpErrorMessage("Passwords don't match. Please try again.");
-							passwordErrorRef.current?.classList.remove("hidePasswordError");
-							return;
-						}
-
-						signUpAccount(signUpInfo.email, signUpInfo.password);
-					}}
-				>
-					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl ">
-						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
-							P
-						</span>
-
-						<span>Pennywise</span>
+		<div className="flex min-h-dvh flex-col lg:flex-row">
+			{/* Form side */}
+			<div className="flex flex-1 flex-col items-center justify-center bg-white px-6 py-12 dark:bg-dark-surface">
+				<div className="w-full max-w-sm">
+					{/* Brand */}
+					<div className="mb-8 flex flex-col items-center gap-3">
+						<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500 shadow-glow-green">
+							<span className="text-xl font-black text-white">P</span>
+						</div>
+						<div className="text-center">
+							<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+								Create your account
+							</h1>
+							<p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+								Start tracking your finances with Pennywise
+							</p>
+						</div>
 					</div>
 
-					<p className="mb-4 text-center ">
-						Register to begin Pennywise account set up
-					</p>
-
-					<div className="flex flex-col gap-4 ">
-						<div className=" inputLabelGroup">
-							<label htmlFor="first-name" className=" inputLabel">
-								First Name
-							</label>
-
-							<input
-								type="text"
-								placeholder="Enter your first name"
-								id="first-name"
-								name="firstName"
-								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
-								value={signUpInfo.firstName}
-								onChange={handleChange}
-							/>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							if (signUpInfo.password !== signUpInfo.confirmPassword) {
+								setSignUpErrorMessage("Passwords don't match. Please try again.");
+								passwordErrorRef.current?.classList.remove("hidePasswordError");
+								return;
+							}
+							signUpAccount(signUpInfo.email, signUpInfo.password);
+						}}
+						className="flex flex-col gap-4"
+					>
+						<div className="grid grid-cols-2 gap-3">
+							<div className="inputLabelGroup">
+								<label htmlFor="first-name" className="inputLabel">First name</label>
+								<input
+									type="text"
+									id="first-name"
+									name="firstName"
+									placeholder="Jane"
+									className="authInput"
+									value={signUpInfo.firstName}
+									onChange={handleChange}
+								/>
+							</div>
+							<div className="inputLabelGroup">
+								<label htmlFor="last-name" className="inputLabel">Last name</label>
+								<input
+									type="text"
+									id="last-name"
+									name="lastName"
+									placeholder="Doe"
+									className="authInput"
+									value={signUpInfo.lastName}
+									onChange={handleChange}
+								/>
+							</div>
 						</div>
 
-						<div className=" inputLabelGroup">
-							<label htmlFor="last-name" className=" inputLabel">
-								Last Name
-							</label>
-
-							<input
-								type="text"
-								placeholder="Enter your last name"
-								id="last-name"
-								name="lastName"
-								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
-								value={signUpInfo.lastName}
-								onChange={handleChange}
-							/>
-						</div>
-
-						<div className=" inputLabelGroup">
-							<label htmlFor="email" className=" inputLabel">
-								Email
-							</label>
-
+						<div className="inputLabelGroup">
+							<label htmlFor="email" className="inputLabel">Email</label>
 							<input
 								type="email"
-								placeholder="Enter your email address"
 								id="email"
 								name="email"
-								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
+								placeholder="you@example.com"
+								className="authInput"
 								value={signUpInfo.email}
 								onChange={handleChange}
 							/>
 						</div>
 
-						<div className=" inputLabelGroup">
-							<label htmlFor="password" className=" inputLabel">
-								Password
-							</label>
-
-							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
-								<input
-									type={isPasswordVisible ? "text" : "password"}
-									placeholder="Password"
-									id="password"
-									name="password"
-									className="w-full outline-0 focus:outline-0"
-									value={signUpInfo.password}
-									onChange={handleChange}
-								/>
-
-								<button
-									type="button"
-									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-									aria-label={isPasswordVisible ? "Hide password" : "Show password"}
-								>
-									{isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-								</button>
+						{[
+							{ id: "password",         name: "password",         label: "Password",         visible: isPasswordVisible,        toggle: () => setIsPasswordVisible(!isPasswordVisible) },
+							{ id: "confirm-password", name: "confirmPassword",  label: "Confirm password", visible: isConfirmPasswordVisible,  toggle: () => setIsConfirmPasswordVisible(!isConfirmPasswordVisible) },
+						].map(({ id, name, label, visible, toggle }) => (
+							<div key={id} className="inputLabelGroup">
+								<label htmlFor={id} className="inputLabel">{label}</label>
+								<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3
+								                transition focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/20
+								                dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-brand-400/60">
+									<input
+										type={visible ? "text" : "password"}
+										id={id}
+										name={name}
+										placeholder="••••••••"
+										className="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-400 outline-none dark:text-zinc-100 dark:placeholder-zinc-500"
+										value={signUpInfo[name as keyof SignUpInfo]}
+										onChange={handleChange}
+									/>
+									<button
+										type="button"
+										onClick={toggle}
+										className="shrink-0 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
+										aria-label={visible ? "Hide password" : "Show password"}
+									>
+										{visible ? <EyeOff size={17} /> : <Eye size={17} />}
+									</button>
+								</div>
 							</div>
-						</div>
+						))}
 
-						<div className=" inputLabelGroup">
-							<label htmlFor="confirm-password" className=" inputLabel">
-								Confirm Password
-							</label>
+						<p
+							ref={passwordErrorRef}
+							className="text-xs text-red-500 transition-all duration-200 hidePasswordError"
+						>
+							{signUpErrorMessage}
+						</p>
 
-							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
-								<input
-									type={isConfirmPasswordVisible ? "text" : "password"}
-									placeholder="Password"
-									id="confirm-password"
-									name="confirmPassword"
-									className="w-full outline-0 focus:outline-0"
-									value={signUpInfo.confirmPassword}
-									onChange={handleChange}
-								/>
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="w-full rounded-xl bg-brand-500 py-3 text-sm font-semibold text-white
+							           shadow-glow-green transition hover:bg-brand-600 disabled:opacity-60 mt-1"
+						>
+							{isLoading ? (
+								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+							) : (
+								"Create account"
+							)}
+						</button>
+					</form>
 
-								<button
-									type="button"
-									onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-									aria-label={isConfirmPasswordVisible ? "Hide password" : "Show password"}
-								>
-									{isConfirmPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-								</button>
-							</div>
-						</div>
-					</div>
-
-					<p
-						className={`text-red-500 text-sm mt-2 transition-all ease-in-out duration-200 hidePasswordError`}
-						ref={passwordErrorRef}
-					>
-						{signUpErrorMessage}
+					<p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+						Already have an account?{" "}
+						<Link href="/" className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400">
+							Sign in
+						</Link>
 					</p>
-
-					<button
-						type="submit"
-						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 my-4 capitalize"
-						disabled={isLoading}
-					>
-						{isLoading ? (
-							<div className="w-5 h-5 mx-auto border-2 border-white rounded-full border-t-transparent animate-spin" />
-						) : (
-							"sign up"
-						)}
-					</button>
-
-					<p className="text-center ">
-						Already have an account ?
-						<span className=" text-[#2D6A4F] cursor-pointer">
-							<Link href={"/"}> Sign in here</Link>
-						</span>
-					</p>
-				</form>
+				</div>
 			</div>
 
-			<Image
-				src={loginImage2}
-				alt="Login Image"
-				className="hidden lg:block h-dvh min-h-dvh object-cover"
-			/>
+			{/* Illustration side */}
+			<div className="hidden lg:flex lg:flex-1 items-center justify-center bg-gradient-to-br from-brand-400 to-brand-300 p-12">
+				<Image
+					src={loginImage2}
+					alt="Pennywise illustration"
+					className="max-h-[75vh] w-full object-contain drop-shadow-2xl"
+				/>
+			</div>
 		</div>
 	);
 };

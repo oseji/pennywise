@@ -38,7 +38,7 @@ const SettingsPage = () => {
 				checked={checked}
 				onChange={(e) => onChange(e.target.checked)}
 			/>
-			<div className="h-6 w-11 rounded-full bg-gray-200 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-[#2D6A4F] peer-checked:after:translate-x-5 dark:bg-slate-600" />
+			<div className="h-6 w-11 rounded-full bg-gray-200 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-5 dark:bg-dark-muted" />
 		</label>
 	);
 
@@ -88,17 +88,17 @@ const SettingsPage = () => {
 		<div className="dashboardScreen">
 			<h1 className="dashboardHeading">settings</h1>
 
-			<div className="mt-6 flex flex-col gap-8 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 md:p-10">
+			<div className="mt-6 flex flex-col gap-8 rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-card dark:border-dark-border dark:bg-dark-raised md:p-10">
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading">Appearance</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							Dark mode reduces glare in low light.
 						</p>
 					</div>
 
 					<div className="flex flex-row items-center gap-3">
-						<span className="text-sm capitalize text-slate-600 dark:text-slate-400">
+						<span className="text-sm capitalize text-zinc-600 dark:text-zinc-400">
 							{theme}
 						</span>
 						<Toggle
@@ -112,7 +112,7 @@ const SettingsPage = () => {
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading">Notifications</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							Show transaction notifications in the dashboard.
 						</p>
 					</div>
@@ -127,7 +127,7 @@ const SettingsPage = () => {
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading">Currency</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							Used to format amounts across the dashboard.
 						</p>
 					</div>
@@ -135,7 +135,7 @@ const SettingsPage = () => {
 					<select
 						name="currency"
 						id="currency"
-						className="rounded-lg border border-slate-200 bg-white p-2 capitalize text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+						className="rounded-lg border border-zinc-200 bg-white p-2 capitalize text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
 						value={currency}
 						onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
 					>
@@ -148,11 +148,11 @@ const SettingsPage = () => {
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading">2-Factor Authentication</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							Extra login security for your account.
 						</p>
 					</div>
-					<span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+					<span className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-500 dark:bg-dark-muted dark:text-zinc-400">
 						Coming soon
 					</span>
 				</div>
@@ -160,7 +160,7 @@ const SettingsPage = () => {
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading text-[#2E90FA]">Change Password</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							A reset link will be sent to your email address.
 						</p>
 					</div>
@@ -177,7 +177,7 @@ const SettingsPage = () => {
 				<div className="settingsRow">
 					<div>
 						<h2 className="settingsHeading text-[#F04438]">Delete Account</h2>
-						<p className="text-slate-600 dark:text-slate-400">
+						<p className="text-zinc-600 dark:text-zinc-400">
 							Permanently delete your Pennywise account and all data.
 						</p>
 					</div>
@@ -197,7 +197,7 @@ const SettingsPage = () => {
 				title="Delete account?"
 				titleId="settings-delete-account-title"
 			>
-				<p className="mb-2 text-slate-700 dark:text-slate-300">
+				<p className="mb-2 text-zinc-700 dark:text-zinc-300">
 					This will permanently delete your Pennywise account and all associated
 					data. This cannot be undone.
 				</p>
@@ -208,7 +208,7 @@ const SettingsPage = () => {
 				<div className="flex flex-row items-center justify-center gap-4">
 					<button
 						type="button"
-						className="w-32 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 disabled:opacity-60"
+						className="w-32 rounded-xl bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 disabled:opacity-60"
 						onClick={handleDeleteAccount}
 						disabled={isDeleting}
 					>
@@ -220,7 +220,7 @@ const SettingsPage = () => {
 					</button>
 					<button
 						type="button"
-						className="w-32 rounded-lg bg-slate-500 px-4 py-2 text-white transition hover:bg-slate-600"
+						className="w-32 rounded-lg bg-zinc-500 px-4 py-2 text-white transition hover:bg-zinc-600"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel

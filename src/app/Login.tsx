@@ -23,21 +23,13 @@ const Login = () => {
 	const formatSignInError = (error: unknown): string => {
 		if (error instanceof FirebaseError) {
 			switch (error.code) {
-				case "auth/invalid-email":
-					return "Please enter a valid email address.";
-				case "auth/user-not-found":
-					return "No account found with this email.";
-				case "auth/wrong-password":
-					return "Incorrect password. Please try again.";
-				case "auth/invalid-credential":
-					return "Your login credentials are invalid or expired. Please try again.";
-				case "auth/network-request-failed":
-					return "Network error. Please check your internet connection.";
+				case "auth/invalid-email":       return "Please enter a valid email address.";
+				case "auth/user-not-found":      return "No account found with this email.";
+				case "auth/wrong-password":      return "Incorrect password. Please try again.";
+				case "auth/invalid-credential":  return "Your login credentials are invalid or expired. Please try again.";
+				case "auth/network-request-failed": return "Network error. Please check your internet connection.";
 				default:
-					return error.message
-						.replace("Firebase: ", "")
-						.replace(/\(.*\)/, "")
-						.trim();
+					return error.message.replace("Firebase: ", "").replace(/\(.*\)/, "").trim();
 			}
 		}
 		return "An unknown error occurred during sign-in.";
@@ -45,24 +37,15 @@ const Login = () => {
 
 	const signIn = async (email: string, password: string) => {
 		setIsLoading(true);
-
 		try {
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				email,
-				password
-			);
+			const userCredential = await signInWithEmailAndPassword(auth, email, password);
 			const user = userCredential.user;
 			errorMessageRef.current?.classList.add("hidePasswordError");
-
-			if (user) {
-				router.push("/dashboard");
-			}
+			if (user) router.push("/dashboard");
 			return user;
 		} catch (err) {
 			const message = formatSignInError(err);
 			setErrorMessage(message);
-			// display error message
 			errorMessageRef.current?.classList.remove("hidePasswordError");
 		} finally {
 			setIsLoading(false);
@@ -70,107 +53,115 @@ const Login = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center min-h-dvh lg:flex-row lg:justify-between">
-			<div className="bg-white w-full flex flex-col items-center justify-center min-h-dvh py-10">
-				<form
-					action=""
-					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
-					onSubmit={(e) => {
-						e.preventDefault();
-
-						signIn(userEmail, userPassword);
-					}}
-				>
-					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl ">
-						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
-							P
-						</span>
-
-						<span>Pennywise</span>
+		<div className="flex min-h-dvh flex-col lg:flex-row">
+			{/* Form side */}
+			<div className="flex flex-1 flex-col items-center justify-center bg-white px-6 py-12 dark:bg-dark-surface">
+				<div className="w-full max-w-sm">
+					{/* Brand */}
+					<div className="mb-8 flex flex-col items-center gap-3">
+						<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500 shadow-glow-green">
+							<span className="text-xl font-black text-white">P</span>
+						</div>
+						<div className="text-center">
+							<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+								Welcome back
+							</h1>
+							<p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+								Sign in to your Pennywise account
+							</p>
+						</div>
 					</div>
 
-					<p className="mb-4 text-center ">Welcome back to Pennywise</p>
+					{/* Demo banner */}
+					<div className="mb-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm dark:border-brand-600/30 dark:bg-brand-600/10">
+						<p className="font-semibold text-brand-600 dark:text-green-400">Demo credentials pre-filled</p>
+						<p className="mt-0.5 text-xs text-brand-500/80 dark:text-green-500/70">
+							Hit Login to explore the app without creating an account.
+						</p>
+					</div>
 
-					<div className="flex flex-col gap-4 ">
-						<div className=" inputLabelGroup">
-							<label htmlFor="email" className=" inputLabel">
-								Email
-							</label>
+					<form
+						onSubmit={(e) => { e.preventDefault(); signIn(userEmail, userPassword); }}
+						className="flex flex-col gap-4"
+					>
+						<div className="inputLabelGroup">
+							<label htmlFor="email" className="inputLabel">Email</label>
 							<input
 								type="email"
-								placeholder="Email"
 								id="email"
-								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
+								placeholder="you@example.com"
+								className="authInput"
 								value={userEmail}
 								onChange={(e) => setUserEmail(e.target.value)}
 							/>
 						</div>
 
-						<div className=" inputLabelGroup">
-							<label htmlFor="password" className=" inputLabel">
-								Password
-							</label>
-
-							<div className="flex flex-row items-center w-full gap-4 p-3 border rounded-lg border-slate-200">
+						<div className="inputLabelGroup">
+							<label htmlFor="password" className="inputLabel">Password</label>
+							<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3
+							                transition focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/20
+							                dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-brand-400/60">
 								<input
 									type={isPasswordVisible ? "text" : "password"}
-									placeholder="Password"
-									className="w-full outline-0 focus:outline-0"
+									id="password"
+									placeholder="••••••••"
+									className="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-400 outline-none dark:text-zinc-100 dark:placeholder-zinc-500"
 									value={userPassword}
 									onChange={(e) => setUserPassword(e.target.value)}
 								/>
-
 								<button
 									type="button"
 									onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-									className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+									className="shrink-0 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
 									aria-label={isPasswordVisible ? "Hide password" : "Show password"}
 								>
-									{isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+									{isPasswordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
 								</button>
 							</div>
 						</div>
-					</div>
 
-					<p
-						className="mt-2 text-sm text-red-500 transition-all duration-200 ease-in-out hidePasswordError"
-						ref={errorMessageRef}
-					>
-						{errorMessage}
-					</p>
-
-					<Link href={"/auth/Forgot-password"}>
-						<p className=" py-4 cursor-pointer underline text-[#2D6A4F]">
-							Forgot password
+						<p
+							ref={errorMessageRef}
+							className="text-xs text-red-500 transition-all duration-200 hidePasswordError"
+						>
+							{errorMessage}
 						</p>
-					</Link>
 
-					<button
-						type="submit"
-						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 mb-4"
-						disabled={isLoading}
-					>
-						{isLoading ? (
-							<div className="w-5 h-5 mx-auto capitalize border-2 border-white rounded-full border-t-transparent animate-spin" />
-						) : (
-							"Login"
-						)}
-					</button>
+						<Link href="/auth/Forgot-password" className="text-sm text-brand-500 hover:text-brand-600 dark:text-green-400 dark:hover:text-green-300 font-medium -mt-1">
+							Forgot password?
+						</Link>
 
-					<p className="text-center ">
-						Don’t have an account ?{" "}
-						<span className=" text-[#2D6A4F] cursor-pointer">
-							<Link href={"/auth/Sign-up"}>Sign up here</Link>
-						</span>
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="w-full rounded-xl bg-brand-500 py-3 text-sm font-semibold text-white
+							           shadow-glow-green transition hover:bg-brand-600 disabled:opacity-60"
+						>
+							{isLoading ? (
+								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+							) : (
+								"Sign in"
+							)}
+						</button>
+					</form>
+
+					<p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+						Don&apos;t have an account?{" "}
+						<Link href="/auth/Sign-up" className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400">
+							Sign up
+						</Link>
 					</p>
-				</form>
+				</div>
 			</div>
 
-			<Image
-				src={loginImage}
-				alt="Login Image"
-				className="hidden lg:block h-dvh min-h-dvh object-cover"
-			/>
+			{/* Illustration side */}
+			<div className="hidden lg:flex lg:flex-1 items-center justify-center bg-gradient-to-br from-brand-500 to-brand-400 p-12">
+				<Image
+					src={loginImage}
+					alt="Pennywise illustration"
+					className="max-h-[75vh] w-full object-contain drop-shadow-2xl"
+				/>
+			</div>
 		</div>
 	);
 };

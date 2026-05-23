@@ -24,7 +24,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
     return (
         <div className="mt-4 flex flex-col items-center gap-2">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Showing {startItem}–{endItem} of {totalItems}
             </p>
 
@@ -38,7 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
                     aria-label="Previous page"
                     className={`transition duration-300 ease-in-out disabled:opacity-50 hover:scale-125 ${currentPage === 1 ? "cursor-not-allowed" : ""}`}
                 >
-                    <ArrowLeft size={24} className="text-[#2D6A4F]" />
+                    <ArrowLeft size={24} className="text-brand-500" />
                 </button>
 
                 <div className="flex flex-row items-center gap-2">
@@ -55,8 +55,8 @@ const Pagination: React.FC<PaginationProps> = ({
                                 aria-current={currentPage === page ? "page" : undefined}
                                 className={`px-4 py-1 rounded-lg ${
                                     currentPage === page
-                                        ? "bg-[#2D6A4F] text-white"
-                                        : "bg-gray-200 dark:bg-slate-700 dark:text-slate-100"
+                                        ? "bg-brand-500 text-white"
+                                        : "bg-gray-200 dark:bg-dark-muted dark:text-zinc-100"
                                 }`}
                             >
                                 {page}
@@ -74,7 +74,7 @@ const Pagination: React.FC<PaginationProps> = ({
                     aria-label="Next page"
                     className={`transition duration-300 ease-in-out disabled:opacity-50 hover:scale-125 ${currentPage === totalPages ? "cursor-not-allowed" : ""}`}
                 >
-                    <ArrowRight size={24} className="text-[#2D6A4F]" />
+                    <ArrowRight size={24} className="text-brand-500" />
                 </button>
             </div>
         </div>

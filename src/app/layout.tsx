@@ -17,7 +17,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${satoshiVariable.className} antialiased bg-slate-100 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100`}
+				className={`${satoshiVariable.className} antialiased bg-zinc-50 text-zinc-900 transition-colors duration-200 dark:bg-dark-base dark:text-zinc-100`}
 			>
 				<AppProviders>
 					<Toaster position="top-center" />

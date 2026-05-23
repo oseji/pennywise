@@ -237,13 +237,15 @@ const Dashboard = () => {
 		const row = payload[0];
 		const name = String(row.name ?? row.payload?.name ?? "");
 		const value = Number(row.value ?? row.payload?.value ?? 0);
+		const pct = row.payload?.percentage ?? null;
 		return (
-			<div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-md dark:border-slate-600 dark:bg-slate-800">
-				<p className="font-medium capitalize text-slate-900 dark:text-slate-100">
+			<div className="rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-sm shadow-card-md dark:border-dark-border dark:bg-dark-overlay">
+				<p className="font-semibold capitalize text-zinc-900 dark:text-zinc-50">
 					{name}
 				</p>
-				<p className="tabular-nums text-slate-700 dark:text-slate-200">
+				<p className="tabular-nums text-zinc-600 dark:text-zinc-300">
 					{formatMoney(value, currency)}
+					{pct !== null && <span className="ml-1.5 text-xs text-zinc-400 dark:text-zinc-500">{pct}%</span>}
 				</p>
 			</div>
 		);
@@ -308,54 +310,27 @@ const Dashboard = () => {
 			{isLoading ? (
 				<DashboardChartSkeleton />
 			) : (
-				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-					<div className="chartBox">
-						<div className="chartBoxHeadingGroup">
-							<h1 className="text-lg">Income</h1>
-
-							<span className="text-lg tabular-nums text-[#2D6A4F] dark:text-[#95D5B2]">
-								{formatMoney(incomeSummary.total, currency)}
-							</span>
+				<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+					{[
+						{ title: "Income",      total: incomeSummary.total,   data: incomeChartData,   summary: incomeSummary,   labelMap: undefined },
+						{ title: "Expenditure", total: expenseSummary.total,  data: expensesChartData, summary: expenseSummary,  labelMap: undefined },
+						{ title: "Budget",      total: budgetSummary.total,   data: budgetChartData,   summary: budgetSummary,   labelMap: BUDGET_LABEL_MAP },
+					].map(({ title, total, data, summary, labelMap }) => (
+						<div key={title} className="chartBox">
+							<div className="chartBoxHeadingGroup">
+								<div>
+									<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-0.5">
+										{title}
+									</p>
+									<p className="text-xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
+										{formatMoney(total, currency)}
+									</p>
+								</div>
+								<div className={`h-2.5 w-2.5 rounded-full ${total > 0 ? "bg-green-400" : "bg-zinc-200 dark:bg-dark-border"}`} />
+							</div>
+							{renderPie(data, summary, labelMap)}
 						</div>
-
-						<p className="chartBoxDescription">
-							Sources of your total income.
-						</p>
-
-						{renderPie(incomeChartData, incomeSummary)}
-					</div>
-
-					<div className="chartBox">
-						<div className="chartBoxHeadingGroup">
-							<h1 className="text-lg">Expenditure</h1>
-
-							<span className="text-lg tabular-nums text-[#2D6A4F] dark:text-[#95D5B2]">
-								{formatMoney(expenseSummary.total, currency)}
-							</span>
-						</div>
-
-						<p className="chartBoxDescription">
-							How your spending breaks down by category.
-						</p>
-
-						{renderPie(expensesChartData, expenseSummary)}
-					</div>
-
-					<div className="chartBox">
-						<div className="chartBoxHeadingGroup">
-							<h1 className="text-lg">Budget</h1>
-
-							<span className="text-lg tabular-nums text-[#2D6A4F] dark:text-[#95D5B2]">
-								{formatMoney(budgetSummary.total, currency)}
-							</span>
-						</div>
-
-						<p className="chartBoxDescription">
-							Allocation across budget groups.
-						</p>
-
-						{renderPie(budgetChartData, budgetSummary, BUDGET_LABEL_MAP)}
-					</div>
+					))}
 				</div>
 			)}
 		</div>
