@@ -9,6 +9,36 @@ import { usePreferencesStore } from "@/store/usePreferencesStore";
 import type { CurrencyCode } from "@/store/usePreferencesStore";
 import { AccessibleDialog } from "@/components/AccessibleDialog";
 
+// Switch control. Lives outside SettingsPage so React keeps the same element
+// across renders (a component declared inside would remount on every toggle).
+const Toggle = ({
+	checked,
+	onChange,
+	id,
+	label,
+}: {
+	checked: boolean;
+	onChange: (v: boolean) => void;
+	id: string;
+	label: string;
+}) => (
+	<label
+		htmlFor={id}
+		className="relative inline-flex min-h-11 cursor-pointer items-center"
+	>
+		<input
+			id={id}
+			type="checkbox"
+			role="switch"
+			aria-label={label}
+			className="peer sr-only"
+			checked={checked}
+			onChange={(e) => onChange(e.target.checked)}
+		/>
+		<div className="relative h-6 w-11 rounded-full bg-zinc-500 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400 peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-dark-raised" />
+	</label>
+);
+
 const SettingsPage = () => {
 	const router = useRouter();
 	const { currency, setCurrency, theme, setTheme, notificationsEnabled, setNotificationsEnabled } =
@@ -17,30 +47,6 @@ const SettingsPage = () => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isSendingReset, setIsSendingReset] = useState(false);
-
-	const Toggle = ({
-		checked,
-		onChange,
-		id,
-	}: {
-		checked: boolean;
-		onChange: (v: boolean) => void;
-		id: string;
-	}) => (
-		<label
-			htmlFor={id}
-			className="relative inline-flex min-h-11 cursor-pointer items-center"
-		>
-			<input
-				id={id}
-				type="checkbox"
-				className="peer sr-only"
-				checked={checked}
-				onChange={(e) => onChange(e.target.checked)}
-			/>
-			<div className="relative h-6 w-11 rounded-full bg-zinc-500 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400 peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-dark-raised" />
-		</label>
-	);
 
 	const handleChangePassword = async () => {
 		const user = auth.currentUser;
@@ -103,6 +109,7 @@ const SettingsPage = () => {
 						</span>
 						<Toggle
 							id="theme-toggle"
+							label="Dark mode"
 							checked={theme === "dark"}
 							onChange={(on) => setTheme(on ? "dark" : "light")}
 						/>
@@ -119,6 +126,7 @@ const SettingsPage = () => {
 
 					<Toggle
 						id="notif-toggle"
+						label="Show notifications"
 						checked={notificationsEnabled}
 						onChange={setNotificationsEnabled}
 					/>

@@ -10,7 +10,7 @@ import avatarIcon from "../../assets/dashboard/avatar.svg";
 
 const DashboardHeader = () => {
 	const { isOpen, toggle } = useNotificationStore();
-	const { theme, toggleTheme } = usePreferencesStore();
+	const { theme, toggleTheme, notificationsEnabled } = usePreferencesStore();
 
 	return (
 		<header className="fixed left-0 top-0 z-30 flex w-full flex-row items-center justify-between
@@ -36,6 +36,7 @@ const DashboardHeader = () => {
 					)}
 				</button>
 
+				{notificationsEnabled && (
 				<button
 					type="button"
 					onClick={toggle}
@@ -47,6 +48,7 @@ const DashboardHeader = () => {
 				>
 					<Bell className="h-5 w-5" aria-hidden />
 				</button>
+				)}
 
 				<div className="ml-1 flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl
 				                border-2 border-zinc-200 dark:border-dark-border">

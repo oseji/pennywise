@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { usePreferencesStore } from "@/store/usePreferencesStore";
 import { EmptyState } from "@/components/EmptyState";
 import { db } from "@/firebase/firebase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -24,6 +25,7 @@ const Notifications = () => {
 	const [notificationsData, setNotificationsData] = useState<notificationDataType[]>([]);
 
 	const { isOpen, close } = useNotificationStore();
+	const notificationsEnabled = usePreferencesStore((s) => s.notificationsEnabled);
 	const panelRef = useRef<HTMLDivElement>(null);
 
 	// Popover behaviour: focus moves into the panel on open, Escape closes it,
@@ -81,6 +83,8 @@ const Notifications = () => {
 		getData();
 	}, [user, isOpen]);
 
+	if (!notificationsEnabled) return null;
+
 	return (
 		<div
 			ref={panelRef}
@@ -104,7 +108,7 @@ const Notifications = () => {
 						Notifications
 					</h2>
 					{notificationsData.length > 0 && (
-						<span className="rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-bold text-white dark:bg-green-500">
+						<span className="rounded-full bg-brand-500 px-2 py-0.5 text-[11px] font-bold text-white dark:bg-green-500">
 							{notificationsData.length}
 						</span>
 					)}

@@ -976,6 +976,9 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 									className="formInput"
 									name="set-limit"
 									id="set-limit"
@@ -1009,6 +1012,9 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 									className="formInput"
 									name="set-plannedPayment-limit"
 									id="set-plannedPayment-limit"
@@ -1082,6 +1088,9 @@ const BudgetScreen = () => {
 							<input
 								className="formInput"
 								type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 								id="edit-amount"
 								placeholder="Amount"
 								value={editingEntry.amount}
@@ -1094,6 +1103,9 @@ const BudgetScreen = () => {
 							<input
 								className="formInput"
 								type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 								id="edit-limit"
 								placeholder="Spending limit"
 								value={editingEntry.setLimit}

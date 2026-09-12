@@ -502,6 +502,9 @@ const ExpensesPage = () => {
 						<input
 							className="formInput"
 							type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 							name="amount"
 							id="amount"
 							placeholder="Enter amount"

@@ -196,20 +196,24 @@ const IncomeScreen = () => {
 			<div>
 				<h1 className="dashboardHeading">Income</h1>
 
-				<p className="my-5 font-bold text-zinc-900 dark:text-zinc-100">
-					<span className="text-lg md:text-xl lg:text-2xl">Balance: </span>
-					<span className="text-xl md:text-2xl lg:text-5xl tabular-nums">
-						{formatMoney(totalIncome, currency)}
-					</span>
-				</p>
+				<div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+					<div>
+						<p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+							Total income
+						</p>
+						<p className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 md:text-4xl">
+							{formatMoney(totalIncome, currency)}
+						</p>
+					</div>
 
-				<button
-					type="button"
-					className="btn-outline-brand"
-					onClick={() => setIsModalOpen(true)}
-				>
-					+ Add income
-				</button>
+					<button
+						type="button"
+						className="btn-primary"
+						onClick={() => setIsModalOpen(true)}
+					>
+						+ Add income
+					</button>
+				</div>
 
 				<div>
 					{/* Mobile cards */}
@@ -405,6 +409,9 @@ const IncomeScreen = () => {
 						<input
 							className="formInput"
 							type="number"
+							inputMode="decimal"
+							min="0"
+							step="0.01"
 							name="amount"
 							id="amount"
 							placeholder="Enter amount"

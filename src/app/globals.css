@@ -64,6 +64,9 @@ input[type="number"] {
 .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
 .dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
+/* Everything below is a component class. Keeping them in @layer components
+   lets plain utilities (w-auto, text-red-600, ...) override them at call sites. */
+@layer components {
 /* ─── Auth ───────────────────────────────────────────── */
 .inputLabelGroup {
     @apply flex flex-col gap-1;
@@ -242,4 +245,4 @@ input[type="number"] {
     @apply sticky left-0 z-10 bg-brand-500
            dark:bg-dark-overlay;
 }
-
+}
