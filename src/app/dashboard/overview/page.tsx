@@ -1,13 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import {
-	Cell,
-	Pie,
-	PieChart,
-	Tooltip,
-	ResponsiveContainer,
-} from "recharts";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 import { db } from "@/firebase/firebase";
 import { getDocs, collection, orderBy, query } from "firebase/firestore";
@@ -20,7 +14,6 @@ import { EmptyState } from "@/components/EmptyState";
 import { DashboardChartSkeleton } from "@/components/DashboardChartSkeleton";
 import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
-import { CHART_COLORS } from "@/utils/chartColors";
 
 type userData = {
 	total: number;
@@ -49,49 +42,17 @@ const BUDGET_LABEL_MAP: Record<string, string> = {
 	dailyNeeds: "Daily needs",
 };
 
+const EMPTY: userData = { total: 0, categories: [] };
+
 const Dashboard = () => {
 	const { user, initialized: authInitialized } = useAuthStore();
 	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isLoading, setisLoading] = useState<boolean>(true);
 
-	const [incomeSummary, setIncomeSummary] = useState<userData>({
-		total: 0,
-		categories: [],
-	});
-	const [expenseSummary, setExpenseSummary] = useState<userData>({
-		total: 0,
-		categories: [],
-	});
-	const [budgetSummary, setBudgetSummary] = useState<userData>({
-		total: 0,
-		categories: [],
-	});
-
-	const incomeChartData = useMemo(
-		() =>
-			incomeSummary.categories.map((item) => ({
-				name: item.name,
-				value: item.totalAmount,
-			})),
-		[incomeSummary.categories]
-	);
-	const expensesChartData = useMemo(
-		() =>
-			expenseSummary.categories.map((item) => ({
-				name: item.name,
-				value: item.totalAmount,
-			})),
-		[expenseSummary.categories]
-	);
-	const budgetChartData = useMemo(
-		() =>
-			budgetSummary.categories.map((item) => ({
-				name: BUDGET_LABEL_MAP[item.name] ?? item.name,
-				value: item.totalAmount,
-			})),
-		[budgetSummary.categories]
-	);
+	const [incomeSummary, setIncomeSummary] = useState<userData>(EMPTY);
+	const [expenseSummary, setExpenseSummary] = useState<userData>(EMPTY);
+	const [budgetSummary, setBudgetSummary] = useState<userData>(EMPTY);
 
 	const fetchUserDataSummary = async (
 		userId: string
@@ -102,10 +63,7 @@ const Dashboard = () => {
 		setisLoading(true);
 
 		if (!userId) {
-			return {
-				income: { total: 0, categories: [] },
-				expense: { total: 0, categories: [] },
-			};
+			return { income: EMPTY, expense: EMPTY };
 		}
 
 		const summarize = async (collectionName: string) => {
@@ -144,17 +102,14 @@ const Dashboard = () => {
 			return { income, expense };
 		} catch (err) {
 			toast.error(formatFetchError(err));
-			return {
-				income: { total: 0, categories: [] },
-				expense: { total: 0, categories: [] },
-			};
+			return { income: EMPTY, expense: EMPTY };
 		} finally {
 			setisLoading(false);
 		}
 	};
 
 	const fetchBudgetData = async (userId: string): Promise<userData> => {
-		if (!userId) return { total: 0, categories: [] };
+		if (!userId) return EMPTY;
 
 		try {
 			const budgetCategories = ["others", "plannedPayments", "dailyNeeds"];
@@ -194,7 +149,7 @@ const Dashboard = () => {
 			return { total, categories: finalCategories };
 		} catch (err) {
 			toast.error(formatFetchError(err));
-			return { total: 0, categories: [] };
+			return EMPTY;
 		}
 	};
 
@@ -218,124 +173,145 @@ const Dashboard = () => {
 		load();
 	}, [user?.uid, authInitialized]);
 
-	const chartTooltip = ({
-		active,
-		payload,
-	}: {
-		active?: boolean;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		payload?: any[];
-	}) => {
-		if (!active || !payload?.length) return null;
-		const row = payload[0];
-		const name = String(row.name ?? row.payload?.name ?? "");
-		const value = Number(row.value ?? row.payload?.value ?? 0);
-		const pct = row.payload?.percentage ?? null;
-		return (
-			<div className="rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-sm shadow-card-md dark:border-dark-border dark:bg-dark-overlay">
-				<p className="font-semibold capitalize text-zinc-900 dark:text-zinc-50">
-					{name}
-				</p>
-				<p className="tabular-nums text-zinc-600 dark:text-zinc-300">
-					{formatMoney(value, currency)}
-					{pct !== null && <span className="ml-1.5 text-xs text-zinc-500 dark:text-zinc-400">{pct}%</span>}
-				</p>
-			</div>
-		);
-	};
+	const net = incomeSummary.total - expenseSummary.total;
+	const hasBudget = budgetSummary.total > 0;
+	const budgetUsed = hasBudget
+		? Math.min((expenseSummary.total / budgetSummary.total) * 100, 100)
+		: 0;
+	const budgetRemaining = budgetSummary.total - expenseSummary.total;
+	const overBudget = hasBudget && budgetRemaining < 0;
 
-	const renderPie = (
-		title: string,
-		data: { name: string; value: number }[],
-		summary: userData,
-		labelMap?: Record<string, string>
-	) => {
-		if (data.length === 0 || summary.total === 0) {
-			return (
-				<EmptyState
-					title="No data yet"
-					description="Add entries on the Income or Expenses pages to see this chart."
-				/>
-			);
-		}
-
-		// Text alternative for the chart: top categories with their share.
-		const chartSummary = [...summary.categories]
-			.sort((a, b) => b.percentage - a.percentage)
-			.slice(0, 5)
-			.map((c) => `${labelMap?.[c.name] ?? c.name} ${c.percentage}%`)
-			.join(", ");
-
-		return (
-			<>
-				<figure
-					role="img"
-					aria-label={`${title} by category: ${chartSummary}`}
-					className="h-[220px] w-full min-w-0 shrink-0"
-				>
-					<ResponsiveContainer width="100%" height="100%">
-						<PieChart>
-							<Tooltip content={chartTooltip} />
-							<Pie
-								data={data}
-								cx="50%"
-								cy="50%"
-								innerRadius={60}
-								outerRadius={88}
-								paddingAngle={1}
-								dataKey="value"
-								nameKey="name"
-								className="outline-none"
-							>
-								{data.map((entry, index) => (
-									<Cell
-										key={`cell-${entry.name}`}
-										fill={CHART_COLORS[index % CHART_COLORS.length]}
-									/>
-								))}
-							</Pie>
-						</PieChart>
-					</ResponsiveContainer>
-				</figure>
-				<div className="mt-auto flex w-full flex-row justify-start">
-					<ChartCategories
-						summary={summary}
-						limit={5}
-						labelMap={labelMap}
-					/>
-				</div>
-			</>
-		);
-	};
+	const cards = [
+		{
+			title: "Income",
+			summary: incomeSummary,
+			labelMap: undefined,
+			empty: { title: "No income yet", description: "Add entries on the Income page to see the breakdown here.", href: "/dashboard/income", cta: "Add income" },
+		},
+		{
+			title: "Expenditure",
+			summary: expenseSummary,
+			labelMap: undefined,
+			empty: { title: "No spending yet", description: "Log expenses to see where the money went.", href: "/dashboard/expenses", cta: "Add expense" },
+		},
+		{
+			title: "Budget",
+			summary: budgetSummary,
+			labelMap: BUDGET_LABEL_MAP,
+			empty: { title: "No budget set", description: "Set limits per category to track spending against them.", href: "/dashboard/budget", cta: "Set a budget" },
+		},
+	];
 
 	return (
 		<div className="dashboardScreen">
-			<h1 className="dashboardHeading">dashboard</h1>
+			<h1 className="dashboardHeading">Dashboard</h1>
 
 			{isLoading ? (
 				<DashboardChartSkeleton />
 			) : (
-				<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-					{[
-						{ title: "Income",      total: incomeSummary.total,   data: incomeChartData,   summary: incomeSummary,   labelMap: undefined },
-						{ title: "Expenditure", total: expenseSummary.total,  data: expensesChartData, summary: expenseSummary,  labelMap: undefined },
-						{ title: "Budget",      total: budgetSummary.total,   data: budgetChartData,   summary: budgetSummary,   labelMap: BUDGET_LABEL_MAP },
-					].map(({ title, total, data, summary, labelMap }) => (
-						<div key={title} className="chartBox">
-							<div className="chartBoxHeadingGroup">
-								<div>
-									<p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-0.5">
-										{title}
-									</p>
-									<p className="text-xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
-										{formatMoney(total, currency)}
-									</p>
-								</div>
-								<div className={`h-2.5 w-2.5 rounded-full ${total > 0 ? "bg-green-400" : "bg-zinc-200 dark:bg-dark-border"}`} />
-							</div>
-							{renderPie(title, data, summary, labelMap)}
+				<div className="flex flex-col gap-5">
+					{/* The one number that matters, first. */}
+					<section
+						aria-labelledby="net-balance-heading"
+						className="card flex flex-col gap-6 p-6 md:flex-row md:items-end md:justify-between md:p-8"
+					>
+						<div>
+							<h2
+								id="net-balance-heading"
+								className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400"
+							>
+								Net balance
+							</h2>
+							<p
+								className={`mt-1 text-4xl font-bold tabular-nums tracking-tight md:text-5xl ${
+									net < 0 ? "text-red-600 dark:text-red-400" : "text-zinc-900 dark:text-zinc-50"
+								}`}
+							>
+								{formatMoney(net, currency)}
+							</p>
+							<p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+								<span className="tabular-nums">{formatMoney(incomeSummary.total, currency)}</span> in
+								{" · "}
+								<span className="tabular-nums">{formatMoney(expenseSummary.total, currency)}</span> out
+							</p>
 						</div>
-					))}
+
+						<div className="w-full md:w-72">
+							<div className="flex items-baseline justify-between gap-3 text-sm">
+								<span className="font-semibold text-zinc-700 dark:text-zinc-300">
+									{hasBudget ? (overBudget ? "Over budget" : "Budget remaining") : "Budget"}
+								</span>
+								{hasBudget ? (
+									<span
+										className={`font-semibold tabular-nums ${
+											overBudget ? "text-red-600 dark:text-red-400" : "text-zinc-900 dark:text-zinc-50"
+										}`}
+									>
+										{formatMoney(Math.abs(budgetRemaining), currency)}
+									</span>
+								) : (
+									<Link
+										href="/dashboard/budget"
+										className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400"
+									>
+										Set a budget
+									</Link>
+								)}
+							</div>
+							{hasBudget && (
+								<>
+									<div
+										className="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-dark-border"
+										role="progressbar"
+										aria-label="Budget used"
+										aria-valuemin={0}
+										aria-valuemax={100}
+										aria-valuenow={Math.round(budgetUsed)}
+									>
+										<div
+											className={`h-full rounded-full ${overBudget ? "bg-red-600" : "bg-brand-500 dark:bg-green-400"}`}
+											style={{ width: `${budgetUsed}%` }}
+										/>
+									</div>
+									<p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+										<span className="tabular-nums">{formatMoney(expenseSummary.total, currency)}</span> of{" "}
+										<span className="tabular-nums">{formatMoney(budgetSummary.total, currency)}</span> used
+									</p>
+								</>
+							)}
+						</div>
+					</section>
+
+					<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+						{cards.map(({ title, summary, labelMap, empty }) => (
+							<section key={title} className="chartBox" aria-labelledby={`card-${title}`}>
+								<div className="chartBoxHeadingGroup">
+									<div>
+										<h2
+											id={`card-${title}`}
+											className="mb-0.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400"
+										>
+											{title}
+										</h2>
+										<p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
+											{formatMoney(summary.total, currency)}
+										</p>
+									</div>
+								</div>
+
+								{summary.total === 0 || summary.categories.length === 0 ? (
+									<div className="flex w-full flex-col items-center">
+										<EmptyState title={empty.title} description={empty.description} />
+										<Link href={empty.href} className="btn-outline-brand -mt-4">
+											{empty.cta}
+										</Link>
+									</div>
+								) : (
+									<ChartCategories summary={summary} limit={5} labelMap={labelMap} />
+								)}
+							</section>
+						))}
+					</div>
 				</div>
 			)}
 		</div>

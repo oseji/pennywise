@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import Pagination from "@/utils/Pagination";
-import Image from "next/image";
 import { db } from "@/firebase/firebase";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
@@ -15,6 +14,7 @@ import {
 	doc,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { Trash2 } from "lucide-react";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { formatAddDocError } from "@/utils/formatAddDocError";
 import { getPaginationRange } from "@/utils/getPaginationRange";
@@ -23,7 +23,6 @@ import { EmptyState } from "@/components/EmptyState";
 import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
 
-import deleteIcon from "../../../assets/dashboard/delete icon.svg";
 
 type expenseDataType = {
 	category: string;
@@ -241,7 +240,7 @@ const ExpensesPage = () => {
 	return (
 		<div className="relative dashboardScreen">
 			<div>
-				<h1 className="dashboardHeading">expenses</h1>
+				<h1 className="dashboardHeading">Expenses</h1>
 
 				<div>
 					{/* Mobile list */}
@@ -252,7 +251,7 @@ const ExpensesPage = () => {
 							</p>
 							<button
 								type="button"
-								className="btn-primary min-h-11"
+								className="btn-primary"
 								onClick={() => setIsModalOpen(true)}
 							>
 								+ Add
@@ -301,7 +300,7 @@ const ExpensesPage = () => {
 												</p>
 												<button
 													type="button"
-													className="-mr-3 mt-1 inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+													className="-mr-3 mt-1 inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
 													onClick={() => {
 														setSelectedIdForDeletion(element.id);
 														setIsDeleteModalOpen(true);
@@ -319,13 +318,13 @@ const ExpensesPage = () => {
 
 					{/* Desktop */}
 					<div className="mt-5 hidden text-sm md:block">
-						<div className="overflow-x-auto rounded-t-xl">
+						<div className="overflow-x-auto rounded-t-2xl">
 							<div className="dataTableHeader grid min-w-[820px] w-full grid-cols-5">
-								<p className="tableStickyHeaderCell min-w-[140px] pl-2">category</p>
-								<p>narration</p>
-								<p>time</p>
-								<p>amount</p>
-								<p className="text-center">action</p>
+								<p className="tableStickyHeaderCell min-w-[140px] pl-2">Category</p>
+								<p>Narration</p>
+								<p>Time</p>
+								<p>Amount</p>
+								<p className="text-center">Action</p>
 							</div>
 						</div>
 
@@ -334,7 +333,7 @@ const ExpensesPage = () => {
 								{[1, 2, 3, 4, 5, 6].map((i) => (
 									<div
 										key={i}
-										className="h-12 animate-pulse rounded-lg bg-zinc-200 dark:bg-dark-muted"
+										className="h-12 animate-pulse rounded-xl bg-zinc-200 dark:bg-dark-muted"
 									/>
 								))}
 							</div>
@@ -347,7 +346,7 @@ const ExpensesPage = () => {
 
 									<button
 										type="button"
-										className="btn-primary min-h-11"
+										className="btn-primary"
 										onClick={() => setIsModalOpen(true)}
 									>
 										+ Add
@@ -387,18 +386,14 @@ const ExpensesPage = () => {
 												<div className="flex flex-row items-center justify-center pt-1">
 													<button
 														type="button"
-														className="iconBtn"
+														className="iconBtn text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
 														onClick={() => {
 															setSelectedIdForDeletion(element.id);
 															setIsDeleteModalOpen(true);
 														}}
 														aria-label="Delete expense"
 													>
-														<Image
-															src={deleteIcon}
-															alt=""
-															className="h-6 w-6 cursor-pointer transition ease-in-out hover:scale-110"
-														/>
+														<Trash2 className="h-5 w-5" aria-hidden />
 													</button>
 												</div>
 											</div>
@@ -517,7 +512,7 @@ const ExpensesPage = () => {
 
 					<button
 						type="submit"
-						className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+						className="btn-primary mt-4 w-full"
 						disabled={isLoading}
 					>
 						{isLoading ? (
@@ -542,7 +537,7 @@ const ExpensesPage = () => {
 				<div className="flex flex-row items-center justify-center gap-5">
 					<button
 						type="button"
-						className="min-h-11 w-28 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+						className="btn-danger w-28"
 						onClick={() => {
 							deleteExpense(selectedIdForDeletion);
 						}}
@@ -555,7 +550,7 @@ const ExpensesPage = () => {
 					</button>
 					<button
 						type="button"
-						className="min-h-11 w-28 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
+						className="btn-secondary w-28"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel

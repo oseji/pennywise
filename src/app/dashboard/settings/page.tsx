@@ -86,7 +86,7 @@ const SettingsPage = () => {
 
 	return (
 		<div className="dashboardScreen">
-			<h1 className="dashboardHeading">settings</h1>
+			<h1 className="dashboardHeading">Settings</h1>
 
 			<div className="mt-6 flex flex-col gap-8 rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-card dark:border-dark-border dark:bg-dark-raised md:p-10">
 				<div className="settingsRow">
@@ -135,7 +135,7 @@ const SettingsPage = () => {
 					<select
 						name="currency"
 						id="currency"
-						className="formInput w-auto min-h-11"
+						className="formInput w-auto"
 						value={currency}
 						onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
 					>
@@ -159,7 +159,7 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading text-blue-600 dark:text-blue-400">Change Password</h2>
+						<h2 className="settingsHeading">Change password</h2>
 						<p className="text-zinc-600 dark:text-zinc-400">
 							A reset link will be sent to your email address.
 						</p>
@@ -168,7 +168,7 @@ const SettingsPage = () => {
 						type="button"
 						onClick={handleChangePassword}
 						disabled={isSendingReset}
-						className="min-h-11 rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600/10 disabled:opacity-60 dark:border-blue-400 dark:text-blue-400"
+						className="btn-secondary"
 					>
 						{isSendingReset ? "Sending…" : "Send reset email"}
 					</button>
@@ -176,7 +176,7 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading text-red-600 dark:text-red-400">Delete Account</h2>
+						<h2 className="settingsHeading text-red-600 dark:text-red-400">Delete account</h2>
 						<p className="text-zinc-600 dark:text-zinc-400">
 							Permanently delete your Pennywise account and all data.
 						</p>
@@ -184,7 +184,7 @@ const SettingsPage = () => {
 					<button
 						type="button"
 						onClick={() => setIsDeleteModalOpen(true)}
-						className="min-h-11 rounded-lg border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-500/10"
+						className="btn-outline-danger"
 					>
 						Delete account
 					</button>
@@ -208,7 +208,7 @@ const SettingsPage = () => {
 				<div className="flex flex-row items-center justify-center gap-4">
 					<button
 						type="button"
-						className="min-h-11 w-32 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+						className="btn-danger w-32"
 						onClick={handleDeleteAccount}
 						disabled={isDeleting}
 					>
@@ -220,7 +220,7 @@ const SettingsPage = () => {
 					</button>
 					<button
 						type="button"
-						className="min-h-11 w-32 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
+						className="btn-secondary w-32"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel

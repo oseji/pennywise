@@ -59,7 +59,7 @@ const Pagination: React.FC<PaginationProps> = ({
                                 onClick={() => onPageChange(page)}
                                 aria-label={`Page ${page}`}
                                 aria-current={currentPage === page ? "page" : undefined}
-                                className={`inline-flex h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-semibold tabular-nums transition ${
+                                className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl px-3 text-sm font-semibold tabular-nums transition ${
                                     currentPage === page
                                         ? "bg-brand-500 text-white"
                                         : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 dark:bg-dark-muted dark:text-zinc-100 dark:hover:bg-zinc-600"

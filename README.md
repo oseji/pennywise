@@ -8,7 +8,7 @@ Pennywise helps users track their income, expenses, savings, and budgets in one 
 
 ## Features
 
-- **Overview dashboard** — pie charts breaking down income and expenses by category, with totals
+- **Overview dashboard** — net balance and budget remaining up top, with ranked category breakdowns for income, expenditure and budget
 - **Expenses** — log and manage spending entries with categories and sub-categories
 - **Income** — record income sources and amounts
 - **Budget** — set spending limits across three buckets (Daily Needs, Planned Payments, Others) and track actual vs. budgeted spend
@@ -20,7 +20,6 @@ Pennywise helps users track their income, expenses, savings, and budgets in one 
 
 - Next.js 15 + React 19 + TypeScript
 - Tailwind CSS
-- Recharts for data visualisation
 - Framer Motion for animations
 - Firebase (Auth + Firestore)
 - Zustand for client state (notifications, preferences)

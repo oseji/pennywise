@@ -1,24 +1,38 @@
 export function DashboardChartSkeleton() {
+	const bar = "animate-pulse rounded-full bg-zinc-100 dark:bg-dark-overlay";
+	const block = "animate-pulse rounded-xl bg-zinc-200 dark:bg-dark-overlay";
+
 	return (
-		<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-			{[0, 1, 2].map((i) => (
-				<div
-					key={i}
-					className="flex h-96 flex-col items-center rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-card
-					           dark:border-dark-border dark:bg-dark-raised dark:shadow-dark-card md:h-[500px]"
-				>
-					<div className="mb-5 flex w-full flex-row items-center justify-between">
-						<div className="h-5 w-20 animate-pulse rounded-lg bg-zinc-200 dark:bg-dark-overlay" />
-						<div className="h-5 w-24 animate-pulse rounded-lg bg-zinc-200 dark:bg-dark-overlay" />
+		<div className="flex flex-col gap-5">
+			{/* Headline */}
+			<div className="card p-6 md:p-8">
+				<div className={`h-3 w-24 ${block}`} />
+				<div className={`mt-3 h-10 w-64 ${block}`} />
+				<div className={`mt-3 h-3 w-80 ${bar}`} />
+			</div>
+
+			{/* Category cards */}
+			<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+				{[0, 1, 2].map((i) => (
+					<div key={i} className="chartBox">
+						<div className="mb-5 flex w-full flex-row items-center justify-between">
+							<div className={`h-3 w-20 ${block}`} />
+						</div>
+						<div className={`mb-5 h-7 w-40 self-start ${block}`} />
+						<div className="w-full space-y-4">
+							{[0, 1, 2, 3].map((r) => (
+								<div key={r} className="space-y-2">
+									<div className="flex justify-between">
+										<div className={`h-3 w-24 ${bar}`} />
+										<div className={`h-3 w-20 ${bar}`} />
+									</div>
+									<div className={`h-1.5 w-full ${bar}`} />
+								</div>
+							))}
+						</div>
 					</div>
-					<div className="my-6 h-[180px] w-[180px] animate-pulse rounded-full bg-zinc-100 dark:bg-dark-overlay" />
-					<div className="mt-auto w-full space-y-2.5">
-						<div className="h-3 w-full animate-pulse rounded-full bg-zinc-100 dark:bg-dark-overlay" />
-						<div className="h-3 w-4/5 animate-pulse rounded-full bg-zinc-100 dark:bg-dark-overlay" />
-						<div className="h-3 w-3/5 animate-pulse rounded-full bg-zinc-100 dark:bg-dark-overlay" />
-					</div>
-				</div>
-			))}
+				))}
+			</div>
 		</div>
 	);
 }

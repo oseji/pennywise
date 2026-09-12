@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
+import { Pencil, X } from "lucide-react";
 
 import { db } from "@/firebase/firebase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -18,12 +18,12 @@ import {
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
 
-import editIcon from "../../../assets/dashboard/edit icon.svg";
 import { formatAddDocError } from "@/utils/formatAddDocError";
 import { AccessibleDialog } from "@/components/AccessibleDialog";
 import { EmptyState } from "@/components/EmptyState";
 import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
+import type { CurrencyCode } from "@/store/usePreferencesStore";
 
 type budgetDataType = {
 	id: string;
@@ -58,6 +58,47 @@ type CategoryTotals = {
 			expenses: Expense[];
 		};
 	};
+};
+
+const getBarColor = (percent: number) => {
+	if (percent < 25) return "bg-green-600";
+	if (percent < 50) return "bg-blue-600";
+	if (percent < 75) return "bg-orange-600";
+	return "bg-red-600";
+};
+
+// Bar + label for one budget row. Over-limit rows say by how much instead of
+// printing a percentage like "3921.4%" next to a bar that's clamped at 100.
+const BudgetStatus = ({
+	spent,
+	limit,
+	currency,
+}: {
+	spent: number;
+	limit: number;
+	currency: CurrencyCode;
+}) => {
+	const percentage = limit > 0 ? (spent / limit) * 100 : 0;
+	const over = spent - limit;
+	const isOver = limit > 0 && over > 0;
+
+	return (
+		<>
+			<div className="progressBarBody" aria-hidden="true">
+				<div
+					className={`progressBarTracker ${getBarColor(percentage)}`}
+					style={{ width: `${Math.min(percentage, 100)}%` }}
+				/>
+			</div>
+			<span className={`progressBarLabel ${isOver ? "text-red-600 dark:text-red-400" : ""}`}>
+				{limit <= 0
+					? "No limit"
+					: isOver
+						? `Over by ${formatMoney(over, currency)}`
+						: `${Math.round(percentage)}% used`}
+			</span>
+		</>
+	);
 };
 
 const BudgetScreen = () => {
@@ -114,13 +155,6 @@ const BudgetScreen = () => {
 	const [isDeleteEntryLoading, setIsDeleteEntryLoading] = useState<boolean>(false);
 
 	// helper for bar color
-	const getBarColor = (percent: number) => {
-		if (percent < 25) return "bg-green-600";
-		if (percent < 50) return "bg-blue-600";
-		if (percent < 75) return "bg-orange-600";
-		return "bg-red-600";
-	};
-
 	const addCategory = async (
 		selectedCategory: "daily needs" | "planned payments" | "others"
 	) => {
@@ -470,7 +504,7 @@ const BudgetScreen = () => {
 	return (
 		<div className="relative dashboardScreen">
 			<div>
-				<h1 className="dashboardHeading">budget</h1>
+				<h1 className="dashboardHeading">Budget</h1>
 
 				{dataLoading ? (
 					<div className="flex min-h-[70dvh] flex-col gap-6 py-8">
@@ -486,10 +520,11 @@ const BudgetScreen = () => {
 						{/* daily needs */}
 						<div className=" budgetCategories">
 							<div className="budgetCategoriesHeading">
-								<h1 className=" budgetCategoriesHeadingText">daily needs</h1>
+								<h2 className="budgetCategoriesHeadingText">Daily needs</h2>
 
 								<button
-									className=" dailyNeedsAddButton"
+									type="button"
+									className="btn-outline-brand"
 									onClick={() => {
 										setIsModalOpen(!isModalOpen);
 										setSelectedModal("daily needs");
@@ -508,12 +543,12 @@ const BudgetScreen = () => {
 									<col className="w-[340px]" />
 								</colgroup>
 
-								<thead className="capitalize">
+								<thead>
 									<tr>
-										<th className="tableStickyCell text-start">category</th>
-										<th className="text-start">set limit</th>
-										<th className="text-start">amount spent</th>
-										<th className="text-start">status</th>
+										<th className="tableStickyCell text-start">Category</th>
+										<th className="text-start">Set limit</th>
+										<th className="text-start">Amount spent</th>
+										<th className="text-start">Status</th>
 									</tr>
 								</thead>
 
@@ -534,9 +569,6 @@ const BudgetScreen = () => {
 											element.category
 										);
 
-										const percentage = element.setLimit
-											? (totalSpent / element.setLimit) * 100
-											: 0;
 
 										return (
 											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
@@ -562,13 +594,7 @@ const BudgetScreen = () => {
 												</td>
 
 												<td className="progressBarContainer">
-													<div className="progressBarBody">
-														<div
-															className={`progressBarTracker ${getBarColor(percentage)}`}
-															style={{ width: `${Math.min(percentage, 100)}%` }}
-														/>
-													</div>
-													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
+													<BudgetStatus spent={totalSpent} limit={element.setLimit} currency={currency} />
 
 													<div className="flex gap-1">
 														<button
@@ -587,7 +613,7 @@ const BudgetScreen = () => {
 																setIsEditModalOpen(true);
 															}}
 														>
-															<Image src={editIcon} alt="" />
+															<Pencil className="h-4 w-4" aria-hidden />
 														</button>
 														<button
 															type="button"
@@ -598,7 +624,7 @@ const BudgetScreen = () => {
 																setIsDeleteConfirmOpen(true);
 															}}
 														>
-															✕
+															<X className="h-4 w-4" aria-hidden />
 														</button>
 													</div>
 												</td>
@@ -614,12 +640,11 @@ const BudgetScreen = () => {
 						{/* planned payments */}
 						<div className="budgetCategories">
 							<div className="budgetCategoriesHeading">
-								<h1 className="budgetCategoriesHeadingText ">
-									planned payments
-								</h1>
+								<h2 className="budgetCategoriesHeadingText">Planned payments</h2>
 
 								<button
-									className=" dailyNeedsAddButton"
+									type="button"
+									className="btn-outline-brand"
 									onClick={() => {
 										setIsModalOpen(!isModalOpen);
 										setSelectedModal("planned payments");
@@ -631,12 +656,12 @@ const BudgetScreen = () => {
 
 							<div className="w-full overflow-x-auto">
 							<table className="min-w-[960px] w-full mt-4">
-								<thead className="capitalize">
+								<thead>
 									<tr>
-										<th className="tableStickyCell text-start">category</th>
-										<th className="text-start">set limit</th>
-										<th className="text-start">amount spent</th>
-										<th className="text-start">status</th>
+										<th className="tableStickyCell text-start">Category</th>
+										<th className="text-start">Set limit</th>
+										<th className="text-start">Amount spent</th>
+										<th className="text-start">Status</th>
 									</tr>
 								</thead>
 
@@ -657,10 +682,6 @@ const BudgetScreen = () => {
 											element.category
 										);
 
-										// avoid null amount
-										const percentage = element.amount
-											? (totalSpent / element.amount) * 100
-											: 0;
 
 										return (
 											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
@@ -675,13 +696,7 @@ const BudgetScreen = () => {
 												</td>
 
 												<td className="progressBarContainer">
-													<div className="progressBarBody">
-														<div
-															className={`progressBarTracker ${getBarColor(percentage)}`}
-															style={{ width: `${Math.min(percentage, 100)}%` }}
-														/>
-													</div>
-													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
+													<BudgetStatus spent={totalSpent} limit={element.amount ?? 0} currency={currency} />
 
 													<div className="flex gap-1">
 														<button
@@ -700,7 +715,7 @@ const BudgetScreen = () => {
 																setIsEditModalOpen(true);
 															}}
 														>
-															<Image src={editIcon} alt="" />
+															<Pencil className="h-4 w-4" aria-hidden />
 														</button>
 														<button
 															type="button"
@@ -711,7 +726,7 @@ const BudgetScreen = () => {
 																setIsDeleteConfirmOpen(true);
 															}}
 														>
-															✕
+															<X className="h-4 w-4" aria-hidden />
 														</button>
 													</div>
 												</td>
@@ -726,12 +741,13 @@ const BudgetScreen = () => {
 
 						{/* others */}
 						<div className="budgetCategories">
-							<div className="pb-3 border-b border-zinc-200">
+							<div className="pb-3 border-b border-zinc-100 dark:border-dark-border">
 								<div className="budgetCategoriesHeading">
-									<h1 className="budgetCategoriesHeadingText ">others</h1>
+									<h2 className="budgetCategoriesHeadingText">Others</h2>
 
 									<button
-										className=" dailyNeedsAddButton"
+										type="button"
+									className="btn-outline-brand"
 										onClick={() => {
 											setIsModalOpen(!isModalOpen);
 											setSelectedModal("others");
@@ -741,7 +757,7 @@ const BudgetScreen = () => {
 									</button>
 								</div>
 
-								<p className="text-sm ">
+								<p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
 									Includes expenditures that do not fit into pre existing
 									categories.
 								</p>
@@ -756,12 +772,12 @@ const BudgetScreen = () => {
 									<col className="w-[340px]" />
 								</colgroup>
 
-								<thead className="capitalize">
+								<thead>
 									<tr>
-										<th className="tableStickyCell text-start">category</th>
-										<th className="text-start">set limit</th>
-										<th className="text-start">amount spent</th>
-										<th className="text-start">status</th>
+										<th className="tableStickyCell text-start">Category</th>
+										<th className="text-start">Set limit</th>
+										<th className="text-start">Amount spent</th>
+										<th className="text-start">Status</th>
 									</tr>
 								</thead>
 
@@ -782,9 +798,6 @@ const BudgetScreen = () => {
 											element.category
 										);
 
-										const percentage = element.setLimit
-											? (totalSpent / element.setLimit) * 100
-											: 0;
 
 										return (
 											<tr className="border-b border-zinc-200 dark:border-dark-border" key={index}>
@@ -810,13 +823,7 @@ const BudgetScreen = () => {
 												</td>
 
 												<td className="progressBarContainer">
-													<div className="progressBarBody">
-														<div
-															className={`progressBarTracker ${getBarColor(percentage)}`}
-															style={{ width: `${Math.min(percentage, 100)}%` }}
-														/>
-													</div>
-													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
+													<BudgetStatus spent={totalSpent} limit={element.setLimit} currency={currency} />
 
 													<div className="flex gap-1">
 														<button
@@ -835,7 +842,7 @@ const BudgetScreen = () => {
 																setIsEditModalOpen(true);
 															}}
 														>
-															<Image src={editIcon} alt="" />
+															<Pencil className="h-4 w-4" aria-hidden />
 														</button>
 														<button
 															type="button"
@@ -846,7 +853,7 @@ const BudgetScreen = () => {
 																setIsDeleteConfirmOpen(true);
 															}}
 														>
-															✕
+															<X className="h-4 w-4" aria-hidden />
 														</button>
 													</div>
 												</td>
@@ -1018,7 +1025,7 @@ const BudgetScreen = () => {
 
 						<button
 							type="submit"
-							className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+							className="btn-primary mt-4 w-full"
 							disabled={isLoading}
 						>
 							{isLoading ? (
@@ -1097,7 +1104,7 @@ const BudgetScreen = () => {
 
 					<button
 						type="submit"
-						className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+						className="btn-primary mt-4 w-full"
 						disabled={isEditLoading}
 					>
 						{isEditLoading ? (
@@ -1124,7 +1131,7 @@ const BudgetScreen = () => {
 			<div className="flex flex-row items-center justify-center gap-5">
 				<button
 					type="button"
-					className="min-h-11 w-28 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+					className="btn-danger w-28"
 					onClick={deleteEntry}
 				>
 					{isDeleteEntryLoading ? (
@@ -1135,7 +1142,7 @@ const BudgetScreen = () => {
 				</button>
 				<button
 					type="button"
-					className="min-h-11 w-28 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
+					className="btn-secondary w-28"
 					onClick={() => { setIsDeleteConfirmOpen(false); setDeletingEntry(null); }}
 				>
 					Cancel

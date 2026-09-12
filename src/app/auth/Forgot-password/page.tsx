@@ -5,6 +5,7 @@ import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import { formatAuthError } from "@/utils/formatAuthError";
+import { Logo } from "@/components/Logo";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState<string>("");
@@ -36,9 +37,7 @@ const ForgotPassword = () => {
 			<div className="w-full max-w-sm">
 				{/* Brand */}
 				<div className="mb-8 flex flex-col items-center gap-3">
-					<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500 shadow-glow-green">
-						<span className="text-xl font-black text-white">P</span>
-					</div>
+					<Logo size="lg" />
 					<div className="text-center">
 						<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
 							Reset your password
@@ -107,7 +106,7 @@ const ForgotPassword = () => {
 						<button
 							type="submit"
 							disabled={isSending}
-							className="w-full rounded-xl bg-brand-500 py-3 text-sm font-semibold text-white shadow-glow-green transition hover:bg-brand-600 disabled:opacity-60"
+							className="btn-primary w-full py-3 shadow-glow-green"
 						>
 							{isSending ? (
 								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

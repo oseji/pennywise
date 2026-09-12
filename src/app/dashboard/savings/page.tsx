@@ -1,187 +1,34 @@
-"use client";
-import { useState } from "react";
-import { AccessibleDialog } from "@/components/AccessibleDialog";
-import { formatMoney } from "@/utils/formatMoney";
-import { usePreferencesStore } from "@/store/usePreferencesStore";
+import Link from "next/link";
+import { PiggyBank } from "lucide-react";
 
+export const metadata = {
+	title: "Pennywise | Savings",
+};
+
+// Savings isn't built yet. This page exists so the URL doesn't 404 and so the
+// "coming soon" promise in the sidebar lands somewhere honest.
 const SavingsPage = () => {
-	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-	const currency = usePreferencesStore((s) => s.currency);
-
-	const demoAmount = 100_000;
-
 	return (
-		<div className="relative dashboardScreen">
-			<div>
-				<h1 className="dashboardHeading">savings</h1>
+		<div className="dashboardScreen">
+			<h1 className="dashboardHeading">Savings</h1>
 
-				<div className="flex flex-row items-center justify-between capitalize">
-					<h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-						Savings target
+			<div className="card flex flex-col items-center gap-4 px-6 py-16 text-center">
+				<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-600/10 dark:text-green-400">
+					<PiggyBank className="h-7 w-7" aria-hidden />
+				</div>
+				<div>
+					<h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+						Savings targets are coming soon
 					</h2>
-
-					<button
-						type="button"
-						className="btn-primary min-h-11 capitalize"
-						onClick={() => setIsModalOpen(true)}
-					>
-						new target
-					</button>
+					<p className="mx-auto mt-1 max-w-sm text-sm text-zinc-600 dark:text-zinc-400">
+						You&apos;ll be able to set a goal, a cadence, and watch progress against it.
+						In the meantime, budgets are the best way to put money aside.
+					</p>
 				</div>
-
-				<p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-					Savings targets will sync to your account in a future update. Below is
-					a sample layout.
-				</p>
-
-				{/* Mobile card */}
-				<div className="mt-6 md:hidden">
-					<div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-raised">
-						<p className="text-xs font-semibold uppercase tracking-wide text-brand-500 dark:text-green-400">
-							Sample
-						</p>
-						<p className="mt-1 capitalize text-zinc-900 dark:text-zinc-100">
-							emergency
-						</p>
-						<p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-							Monthly · Target {formatMoney(demoAmount, currency)}
-						</p>
-						<p className="mt-1 text-xs text-zinc-500">Dec 2023</p>
-						<div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-dark-overlay">
-							<div className="h-full w-[45%] rounded-full bg-brand-500" />
-						</div>
-					</div>
-				</div>
-
-				{/* Desktop table */}
-				<div className="mt-6 hidden text-sm md:block">
-					<div className="overflow-x-auto rounded-t-xl">
-						<div className="dataTableHeader grid min-w-[820px] grid-cols-5">
-							<p className="tableStickyHeaderCell">purpose</p>
-							<p>frequency</p>
-							<p>amount</p>
-							<p>target date</p>
-							<p>progress</p>
-						</div>
-					</div>
-					<div className="dataTableSurface min-w-[820px] px-4 pb-6 pt-5">
-						<div className="grid grid-cols-5 gap-2 border-b border-zinc-100 py-3 dark:border-dark-border">
-							<p className="tableStickyCell text-zinc-900 dark:text-zinc-100">
-								<span className="mr-1">1.</span>
-								<span className="capitalize">emergency</span>
-							</p>
-							<p className="capitalize text-zinc-700 dark:text-zinc-300">
-								monthly
-							</p>
-							<p className="tabular-nums text-zinc-900 dark:text-zinc-100">
-								{formatMoney(demoAmount, currency)}
-							</p>
-							<p className="text-zinc-600 dark:text-zinc-400">Dec, 2023</p>
-							<p className="truncate text-zinc-600 dark:text-zinc-400">
-								45% toward goal
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div className="mt-10 flex flex-col gap-4 text-sm md:flex-row md:items-center md:justify-between">
-					<div className="flex flex-row items-end gap-3">
-						<div className="h-5 w-5 shrink-0 rounded bg-green-500" />
-						<p className="text-zinc-700 dark:text-zinc-300">Savings on track</p>
-					</div>
-
-					<div className="flex flex-row items-end gap-3">
-						<div className="h-5 w-5 shrink-0 rounded bg-yellow-500" />
-						<p className="text-zinc-700 dark:text-zinc-300">1 payment behind</p>
-					</div>
-
-					<div className="flex flex-row items-end gap-3">
-						<div className="h-5 w-5 shrink-0 rounded bg-red-600" />
-						<p className="text-zinc-700 dark:text-zinc-300">
-							Multiple payments behind
-						</p>
-					</div>
-				</div>
+				<Link href="/dashboard/budget" className="btn-outline-brand">
+					Go to Budget
+				</Link>
 			</div>
-
-			<AccessibleDialog
-				open={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				title="Add savings target"
-				titleId="savings-dialog-title"
-			>
-				<form
-					className="flex flex-col gap-2"
-					onSubmit={(e) => {
-						e.preventDefault();
-						setIsModalOpen(false);
-					}}
-				>
-					<div className="inputLabelGroup">
-						<label htmlFor="savings-purpose" className="inputLabel">
-							Savings purpose
-						</label>
-						<input
-							className="formInput"
-							type="text"
-							name="narration"
-							id="savings-purpose"
-							placeholder="e.g. Emergency fund"
-						/>
-					</div>
-
-					<div className="inputLabelGroup">
-						<label htmlFor="frequency" className="inputLabel">
-							Frequency
-						</label>
-						<select
-							name="frequency"
-							id="frequency"
-							className="formInput"
-							defaultValue=""
-						>
-							<option value="" disabled>
-								Select frequency
-							</option>
-							<option value="Daily">Daily</option>
-							<option value="Monthly">Monthly</option>
-							<option value="Yearly">Yearly</option>
-						</select>
-					</div>
-
-					<div className="inputLabelGroup">
-						<label htmlFor="target-amount" className="inputLabel">
-							Target amount
-						</label>
-						<input
-							className="formInput"
-							type="number"
-							name="amount"
-							id="target-amount"
-							placeholder="Enter target amount"
-						/>
-					</div>
-
-					<div className="inputLabelGroup">
-						<label htmlFor="target-date" className="inputLabel">
-							Target date
-						</label>
-						<input
-							className="formInput"
-							type="date"
-							name="date"
-							id="target-date"
-						/>
-					</div>
-
-					<button
-						type="submit"
-						className="mt-4 w-full rounded-lg bg-brand-500 py-2 font-semibold text-white transition hover:opacity-95"
-					>
-						Add
-					</button>
-				</form>
-			</AccessibleDialog>
 		</div>
 	);
 };

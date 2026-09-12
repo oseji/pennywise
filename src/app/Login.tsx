@@ -1,18 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { auth } from "@/firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { Eye, EyeOff } from "lucide-react";
-
-import loginImage from "../assets/onboarding/login screen image.svg";
+import { Logo } from "@/components/Logo";
+import { AuthShowcase } from "@/components/AuthShowcase";
 
 const Login = () => {
-    const errorMessageRef = useRef<HTMLParagraphElement>(null);
     const [userEmail, setUserEmail] = useState<string>("fake@gmail.com");
     const [userPassword, setUserPassword] = useState<string>("523577");
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -45,6 +43,7 @@ const Login = () => {
 
     const signIn = async (email: string, password: string) => {
         setIsLoading(true);
+        setErrorMessage("");
         try {
             const userCredential = await signInWithEmailAndPassword(
                 auth,
@@ -52,13 +51,10 @@ const Login = () => {
                 password,
             );
             const user = userCredential.user;
-            errorMessageRef.current?.classList.add("hidePasswordError");
             if (user) router.push("/dashboard");
             return user;
         } catch (err) {
-            const message = formatSignInError(err);
-            setErrorMessage(message);
-            errorMessageRef.current?.classList.remove("hidePasswordError");
+            setErrorMessage(formatSignInError(err));
         } finally {
             setIsLoading(false);
         }
@@ -71,11 +67,7 @@ const Login = () => {
                 <div className="w-full max-w-sm">
                     {/* Brand */}
                     <div className="flex flex-col items-center gap-3 mb-8">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-500 shadow-glow-green">
-                            <span className="text-xl font-black text-white">
-                                P
-                            </span>
-                        </div>
+                        <Logo size="lg" />
                         <div className="text-center">
                             <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
                                 Welcome back
@@ -111,6 +103,9 @@ const Login = () => {
                             <input
                                 type="email"
                                 id="email"
+                                name="email"
+                                autoComplete="email"
+                                required
                                 placeholder="you@example.com"
                                 className="authInput"
                                 value={userEmail}
@@ -128,6 +123,9 @@ const Login = () => {
                                         isPasswordVisible ? "text" : "password"
                                     }
                                     id="password"
+                                    name="password"
+                                    autoComplete="current-password"
+                                    required
                                     placeholder="••••••••"
                                     className="w-full text-sm bg-transparent outline-none text-zinc-900 placeholder-zinc-500 dark:text-zinc-100 dark:placeholder-zinc-400"
                                     value={userPassword}
@@ -140,29 +138,28 @@ const Login = () => {
                                     onClick={() =>
                                         setIsPasswordVisible(!isPasswordVisible)
                                     }
-                                    className="transition shrink-0 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                    className="iconBtn -my-3 -mr-3"
                                     aria-label={
                                         isPasswordVisible
                                             ? "Hide password"
                                             : "Show password"
                                     }
+                                    aria-pressed={isPasswordVisible}
                                 >
                                     {isPasswordVisible ? (
-                                        <EyeOff size={17} />
+                                        <EyeOff size={17} aria-hidden />
                                     ) : (
-                                        <Eye size={17} />
+                                        <Eye size={17} aria-hidden />
                                     )}
                                 </button>
                             </div>
                         </div>
 
-                        <p
-                            ref={errorMessageRef}
-                            role="alert"
-							className="text-xs text-red-600 transition-all duration-200 hidePasswordError dark:text-red-400"
-                        >
-                            {errorMessage}
-                        </p>
+                        {errorMessage && (
+                            <p role="alert" className="text-xs text-red-600 dark:text-red-400">
+                                {errorMessage}
+                            </p>
+                        )}
 
                         <Link
                             href="/auth/Forgot-password"
@@ -174,7 +171,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 text-sm font-semibold text-white transition rounded-xl bg-brand-500 shadow-glow-green hover:bg-brand-600 disabled:opacity-60"
+                            className="btn-primary w-full py-3 shadow-glow-green"
                         >
                             {isLoading ? (
                                 <div className="w-4 h-4 mx-auto border-2 border-white rounded-full animate-spin border-t-transparent" />
@@ -196,14 +193,7 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Illustration side */}
-            <div className="items-center justify-center hidden p-12 lg:flex lg:flex-1 bg-gradient-to-br from-brand-500 to-brand-400">
-                <Image
-                    src={loginImage}
-                    alt="Pennywise illustration"
-                    className="max-h-[75vh] w-full object-contain drop-shadow-2xl"
-                />
-            </div>
+            <AuthShowcase />
         </div>
     );
 };

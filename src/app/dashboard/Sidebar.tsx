@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useState } from "react";
@@ -13,34 +12,34 @@ import {
 	Menu, LogOut, Settings,
 	LayoutDashboard, TrendingUp, PiggyBank, Receipt,
 	Wallet, User, History,
+	type LucideIcon,
 } from "lucide-react";
 
-import dashboardIcon from "../../assets/sidebar/dashboard.svg";
-import incomeIcon     from "../../assets/sidebar/income.svg";
-import budgetIcon     from "../../assets/sidebar/budget.svg";
-import expensesIcon   from "../../assets/sidebar/expenses.svg";
-import savingsIcon    from "../../assets/sidebar/savings.svg";
-import profileIcon    from "../../assets/sidebar/profile.svg";
-import historyIcon    from "../../assets/sidebar/history.svg";
-import settingsIcon   from "../../assets/sidebar/settings.svg";
-import logoutIcon     from "../../assets/sidebar/logout.svg";
+type NavItem = { href: string; label: string; icon: LucideIcon };
 
-const NAV_ITEMS = [
-	{ href: "/dashboard/overview", label: "Dashboard",  icon: dashboardIcon,  lucide: LayoutDashboard },
-	{ href: "/dashboard/income",   label: "Income",     icon: incomeIcon,     lucide: TrendingUp      },
-	{ href: "/dashboard/budget",   label: "Budget",     icon: budgetIcon,     lucide: PiggyBank       },
-	{ href: "/dashboard/expenses", label: "Expenses",   icon: expensesIcon,   lucide: Receipt         },
+const NAV_ITEMS: NavItem[] = [
+	{ href: "/dashboard/overview", label: "Dashboard", icon: LayoutDashboard },
+	{ href: "/dashboard/income",   label: "Income",    icon: TrendingUp      },
+	{ href: "/dashboard/budget",   label: "Budget",    icon: PiggyBank       },
+	{ href: "/dashboard/expenses", label: "Expenses",  icon: Receipt         },
 ];
 
-const COMING_SOON = [
-	{ label: "Savings", icon: savingsIcon,  lucide: Wallet  },
-	{ label: "Profile", icon: profileIcon,  lucide: User    },
-	{ label: "History", icon: historyIcon,  lucide: History },
+const COMING_SOON: { label: string; icon: LucideIcon }[] = [
+	{ label: "Savings", icon: Wallet  },
+	{ label: "Profile", icon: User    },
+	{ label: "History", icon: History },
 ];
 
 // Section label inside the nav — muted but still ≥4.5:1 on both surfaces.
 const sectionLabelClass =
 	"mb-1 px-3 text-[11px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400";
+
+const navLinkClass = (active: boolean) =>
+	`flex flex-row items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150 ${
+		active
+			? "bg-brand-500 text-white"
+			: "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
+	}`;
 
 const Sidebar = () => {
 	const router   = useRouter();
@@ -72,7 +71,7 @@ const Sidebar = () => {
 			>
 				<p className={sectionLabelClass}>Overview</p>
 
-				{NAV_ITEMS.map(({ href, label, icon }) => {
+				{NAV_ITEMS.map(({ href, label, icon: Icon }) => {
 					const active = isActive(href);
 					return (
 						<Link
@@ -80,19 +79,15 @@ const Sidebar = () => {
 							href={href}
 							onClick={close}
 							aria-current={active ? "page" : undefined}
-							className={`flex flex-row items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150
-							           ${active
-							               ? "bg-brand-500 text-white shadow-glow-green"
-							               : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
-							           }`}
+							className={navLinkClass(active)}
 						>
-							<Image src={icon} alt="" className={`h-4 w-4 ${active ? "brightness-0 invert" : "opacity-70 dark:invert dark:opacity-50"}`} />
-							<span className="text-sm font-medium capitalize">{label}</span>
+							<Icon className="h-4 w-4 shrink-0" aria-hidden />
+							<span className="text-sm font-medium">{label}</span>
 						</Link>
 					);
 				})}
 
-				{COMING_SOON.map(({ label, icon }) => (
+				{COMING_SOON.map(({ label, icon: Icon }) => (
 					<button
 						key={label}
 						type="button"
@@ -101,8 +96,8 @@ const Sidebar = () => {
 						           text-zinc-500 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-dark-overlay/50
 						           transition-all duration-150"
 					>
-						<Image src={icon} alt="" className="h-4 w-4 opacity-50 dark:invert dark:opacity-40" />
-						<span className="text-sm font-medium capitalize">{label}</span>
+						<Icon className="h-4 w-4 shrink-0" aria-hidden />
+						<span className="text-sm font-medium">{label}</span>
 						<span className="ml-auto rounded-full bg-zinc-100 px-1.5 py-0.5 text-[11px] font-semibold text-zinc-600
 						                 dark:bg-dark-overlay dark:text-zinc-400">
 							Soon
@@ -116,14 +111,10 @@ const Sidebar = () => {
 						href="/dashboard/settings"
 						onClick={close}
 						aria-current={isActive("/dashboard/settings") ? "page" : undefined}
-						className={`flex flex-row items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150
-						           ${isActive("/dashboard/settings")
-						               ? "bg-brand-500 text-white shadow-glow-green"
-						               : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
-						           }`}
+						className={navLinkClass(isActive("/dashboard/settings"))}
 					>
-						<Image src={settingsIcon} alt="" className={`h-4 w-4 ${isActive("/dashboard/settings") ? "brightness-0 invert" : "opacity-70 dark:invert dark:opacity-50"}`} />
-						<span className="text-sm font-medium capitalize">Settings</span>
+						<Settings className="h-4 w-4 shrink-0" aria-hidden />
+						<span className="text-sm font-medium">Settings</span>
 					</Link>
 
 					<button
@@ -133,8 +124,8 @@ const Sidebar = () => {
 						           text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10
 						           transition-all duration-150"
 					>
-						<Image src={logoutIcon} alt="" className="h-4 w-4 opacity-70" />
-						<span className="text-sm font-medium capitalize">Logout</span>
+						<LogOut className="h-4 w-4 shrink-0" aria-hidden />
+						<span className="text-sm font-medium">Logout</span>
 					</button>
 				</div>
 			</nav>
@@ -147,7 +138,7 @@ const Sidebar = () => {
 			                dark:border-dark-border dark:bg-dark-surface/95"
 			>
 				<div className="flex flex-row items-center justify-around">
-					{NAV_ITEMS.map(({ href, label, icon }) => {
+					{NAV_ITEMS.map(({ href, label, icon: Icon }) => {
 						const active = isActive(href);
 						return (
 							<Link
@@ -158,16 +149,8 @@ const Sidebar = () => {
 								className={`flex min-h-11 min-w-11 flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-1.5 transition-all
 								           ${active ? "text-brand-500 dark:text-green-400" : "text-zinc-500 dark:text-zinc-400"}`}
 							>
-								<Image
-									src={icon}
-									alt=""
-									className={`h-5 w-5 transition-all ${
-										active
-											? "opacity-100 dark:invert dark:hue-rotate-[40deg]"
-											: "opacity-50 dark:invert dark:opacity-40"
-									}`}
-								/>
-								<span className="text-[11px] font-semibold capitalize">{label}</span>
+								<Icon className="h-5 w-5" aria-hidden />
+								<span className="text-[11px] font-semibold">{label}</span>
 							</Link>
 						);
 					})}
@@ -198,7 +181,7 @@ const Sidebar = () => {
 				<div className="mb-3">
 					<p className={`${sectionLabelClass} px-0`}>Navigate</p>
 					<div className="grid grid-cols-2 gap-2">
-						{NAV_ITEMS.map(({ href, label }) => (
+						{NAV_ITEMS.map(({ href, label, icon: Icon }) => (
 							<Link
 								key={href}
 								href={href}
@@ -208,6 +191,7 @@ const Sidebar = () => {
 								           text-sm font-medium text-zinc-800 hover:bg-zinc-50
 								           dark:border-dark-border dark:text-zinc-200 dark:hover:bg-dark-overlay"
 							>
+								<Icon className="h-4 w-4 text-zinc-500 dark:text-zinc-400" aria-hidden />
 								{label}
 							</Link>
 						))}
@@ -217,7 +201,7 @@ const Sidebar = () => {
 				<div className="mb-4">
 					<p className={`${sectionLabelClass} px-0`}>Coming soon</p>
 					<div className="flex flex-wrap gap-2">
-						{COMING_SOON.map(({ label }) => (
+						{COMING_SOON.map(({ label, icon: Icon }) => (
 							<button
 								key={label}
 								type="button"
@@ -225,6 +209,7 @@ const Sidebar = () => {
 								className="flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200 px-3 py-2
 								           text-sm font-medium text-zinc-600 dark:border-dark-border dark:text-zinc-400"
 							>
+								<Icon className="h-4 w-4" aria-hidden />
 								{label}
 								<span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[11px] font-semibold text-zinc-600
 								                 dark:bg-dark-overlay dark:text-zinc-400">
@@ -242,14 +227,13 @@ const Sidebar = () => {
 						className="flex min-h-11 items-center gap-3 rounded-xl border border-zinc-200 p-3 text-sm font-medium
 						           text-zinc-800 hover:bg-zinc-50 dark:border-dark-border dark:text-zinc-200 dark:hover:bg-dark-overlay"
 					>
-						<Settings className="h-4 w-4" aria-hidden />
+						<Settings className="h-4 w-4 text-zinc-500 dark:text-zinc-400" aria-hidden />
 						Settings
 					</Link>
 					<button
 						type="button"
 						onClick={() => { setIsMoreOpen(false); logout(); }}
-						className="flex min-h-11 items-center gap-3 rounded-xl bg-red-600 p-3 text-sm font-semibold text-white
-						           hover:bg-red-700 transition"
+						className="btn-danger min-h-11 w-full"
 					>
 						<LogOut className="h-4 w-4" aria-hidden />
 						Logout

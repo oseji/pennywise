@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import { Moon, Sun, Bell } from "lucide-react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
@@ -18,14 +19,7 @@ const DashboardHeader = () => {
 		                   md:px-10">
 
 			{/* Brand */}
-			<div className="flex flex-row items-center gap-3">
-				<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 shadow-glow-green">
-					<span className="text-base font-black text-white tracking-tight">P</span>
-				</div>
-				<span className="hidden text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50 md:block">
-					Pennywise
-				</span>
-			</div>
+			<Logo size="sm" withWordmark href="/dashboard" className="[&>span:last-child]:hidden md:[&>span:last-child]:inline" />
 
 			{/* Actions */}
 			<div className="flex flex-row items-center gap-1 md:gap-2">
