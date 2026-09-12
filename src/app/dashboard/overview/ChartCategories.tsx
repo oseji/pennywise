@@ -2,6 +2,7 @@
 
 import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
+import { CHART_COLORS } from "@/utils/chartColors";
 
 type Category = {
     name: string;
@@ -16,22 +17,9 @@ interface CategoryListProps {
     labelMap?: Record<string, string>;
 }
 
-const defaultColors = [
-    "#FF6F61",
-    "#6B5B95",
-    "#88B04B",
-    "#F7CAC9",
-    "#92A8D1",
-    "#F7786B",
-    "#DE6FA1",
-    "#009B77",
-    "#FFD662",
-    "#6C5B7B",
-];
-
 const ChartCategories: React.FC<CategoryListProps> = ({
     summary,
-    colors = defaultColors,
+    colors = CHART_COLORS,
     limit = 5,
     labelMap,
 }) => {
@@ -60,7 +48,7 @@ const ChartCategories: React.FC<CategoryListProps> = ({
         labelMap?.[name] ?? name.replace(/([A-Z])/g, " $1").trim();
 
     return (
-        <div className="w-full max-w-full overflow-hidden text-sm text-slate-800 dark:text-zinc-200">
+        <div className="w-full max-w-full overflow-hidden text-sm text-zinc-800 dark:text-zinc-200">
             {topCategories.map((element) => (
                 <div
                     className="flex flex-row items-center w-full min-w-0 gap-2 py-1 overflow-hidden"
@@ -85,7 +73,7 @@ const ChartCategories: React.FC<CategoryListProps> = ({
                                             currency,
                                         )}
                                     </span>
-                                    <span className="text-xs font-normal text-slate-500 dark:text-zinc-400">
+                                    <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">
                                         {element.percentage}%
                                     </span>
                                 </span>

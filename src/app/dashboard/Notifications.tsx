@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { EmptyState } from "@/components/EmptyState";
@@ -24,6 +24,27 @@ const Notifications = () => {
 	const [notificationsData, setNotificationsData] = useState<notificationDataType[]>([]);
 
 	const { isOpen, close } = useNotificationStore();
+	const panelRef = useRef<HTMLDivElement>(null);
+
+	// Popover behaviour: focus moves into the panel on open, Escape closes it,
+	// and focus goes back to the bell when it closes.
+	useEffect(() => {
+		if (!isOpen) return;
+		const panel = panelRef.current;
+		panel?.focus();
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") close();
+		};
+		document.addEventListener("keydown", onKeyDown);
+		return () => {
+			document.removeEventListener("keydown", onKeyDown);
+			const trigger = document.getElementById("notifications-trigger");
+			const active = document.activeElement;
+			if (trigger && (active === document.body || panel?.contains(active))) {
+				trigger.focus();
+			}
+		};
+	}, [isOpen, close]);
 
 	const fetchNotifications = async (userId: string) => {
 		if (!userId) return;
@@ -62,7 +83,11 @@ const Notifications = () => {
 
 	return (
 		<div
-			className={`fixed left-3 right-3 top-[76px] z-50 rounded-2xl shadow-card-md
+			ref={panelRef}
+			id="notifications-panel"
+			tabIndex={-1}
+			inert={!isOpen}
+			className={`fixed left-3 right-3 top-[76px] z-50 rounded-2xl shadow-card-md outline-none
 			            border border-zinc-200/80 bg-white/97 backdrop-blur-xl
 			            dark:border-dark-border dark:bg-dark-raised
 			            transition-all duration-300 ease-in-out
@@ -70,7 +95,6 @@ const Notifications = () => {
 			            ${isOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}
 			role="region"
 			aria-label="Notifications"
-			aria-hidden={!isOpen}
 		>
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4 dark:border-dark-border">
@@ -87,12 +111,11 @@ const Notifications = () => {
 				</div>
 				<button
 					type="button"
-					className="rounded-xl p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700
-					           dark:hover:bg-dark-overlay dark:hover:text-zinc-200"
+					className="iconBtn -mr-2"
 					onClick={close}
 					aria-label="Close notifications"
 				>
-					<X className="h-4 w-4" />
+					<X className="h-4 w-4" aria-hidden />
 				</button>
 			</div>
 
@@ -117,7 +140,7 @@ const Notifications = () => {
 								className="flex flex-col gap-1 rounded-xl border border-zinc-100 bg-zinc-50 px-3.5 py-3
 								           dark:border-dark-border dark:bg-dark-overlay"
 							>
-								<p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
+								<p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
 									{data.date}
 								</p>
 								<p className="text-sm text-zinc-800 dark:text-zinc-200 leading-snug">

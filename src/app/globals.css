@@ -22,12 +22,44 @@ input[type="number"] {
     --brand-light:  #40916c;
     --brand-subtle: #dcfce8;
     --radius:       0.75rem;
+
+    /* Chart palette — every value is >= 4.9:1 against white so slices and
+       legend swatches stay visible on the card surface. */
+    --chart-1: #2d6a4f;
+    --chart-2: #1d4ed8;
+    --chart-3: #c2410c;
+    --chart-4: #7e22ce;
+    --chart-5: #0f766e;
+    --chart-6: #be185d;
+    --chart-7: #b45309;
+    --chart-8: #4d7c0f;
+    --chart-9: #b91c1c;
+    --chart-10: #52525b;
 }
 
 .dark {
     --brand:        #4ade80;
     --brand-light:  #86efac;
     --brand-subtle: rgba(74,222,128,0.08);
+
+    /* >= 6.4:1 against dark-raised (#18181b) */
+    --chart-1: #4ade80;
+    --chart-2: #60a5fa;
+    --chart-3: #fb923c;
+    --chart-4: #c084fc;
+    --chart-5: #2dd4bf;
+    --chart-6: #f472b6;
+    --chart-7: #fbbf24;
+    --chart-8: #a3e635;
+    --chart-9: #f87171;
+    --chart-10: #a1a1aa;
+}
+
+/* ─── Focus ──────────────────────────────────────────── */
+/* One designed keyboard focus ring for everything that doesn't draw its own. */
+:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
 }
 
 /* ─── Scrollbar ──────────────────────────────────────── */
@@ -47,11 +79,28 @@ input[type="number"] {
 }
 
 .authInput {
-    @apply w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900
-           placeholder-zinc-400 outline-none transition
-           focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20
-           dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100
-           dark:placeholder-zinc-500 dark:focus:border-brand-400/60 dark:focus:ring-brand-400/10;
+    @apply w-full rounded-xl border border-zinc-500 bg-white px-4 py-3 text-sm text-zinc-900
+           placeholder-zinc-500 outline-none transition
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50
+           dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100
+           dark:placeholder-zinc-400 dark:focus:border-brand-400 dark:focus:ring-brand-400/40;
+}
+
+/* Shared control styling for dashboard forms (modals, settings). */
+.formInput {
+    @apply w-full rounded-lg border border-zinc-500 bg-white px-4 py-2.5 text-sm text-zinc-900
+           placeholder-zinc-500 outline-none transition
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50
+           disabled:opacity-60
+           dark:border-zinc-500 dark:bg-dark-base dark:text-zinc-100
+           dark:placeholder-zinc-400 dark:focus:border-brand-400 dark:focus:ring-brand-400/40;
+}
+
+/* 44px-square icon-only button (WCAG 2.5.5 target size). */
+.iconBtn {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
+           text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900
+           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100;
 }
 
 .hidePasswordError {
@@ -149,7 +198,7 @@ input[type="number"] {
 }
 
 .chartBoxDescription {
-    @apply w-full mb-3 text-xs text-center text-zinc-500 dark:text-zinc-500 uppercase tracking-wide font-medium;
+    @apply w-full mb-3 text-xs text-center text-zinc-500 dark:text-zinc-400 uppercase tracking-wide font-medium;
 }
 
 /* ─── Settings ──────────────────────────────────────── */
@@ -207,7 +256,7 @@ input[type="number"] {
 }
 
 .progressBarBody {
-    @apply relative flex-1 max-w-[200px] h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-dark-border;
+    @apply relative flex-1 max-w-[160px] h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-dark-border;
 }
 
 .progressBarTracker {
@@ -248,7 +297,7 @@ input[type="number"] {
 
 /* ─── Add button (budget) ───────────────────────────── */
 .dailyNeedsAddButton {
-    @apply text-sm text-brand-500 border border-brand-500/60 bg-brand-50 rounded-xl px-4 py-2
+    @apply min-h-11 text-sm text-brand-500 border border-brand-500/60 bg-brand-50 rounded-xl px-4 py-2
            font-semibold transition ease-in-out duration-200
            hover:bg-brand-500 hover:text-white hover:border-brand-500
            dark:text-green-400 dark:border-green-500/40 dark:bg-green-500/5

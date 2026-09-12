@@ -9,7 +9,13 @@ type AccessibleDialogProps = {
 	title: string;
 	children: ReactNode;
 	titleId?: string;
+	/** "center" (default) is a centred modal; "sheet" slides up from the bottom edge. */
+	variant?: "center" | "sheet";
+	className?: string;
 };
+
+const FOCUSABLE =
+	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function AccessibleDialog({
 	open,
@@ -17,14 +23,46 @@ export function AccessibleDialog({
 	title,
 	children,
 	titleId = "accessible-dialog-title",
+	variant = "center",
+	className = "",
 }: AccessibleDialogProps) {
 	const panelRef = useRef<HTMLDivElement>(null);
+	// element that had focus before the dialog opened; restored on close
+	const triggerRef = useRef<HTMLElement | null>(null);
 
+	// Escape closes; Tab / Shift+Tab cycle inside the panel; body scroll locked.
 	useEffect(() => {
 		if (!open) return;
+
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") { e.preventDefault(); onClose(); }
+			if (e.key === "Escape") {
+				e.preventDefault();
+				onClose();
+				return;
+			}
+			if (e.key !== "Tab" || !panelRef.current) return;
+
+			const focusable = Array.from(
+				panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)
+			);
+			if (focusable.length === 0) {
+				e.preventDefault();
+				panelRef.current.focus();
+				return;
+			}
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			const active = document.activeElement as HTMLElement | null;
+
+			if (e.shiftKey && (active === first || !panelRef.current.contains(active))) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && (active === last || !panelRef.current.contains(active))) {
+				e.preventDefault();
+				first.focus();
+			}
 		};
+
 		document.addEventListener("keydown", handleKeyDown);
 		const prevOverflow = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
@@ -34,25 +72,46 @@ export function AccessibleDialog({
 		};
 	}, [open, onClose]);
 
+	// Initial focus goes to the first field (not the close button); focus
+	// returns to whatever opened the dialog when it closes.
 	useEffect(() => {
 		if (!open) return;
-		const focusable = panelRef.current?.querySelector<HTMLElement>(
-			'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-		);
-		const t = window.setTimeout(() => focusable?.focus(), 0);
-		return () => clearTimeout(t);
+		triggerRef.current = document.activeElement as HTMLElement | null;
+
+		const t = window.setTimeout(() => {
+			const panel = panelRef.current;
+			if (!panel) return;
+			const field = panel.querySelector<HTMLElement>(
+				'input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+			);
+			const firstAction = Array.from(
+				panel.querySelectorAll<HTMLElement>(FOCUSABLE)
+			).find((el) => el.dataset.dialogClose === undefined);
+			(field ?? firstAction ?? panel).focus();
+		}, 0);
+
+		return () => {
+			clearTimeout(t);
+			const trigger = triggerRef.current;
+			if (trigger && trigger.isConnected) trigger.focus();
+		};
 	}, [open]);
 
 	if (!open) return null;
 
+	const isSheet = variant === "sheet";
+
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+		<div
+			className={`fixed inset-0 z-50 flex justify-center ${
+				isSheet ? "items-end" : "items-center p-4"
+			} ${className}`}
+		>
 			{/* Backdrop */}
 			<div
 				className="absolute inset-0 bg-black/60 backdrop-blur-sm"
 				aria-hidden="true"
 				onClick={onClose}
-				role="presentation"
 			/>
 
 			{/* Panel */}
@@ -61,13 +120,21 @@ export function AccessibleDialog({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby={titleId}
-				className="relative z-10 w-[92%] max-h-[90dvh] overflow-y-auto sm:w-[400px]
-				           rounded-2xl border border-zinc-200/80 bg-white px-6 py-6 shadow-card-md
-				           dark:border-dark-border dark:bg-dark-raised dark:shadow-dark-card-md"
+				tabIndex={-1}
+				className={`relative z-10 max-h-[90dvh] overflow-y-auto border border-zinc-200/80 bg-white
+				           shadow-card-md outline-none dark:border-dark-border dark:bg-dark-raised dark:shadow-dark-card-md
+				           ${isSheet
+				               ? "w-full max-w-lg rounded-t-2xl px-5 pb-5 pt-3"
+				               : "w-[92%] rounded-2xl px-6 py-6 sm:w-[400px]"
+				           }`}
 				onClick={(e) => e.stopPropagation()}
 			>
+				{isSheet && (
+					<div className="mx-auto mb-3 h-1 w-12 rounded-full bg-zinc-300 dark:bg-dark-border" aria-hidden="true" />
+				)}
+
 				{/* Header */}
-				<div className="mb-5 flex items-center justify-between">
+				<div className="mb-4 flex items-center justify-between">
 					<h2
 						id={titleId}
 						className="text-lg font-bold text-zinc-900 dark:text-zinc-50"
@@ -77,8 +144,8 @@ export function AccessibleDialog({
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-xl p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700
-						           dark:hover:bg-dark-overlay dark:hover:text-zinc-200"
+						data-dialog-close
+						className="iconBtn -mr-2"
 						aria-label="Close dialog"
 					>
 						<X size={18} />

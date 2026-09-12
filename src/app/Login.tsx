@@ -122,14 +122,14 @@ const Login = () => {
                             <label htmlFor="password" className="inputLabel">
                                 Password
                             </label>
-                            <div className="flex items-center gap-3 px-4 py-3 transition bg-white border rounded-xl border-zinc-200 focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/20 dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-brand-400/60">
+                            <div className="flex items-center gap-3 px-4 py-3 transition bg-white border rounded-xl border-zinc-500 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-400/50 dark:border-zinc-500 dark:bg-zinc-900 dark:focus-within:border-brand-400">
                                 <input
                                     type={
                                         isPasswordVisible ? "text" : "password"
                                     }
                                     id="password"
                                     placeholder="••••••••"
-                                    className="w-full text-sm bg-transparent outline-none text-zinc-900 placeholder-zinc-400 dark:text-zinc-100 dark:placeholder-zinc-500"
+                                    className="w-full text-sm bg-transparent outline-none text-zinc-900 placeholder-zinc-500 dark:text-zinc-100 dark:placeholder-zinc-400"
                                     value={userPassword}
                                     onChange={(e) =>
                                         setUserPassword(e.target.value)
@@ -140,7 +140,7 @@ const Login = () => {
                                     onClick={() =>
                                         setIsPasswordVisible(!isPasswordVisible)
                                     }
-                                    className="transition shrink-0 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                    className="transition shrink-0 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200"
                                     aria-label={
                                         isPasswordVisible
                                             ? "Hide password"
@@ -158,7 +158,8 @@ const Login = () => {
 
                         <p
                             ref={errorMessageRef}
-                            className="text-xs text-red-500 transition-all duration-200 hidePasswordError"
+                            role="alert"
+							className="text-xs text-red-600 transition-all duration-200 hidePasswordError dark:text-red-400"
                         >
                             {errorMessage}
                         </p>

@@ -29,7 +29,7 @@ const SettingsPage = () => {
 	}) => (
 		<label
 			htmlFor={id}
-			className="relative inline-flex cursor-pointer items-center"
+			className="relative inline-flex min-h-11 cursor-pointer items-center"
 		>
 			<input
 				id={id}
@@ -38,7 +38,7 @@ const SettingsPage = () => {
 				checked={checked}
 				onChange={(e) => onChange(e.target.checked)}
 			/>
-			<div className="h-6 w-11 rounded-full bg-gray-200 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-5 dark:bg-dark-muted" />
+			<div className="relative h-6 w-11 rounded-full bg-zinc-500 transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all after:content-[''] peer-checked:bg-brand-500 peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400 peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-dark-raised" />
 		</label>
 	);
 
@@ -135,7 +135,7 @@ const SettingsPage = () => {
 					<select
 						name="currency"
 						id="currency"
-						className="rounded-lg border border-zinc-200 bg-white p-2 capitalize text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+						className="formInput w-auto min-h-11"
 						value={currency}
 						onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
 					>
@@ -159,7 +159,7 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading text-[#2E90FA]">Change Password</h2>
+						<h2 className="settingsHeading text-blue-600 dark:text-blue-400">Change Password</h2>
 						<p className="text-zinc-600 dark:text-zinc-400">
 							A reset link will be sent to your email address.
 						</p>
@@ -168,7 +168,7 @@ const SettingsPage = () => {
 						type="button"
 						onClick={handleChangePassword}
 						disabled={isSendingReset}
-						className="rounded-lg border border-[#2E90FA] px-4 py-2 text-sm font-medium text-[#2E90FA] transition hover:bg-[#2E90FA]/10 disabled:opacity-60"
+						className="min-h-11 rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-600/10 disabled:opacity-60 dark:border-blue-400 dark:text-blue-400"
 					>
 						{isSendingReset ? "Sending…" : "Send reset email"}
 					</button>
@@ -176,7 +176,7 @@ const SettingsPage = () => {
 
 				<div className="settingsRow">
 					<div>
-						<h2 className="settingsHeading text-[#F04438]">Delete Account</h2>
+						<h2 className="settingsHeading text-red-600 dark:text-red-400">Delete Account</h2>
 						<p className="text-zinc-600 dark:text-zinc-400">
 							Permanently delete your Pennywise account and all data.
 						</p>
@@ -184,7 +184,7 @@ const SettingsPage = () => {
 					<button
 						type="button"
 						onClick={() => setIsDeleteModalOpen(true)}
-						className="rounded-lg border border-red-400 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50 dark:hover:bg-red-950"
+						className="min-h-11 rounded-lg border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-500/10"
 					>
 						Delete account
 					</button>
@@ -201,14 +201,14 @@ const SettingsPage = () => {
 					This will permanently delete your Pennywise account and all associated
 					data. This cannot be undone.
 				</p>
-				<p className="mb-6 text-sm text-red-500">
+				<p className="mb-6 text-sm text-red-600">
 					Are you absolutely sure?
 				</p>
 
 				<div className="flex flex-row items-center justify-center gap-4">
 					<button
 						type="button"
-						className="w-32 rounded-xl bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 disabled:opacity-60"
+						className="min-h-11 w-32 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
 						onClick={handleDeleteAccount}
 						disabled={isDeleting}
 					>
@@ -220,7 +220,7 @@ const SettingsPage = () => {
 					</button>
 					<button
 						type="button"
-						className="w-32 rounded-lg bg-zinc-500 px-4 py-2 text-white transition hover:bg-zinc-600"
+						className="min-h-11 w-32 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel

@@ -135,22 +135,22 @@ const SignUp = () => {
 						].map(({ id, name, label, visible, toggle }) => (
 							<div key={id} className="inputLabelGroup">
 								<label htmlFor={id} className="inputLabel">{label}</label>
-								<div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3
-								                transition focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/20
-								                dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-brand-400/60">
+								<div className="flex items-center gap-3 rounded-xl border border-zinc-500 bg-white px-4 py-3
+								                transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-400/50
+								                dark:border-zinc-500 dark:bg-zinc-900 dark:focus-within:border-brand-400">
 									<input
 										type={visible ? "text" : "password"}
 										id={id}
 										name={name}
 										placeholder="••••••••"
-										className="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-400 outline-none dark:text-zinc-100 dark:placeholder-zinc-500"
+										className="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-500 outline-none dark:text-zinc-100 dark:placeholder-zinc-400"
 										value={signUpInfo[name as keyof SignUpInfo]}
 										onChange={handleChange}
 									/>
 									<button
 										type="button"
 										onClick={toggle}
-										className="shrink-0 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
+										className="iconBtn -my-3 -mr-3"
 										aria-label={visible ? "Hide password" : "Show password"}
 									>
 										{visible ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -161,7 +161,8 @@ const SignUp = () => {
 
 						<p
 							ref={passwordErrorRef}
-							className="text-xs text-red-500 transition-all duration-200 hidePasswordError"
+							role="alert"
+							className="text-xs text-red-600 transition-all duration-200 hidePasswordError dark:text-red-400"
 						>
 							{signUpErrorMessage}
 						</p>

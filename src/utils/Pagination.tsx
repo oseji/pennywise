@@ -23,40 +23,46 @@ const Pagination: React.FC<PaginationProps> = ({
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
     return (
-        <div className="mt-4 flex flex-col items-center gap-2">
+        <nav
+            aria-label="Pagination"
+            className="mt-4 flex flex-col items-center gap-2"
+        >
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Showing {startItem}–{endItem} of {totalItems}
             </p>
 
-            <div className="flex flex-row items-center justify-center gap-10">
+            <div className="flex flex-row items-center justify-center gap-6">
                 <button
+                    type="button"
                     onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowLeft") onPageChange(Math.max(currentPage - 1, 1));
-                    }}
                     disabled={currentPage === 1}
                     aria-label="Previous page"
-                    className={`transition duration-300 ease-in-out disabled:opacity-50 hover:scale-125 ${currentPage === 1 ? "cursor-not-allowed" : ""}`}
+                    className="iconBtn text-brand-500 disabled:cursor-not-allowed disabled:opacity-50 dark:text-green-400"
                 >
-                    <ArrowLeft size={24} className="text-brand-500" />
+                    <ArrowLeft size={22} aria-hidden />
                 </button>
 
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-center gap-1.5">
                     {paginationRange.map((page, i) =>
                         typeof page === "string" ? (
-                            <span key={i} className="px-3 py-1">
+                            <span
+                                key={i}
+                                className="px-2 text-zinc-500 dark:text-zinc-400"
+                                aria-hidden
+                            >
                                 {page}
                             </span>
                         ) : (
                             <button
                                 key={i}
+                                type="button"
                                 onClick={() => onPageChange(page)}
                                 aria-label={`Page ${page}`}
                                 aria-current={currentPage === page ? "page" : undefined}
-                                className={`px-4 py-1 rounded-lg ${
+                                className={`inline-flex h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-semibold tabular-nums transition ${
                                     currentPage === page
                                         ? "bg-brand-500 text-white"
-                                        : "bg-gray-200 dark:bg-dark-muted dark:text-zinc-100"
+                                        : "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 dark:bg-dark-muted dark:text-zinc-100 dark:hover:bg-zinc-600"
                                 }`}
                             >
                                 {page}
@@ -66,18 +72,16 @@ const Pagination: React.FC<PaginationProps> = ({
                 </div>
 
                 <button
+                    type="button"
                     onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-                    onKeyDown={(e) => {
-                        if (e.key === "ArrowRight") onPageChange(Math.min(currentPage + 1, totalPages));
-                    }}
                     disabled={currentPage === totalPages}
                     aria-label="Next page"
-                    className={`transition duration-300 ease-in-out disabled:opacity-50 hover:scale-125 ${currentPage === totalPages ? "cursor-not-allowed" : ""}`}
+                    className="iconBtn text-brand-500 disabled:cursor-not-allowed disabled:opacity-50 dark:text-green-400"
                 >
-                    <ArrowRight size={24} className="text-brand-500" />
+                    <ArrowRight size={22} aria-hidden />
                 </button>
             </div>
-        </div>
+        </nav>
     );
 };
 

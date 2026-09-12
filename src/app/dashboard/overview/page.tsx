@@ -20,6 +20,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { DashboardChartSkeleton } from "@/components/DashboardChartSkeleton";
 import { formatMoney } from "@/utils/formatMoney";
 import { usePreferencesStore } from "@/store/usePreferencesStore";
+import { CHART_COLORS } from "@/utils/chartColors";
 
 type userData = {
 	total: number;
@@ -91,19 +92,6 @@ const Dashboard = () => {
 			})),
 		[budgetSummary.categories]
 	);
-
-	const COLORS = [
-		"#FF6F61",
-		"#6B5B95",
-		"#88B04B",
-		"#F7CAC9",
-		"#92A8D1",
-		"#FFB347",
-		"#E94B3C",
-		"#009688",
-		"#FFD700",
-		"#7B68EE",
-	];
 
 	const fetchUserDataSummary = async (
 		userId: string
@@ -250,13 +238,14 @@ const Dashboard = () => {
 				</p>
 				<p className="tabular-nums text-zinc-600 dark:text-zinc-300">
 					{formatMoney(value, currency)}
-					{pct !== null && <span className="ml-1.5 text-xs text-zinc-400 dark:text-zinc-500">{pct}%</span>}
+					{pct !== null && <span className="ml-1.5 text-xs text-zinc-500 dark:text-zinc-400">{pct}%</span>}
 				</p>
 			</div>
 		);
 	};
 
 	const renderPie = (
+		title: string,
 		data: { name: string; value: number }[],
 		summary: userData,
 		labelMap?: Record<string, string>
@@ -270,9 +259,20 @@ const Dashboard = () => {
 			);
 		}
 
+		// Text alternative for the chart: top categories with their share.
+		const chartSummary = [...summary.categories]
+			.sort((a, b) => b.percentage - a.percentage)
+			.slice(0, 5)
+			.map((c) => `${labelMap?.[c.name] ?? c.name} ${c.percentage}%`)
+			.join(", ");
+
 		return (
 			<>
-				<div className="h-[220px] w-full min-w-0 shrink-0">
+				<figure
+					role="img"
+					aria-label={`${title} by category: ${chartSummary}`}
+					className="h-[220px] w-full min-w-0 shrink-0"
+				>
 					<ResponsiveContainer width="100%" height="100%">
 						<PieChart>
 							<Tooltip content={chartTooltip} />
@@ -290,13 +290,13 @@ const Dashboard = () => {
 								{data.map((entry, index) => (
 									<Cell
 										key={`cell-${entry.name}`}
-										fill={COLORS[index % COLORS.length]}
+										fill={CHART_COLORS[index % CHART_COLORS.length]}
 									/>
 								))}
 							</Pie>
 						</PieChart>
 					</ResponsiveContainer>
-				</div>
+				</figure>
 				<div className="mt-auto flex w-full flex-row justify-start">
 					<ChartCategories
 						summary={summary}
@@ -324,7 +324,7 @@ const Dashboard = () => {
 						<div key={title} className="chartBox">
 							<div className="chartBoxHeadingGroup">
 								<div>
-									<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-0.5">
+									<p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-0.5">
 										{title}
 									</p>
 									<p className="text-xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
@@ -333,7 +333,7 @@ const Dashboard = () => {
 								</div>
 								<div className={`h-2.5 w-2.5 rounded-full ${total > 0 ? "bg-green-400" : "bg-zinc-200 dark:bg-dark-border"}`} />
 							</div>
-							{renderPie(data, summary, labelMap)}
+							{renderPie(title, data, summary, labelMap)}
 						</div>
 					))}
 				</div>

@@ -8,7 +8,7 @@ import { usePreferencesStore } from "@/store/usePreferencesStore";
 import avatarIcon from "../../assets/dashboard/avatar.svg";
 
 const DashboardHeader = () => {
-	const { toggle } = useNotificationStore();
+	const { isOpen, toggle } = useNotificationStore();
 	const { theme, toggleTheme } = usePreferencesStore();
 
 	return (
@@ -32,8 +32,7 @@ const DashboardHeader = () => {
 				<button
 					type="button"
 					onClick={toggleTheme}
-					className="rounded-xl p-2.5 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900
-					           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
+					className="iconBtn"
 					aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
 				>
 					{theme === "dark" ? (
@@ -46,11 +45,13 @@ const DashboardHeader = () => {
 				<button
 					type="button"
 					onClick={toggle}
-					className="relative rounded-xl p-2.5 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900
-					           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100"
-					aria-label="Open notifications"
+					id="notifications-trigger"
+					className="iconBtn relative"
+					aria-label="Notifications"
+					aria-expanded={isOpen}
+					aria-controls="notifications-panel"
 				>
-					<Bell className="h-5 w-5" />
+					<Bell className="h-5 w-5" aria-hidden />
 				</button>
 
 				<div className="ml-1 flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl

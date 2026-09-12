@@ -115,10 +115,10 @@ const BudgetScreen = () => {
 
 	// helper for bar color
 	const getBarColor = (percent: number) => {
-		if (percent < 25) return "bg-green-500";
-		if (percent < 50) return "bg-blue-500";
-		if (percent < 75) return "bg-yellow-400";
-		return "bg-red-500";
+		if (percent < 25) return "bg-green-600";
+		if (percent < 50) return "bg-blue-600";
+		if (percent < 75) return "bg-orange-600";
+		return "bg-red-600";
 	};
 
 	const addCategory = async (
@@ -500,12 +500,12 @@ const BudgetScreen = () => {
 							</div>
 
 							<div className="w-full overflow-x-auto">
-							<table className="min-w-[900px] w-full mt-4 border-separate border-spacing-x-4">
+							<table className="min-w-[960px] w-full mt-4 border-separate border-spacing-x-4">
 								<colgroup>
 									<col className=" w-72" />
 									<col className="w-32" />
 									<col className="w-32" />
-									<col className="w-60" />
+									<col className="w-[340px]" />
 								</colgroup>
 
 								<thead className="capitalize">
@@ -544,7 +544,7 @@ const BudgetScreen = () => {
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-brand-400 dark:text-green-400">
+															<span className="text-brand-500 dark:text-green-400">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -570,10 +570,10 @@ const BudgetScreen = () => {
 													</div>
 													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
-													<div className="flex gap-2">
+													<div className="flex gap-1">
 														<button
 															type="button"
-															className="budgetEditIcon opacity-70 hover:opacity-100"
+															className="iconBtn"
 															aria-label="Edit entry"
 															onClick={() => {
 																setEditingEntry({
@@ -591,7 +591,7 @@ const BudgetScreen = () => {
 														</button>
 														<button
 															type="button"
-															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															className="iconBtn text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
 															aria-label="Delete entry"
 															onClick={() => {
 																setDeletingEntry({ id: element.id, budgetSection: "dailyNeeds" });
@@ -630,7 +630,7 @@ const BudgetScreen = () => {
 							</div>
 
 							<div className="w-full overflow-x-auto">
-							<table className="min-w-[900px] w-full mt-4">
+							<table className="min-w-[960px] w-full mt-4">
 								<thead className="capitalize">
 									<tr>
 										<th className="tableStickyCell text-start">category</th>
@@ -683,10 +683,10 @@ const BudgetScreen = () => {
 													</div>
 													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
-													<div className="flex gap-2">
+													<div className="flex gap-1">
 														<button
 															type="button"
-															className="budgetEditIcon opacity-70 hover:opacity-100"
+															className="iconBtn"
 															aria-label="Edit entry"
 															onClick={() => {
 																setEditingEntry({
@@ -704,7 +704,7 @@ const BudgetScreen = () => {
 														</button>
 														<button
 															type="button"
-															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															className="iconBtn text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
 															aria-label="Delete entry"
 															onClick={() => {
 																setDeletingEntry({ id: element.id, budgetSection: "plannedPayments" });
@@ -748,12 +748,12 @@ const BudgetScreen = () => {
 							</div>
 
 							<div className="w-full overflow-x-auto">
-							<table className="min-w-[900px] w-full mt-4">
+							<table className="min-w-[960px] w-full mt-4">
 								<colgroup>
 									<col className="w-72" />
 									<col className="w-32" />
 									<col className="w-32" />
-									<col className="w-64" />
+									<col className="w-[340px]" />
 								</colgroup>
 
 								<thead className="capitalize">
@@ -792,7 +792,7 @@ const BudgetScreen = () => {
 													<div className="flex flex-col gap-2">
 														<p className="capitalize">{element.category}</p>
 														<p className="text-xs">
-															<span className="text-brand-400 dark:text-green-400">
+															<span className="text-brand-500 dark:text-green-400">
 																Description:{" "}
 															</span>
 															<span className="italic">
@@ -818,10 +818,10 @@ const BudgetScreen = () => {
 													</div>
 													<span className="progressBarLabel">{percentage.toFixed(1)}%</span>
 
-													<div className="flex gap-2">
+													<div className="flex gap-1">
 														<button
 															type="button"
-															className="budgetEditIcon opacity-70 hover:opacity-100"
+															className="iconBtn"
 															aria-label="Edit entry"
 															onClick={() => {
 																setEditingEntry({
@@ -839,7 +839,7 @@ const BudgetScreen = () => {
 														</button>
 														<button
 															type="button"
-															className="text-xs text-red-500 hover:text-red-700 dark:text-red-400"
+															className="iconBtn text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
 															aria-label="Delete entry"
 															onClick={() => {
 																setDeletingEntry({ id: element.id, budgetSection: "others" });
@@ -882,7 +882,7 @@ const BudgetScreen = () => {
 									Category
 								</label>
 								<input
-									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
+									className="formInput"
 									type="text"
 									name="category"
 									id="category"
@@ -915,7 +915,7 @@ const BudgetScreen = () => {
 									Description
 								</label>
 								<textarea
-									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 max-h-32"
+									className="formInput max-h-32"
 									name="description"
 									id="description"
 									placeholder="Enter description"
@@ -947,7 +947,7 @@ const BudgetScreen = () => {
 									Category
 								</label>
 								<input
-									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
+									className="formInput"
 									type="text"
 									name="category"
 									id="category"
@@ -969,7 +969,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
+									className="formInput"
 									name="set-limit"
 									id="set-limit"
 									placeholder="Set Limit"
@@ -1002,7 +1002,7 @@ const BudgetScreen = () => {
 								</label>
 								<input
 									type="number"
-									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
+									className="formInput"
 									name="set-plannedPayment-limit"
 									id="set-plannedPayment-limit"
 									placeholder="Set Limit"
@@ -1047,7 +1047,7 @@ const BudgetScreen = () => {
 					<div className="inputLabelGroup">
 						<label htmlFor="edit-category" className="inputLabel">Category</label>
 						<input
-							className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
+							className="formInput"
 							type="text"
 							id="edit-category"
 							placeholder="Category name"
@@ -1060,7 +1060,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-description" className="inputLabel">Description</label>
 							<textarea
-								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 max-h-32 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
+								className="formInput max-h-32"
 								id="edit-description"
 								placeholder="Description"
 								value={editingEntry.description}
@@ -1073,7 +1073,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-amount" className="inputLabel">Amount</label>
 							<input
-								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
+								className="formInput"
 								type="number"
 								id="edit-amount"
 								placeholder="Amount"
@@ -1085,7 +1085,7 @@ const BudgetScreen = () => {
 						<div className="inputLabelGroup">
 							<label htmlFor="edit-limit" className="inputLabel">Set Limit</label>
 							<input
-								className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0 bg-white dark:bg-dark-base dark:border-dark-border dark:text-zinc-100"
+								className="formInput"
 								type="number"
 								id="edit-limit"
 								placeholder="Spending limit"
@@ -1124,7 +1124,7 @@ const BudgetScreen = () => {
 			<div className="flex flex-row items-center justify-center gap-5">
 				<button
 					type="button"
-					className="w-28 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
+					className="min-h-11 w-28 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
 					onClick={deleteEntry}
 				>
 					{isDeleteEntryLoading ? (
@@ -1135,7 +1135,7 @@ const BudgetScreen = () => {
 				</button>
 				<button
 					type="button"
-					className="w-28 rounded-lg bg-zinc-500 px-4 py-2 text-white transition hover:bg-zinc-600"
+					className="min-h-11 w-28 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
 					onClick={() => { setIsDeleteConfirmOpen(false); setDeletingEntry(null); }}
 				>
 					Cancel

@@ -252,7 +252,7 @@ const ExpensesPage = () => {
 							</p>
 							<button
 								type="button"
-								className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
+								className="btn-primary min-h-11"
 								onClick={() => setIsModalOpen(true)}
 							>
 								+ Add
@@ -301,7 +301,7 @@ const ExpensesPage = () => {
 												</p>
 												<button
 													type="button"
-													className="mt-2 text-sm text-red-600 dark:text-red-400"
+													className="-mr-3 mt-1 inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
 													onClick={() => {
 														setSelectedIdForDeletion(element.id);
 														setIsDeleteModalOpen(true);
@@ -347,7 +347,7 @@ const ExpensesPage = () => {
 
 									<button
 										type="button"
-										className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
+										className="btn-primary min-h-11"
 										onClick={() => setIsModalOpen(true)}
 									>
 										+ Add
@@ -387,7 +387,7 @@ const ExpensesPage = () => {
 												<div className="flex flex-row items-center justify-center pt-1">
 													<button
 														type="button"
-														className="rounded-lg p-1 transition hover:bg-zinc-100 dark:hover:bg-dark-overlay"
+														className="iconBtn"
 														onClick={() => {
 															setSelectedIdForDeletion(element.id);
 															setIsDeleteModalOpen(true);
@@ -442,7 +442,7 @@ const ExpensesPage = () => {
 						<select
 							name="category"
 							id="expense-category"
-							className="rounded-lg border border-zinc-200 bg-white p-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							value={categoryInput}
 							onChange={(e) => {
 								setCategoriesInput(e.target.value);
@@ -466,7 +466,7 @@ const ExpensesPage = () => {
 						<select
 							name="subcategory"
 							id="subcategory"
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 capitalize text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100 disabled:opacity-60"
+							className="formInput capitalize"
 							value={subCategoryInput}
 							onChange={(e) => {
 								setSubCategoryInput(e.target.value);
@@ -490,7 +490,7 @@ const ExpensesPage = () => {
 							Narration
 						</label>
 						<input
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							type="text"
 							name="narration"
 							id="narration"
@@ -505,7 +505,7 @@ const ExpensesPage = () => {
 							Amount
 						</label>
 						<input
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							type="number"
 							name="amount"
 							id="amount"
@@ -542,7 +542,7 @@ const ExpensesPage = () => {
 				<div className="flex flex-row items-center justify-center gap-5">
 					<button
 						type="button"
-						className="w-28 rounded-lg bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
+						className="min-h-11 w-28 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
 						onClick={() => {
 							deleteExpense(selectedIdForDeletion);
 						}}
@@ -555,7 +555,7 @@ const ExpensesPage = () => {
 					</button>
 					<button
 						type="button"
-						className="w-28 rounded-lg bg-zinc-500 px-4 py-2 text-white transition hover:bg-zinc-600"
+						className="min-h-11 w-28 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel

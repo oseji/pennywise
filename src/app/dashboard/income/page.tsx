@@ -206,7 +206,7 @@ const IncomeScreen = () => {
 
 				<button
 					type="button"
-					className="block rounded-lg border border-brand-500 bg-white px-4 py-2 text-brand-500 transition ease-in-out hover:scale-[1.02] dark:bg-dark-raised dark:text-green-400 md:ml-auto"
+					className="btn-outline-brand min-h-11"
 					onClick={() => setIsModalOpen(true)}
 				>
 					+ Add income
@@ -253,7 +253,7 @@ const IncomeScreen = () => {
 											</p>
 											<button
 												type="button"
-												className="mt-2 text-sm text-red-600 dark:text-red-400"
+												className="-mr-3 mt-1 inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
 												onClick={() => {
 													setSelectedIdForDeletion(element.id);
 													setIsDeleteModalOpen(true);
@@ -320,7 +320,7 @@ const IncomeScreen = () => {
 										<div className="flex flex-row items-center justify-center gap-4">
 											<button
 												type="button"
-												className="rounded-lg p-1 transition hover:bg-zinc-100 dark:hover:bg-dark-overlay"
+												className="iconBtn"
 												onClick={() => {
 													setSelectedIdForDeletion(element.id);
 													setIsDeleteModalOpen(true);
@@ -371,7 +371,7 @@ const IncomeScreen = () => {
 							Narration
 						</label>
 						<input
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							type="text"
 							name="narration"
 							id="narration"
@@ -389,7 +389,7 @@ const IncomeScreen = () => {
 						<select
 							name="income-category"
 							id="income-category"
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							value={categoryInput}
 							onChange={(e) => setCategoryInput(e.target.value)}
 						>
@@ -408,7 +408,7 @@ const IncomeScreen = () => {
 							Amount
 						</label>
 						<input
-							className="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-400/30 dark:border-dark-border dark:bg-dark-base dark:text-zinc-100"
+							className="formInput"
 							type="number"
 							name="amount"
 							id="amount"
@@ -445,7 +445,7 @@ const IncomeScreen = () => {
 				<div className="flex flex-row items-center justify-center gap-5">
 					<button
 						type="button"
-						className="w-28 rounded-lg bg-red-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:bg-red-600"
+						className="min-h-11 w-28 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
 						onClick={() => {
 							deleteIncome(selectedIdForDeletion);
 						}}
@@ -458,7 +458,7 @@ const IncomeScreen = () => {
 					</button>
 					<button
 						type="button"
-						className="w-28 rounded-lg bg-zinc-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:bg-zinc-600 dark:bg-dark-muted"
+						className="min-h-11 w-28 rounded-lg bg-zinc-500 px-4 py-2 font-semibold text-white transition hover:bg-zinc-600"
 						onClick={() => setIsDeleteModalOpen(false)}
 					>
 						Cancel
