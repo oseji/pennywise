@@ -9,8 +9,9 @@ import {
 	ResponsiveContainer,
 } from "recharts";
 
-import { auth, db } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase";
 import { getDocs, collection, orderBy, query } from "firebase/firestore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 import toast from "react-hot-toast";
 import { formatFetchError } from "@/utils/formatFetchError";
@@ -48,7 +49,7 @@ const BUDGET_LABEL_MAP: Record<string, string> = {
 };
 
 const Dashboard = () => {
-	const user = auth.currentUser;
+	const { user, initialized: authInitialized } = useAuthStore();
 	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isLoading, setisLoading] = useState<boolean>(true);
@@ -211,7 +212,11 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		const load = async () => {
-			if (!user?.uid) return;
+			if (!authInitialized) return;
+			if (!user?.uid) {
+				setisLoading(false);
+				return;
+			}
 
 			const data = await fetchUserDataSummary(user.uid);
 			const budget = await fetchBudgetData(user.uid);
@@ -223,7 +228,7 @@ const Dashboard = () => {
 			}
 		};
 		load();
-	}, [user?.uid]);
+	}, [user?.uid, authInitialized]);
 
 	const chartTooltip = ({
 		active,

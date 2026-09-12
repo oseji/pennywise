@@ -57,7 +57,7 @@ const SavingsPage = () => {
 				<div className="mt-6 hidden text-sm md:block">
 					<div className="overflow-x-auto rounded-t-xl">
 						<div className="dataTableHeader grid min-w-[820px] grid-cols-5">
-							<p className="tableStickyCell">purpose</p>
+							<p className="tableStickyHeaderCell">purpose</p>
 							<p>frequency</p>
 							<p>amount</p>
 							<p>target date</p>

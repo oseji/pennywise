@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { formatFetchError } from "@/utils/formatFetchError";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { EmptyState } from "@/components/EmptyState";
-import { db, auth } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase";
+import { useAuthStore } from "@/store/useAuthStore";
 import { getDocs, query, orderBy, collection } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { X, Bell } from "lucide-react";
@@ -17,7 +18,7 @@ type notificationDataType = {
 };
 
 const Notifications = () => {
-	const user = auth.currentUser;
+	const user = useAuthStore((s) => s.user);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [notificationsData, setNotificationsData] = useState<notificationDataType[]>([]);

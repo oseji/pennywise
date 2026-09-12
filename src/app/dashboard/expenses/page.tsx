@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Pagination from "@/utils/Pagination";
 import Image from "next/image";
-import { auth, db } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
 	addDoc,
 	getDocs,
@@ -34,12 +35,13 @@ type expenseDataType = {
 }[];
 
 const ExpensesPage = () => {
-	const user = auth.currentUser;
+	const { user, initialized: authInitialized } = useAuthStore();
 	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+	// starts true so the skeleton shows until the auth session resolves and the first fetch completes
+	const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
 	const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 	const [selectedIdForDeletion, setSelectedIdForDeletion] =
@@ -225,13 +227,16 @@ const ExpensesPage = () => {
 
 	useEffect(() => {
 		const getData = async () => {
-			if (user) {
-				setExpenseData((await fetchExpenses(user.uid)) ?? []);
+			if (!authInitialized) return;
+			if (!user) {
+				setIsDataLoading(false);
+				return;
 			}
+			setExpenseData((await fetchExpenses(user.uid)) ?? []);
 		};
 		getData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount / uid only
-	}, [user?.uid]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- refetch on session change only
+	}, [user?.uid, authInitialized]);
 
 	return (
 		<div className="relative dashboardScreen">
@@ -316,7 +321,7 @@ const ExpensesPage = () => {
 					<div className="mt-5 hidden text-sm md:block">
 						<div className="overflow-x-auto rounded-t-xl">
 							<div className="dataTableHeader grid min-w-[820px] w-full grid-cols-5">
-								<p className="tableStickyCell min-w-[140px] pl-2">category</p>
+								<p className="tableStickyHeaderCell min-w-[140px] pl-2">category</p>
 								<p>narration</p>
 								<p>time</p>
 								<p>amount</p>

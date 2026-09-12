@@ -1,93 +1,131 @@
 "use client";
-import Link from "next/link";
 
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "@/firebase/firebase";
+import { formatAuthError } from "@/utils/formatAuthError";
 
 const ForgotPassword = () => {
-	const alertModalRef = useRef<HTMLDivElement>(null);
+	const [email, setEmail] = useState<string>("");
+	const [isSending, setIsSending] = useState<boolean>(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [sentTo, setSentTo] = useState<string>("");
 
-	const [hide, setHide] = useState(true);
+	const sendReset = async () => {
+		const address = email.trim();
+		if (!address) {
+			setErrorMessage("Please enter your email address.");
+			return;
+		}
 
-	const showAlertModal = () => {
-		setHide(false);
-		setTimeout(() => setHide(true), 5000);
+		setIsSending(true);
+		setErrorMessage("");
+		try {
+			await sendPasswordResetEmail(auth, address);
+			setSentTo(address);
+		} catch (err) {
+			setErrorMessage(formatAuthError(err));
+		} finally {
+			setIsSending(false);
+		}
 	};
 
 	return (
-		<div className="relative min-h-dvh">
-			<div className="bg-white w-full flex flex-col items-center justify-center min-h-dvh py-10">
-				<form
-					action=""
-					className="rounded-lg px-6 py-8 shadow-lg w-[92%] sm:w-[420px] md:w-[500px]"
-					onClick={(e) => e.preventDefault()}
-				>
-					<div className="flex flex-row items-center justify-center gap-4 mb-4 text-xl font-bold md:text-2xl">
-						<span className=" rounded-full bg-[#B7E4C7] text-[#40916C] px-4 py-2">
-							P
-						</span>
-
-						<span>Pennywise</span>
+		<div className="flex min-h-dvh flex-col items-center justify-center bg-white px-6 py-12 dark:bg-dark-surface">
+			<div className="w-full max-w-sm">
+				{/* Brand */}
+				<div className="mb-8 flex flex-col items-center gap-3">
+					<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500 shadow-glow-green">
+						<span className="text-xl font-black text-white">P</span>
 					</div>
+					<div className="text-center">
+						<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+							Reset your password
+						</h1>
+						<p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+							Enter your email and we&apos;ll send you a reset link.
+						</p>
+					</div>
+				</div>
 
-					<h2 className="mb-4 text-lg font-bold text-center ">
-						Reset your password
-					</h2>
-
-					<p className="mb-4 text-center text-slate-400">
-						Enter your email below and we’ll send you instructions on how to
-						reset your password.
-					</p>
-
-					<div className="flex flex-col gap-4 ">
-						<div className=" inputLabelGroup">
-							<label htmlFor="email-address" className=" inputLabel">
+				{sentTo ? (
+					<div
+						role="status"
+						className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-4 text-sm dark:border-brand-600/30 dark:bg-brand-600/10"
+					>
+						<p className="font-semibold text-brand-600 dark:text-green-400">
+							Check your mail
+						</p>
+						<p className="mt-1 text-zinc-600 dark:text-zinc-300">
+							We sent a password reset link to <strong>{sentTo}</strong>.
+							Follow the link to choose a new password.
+						</p>
+						<p className="mt-3 text-zinc-500 dark:text-zinc-400">
+							Didn&apos;t receive it?{" "}
+							<button
+								type="button"
+								onClick={sendReset}
+								disabled={isSending}
+								className="font-semibold text-brand-500 hover:text-brand-600 disabled:opacity-60 dark:text-green-400"
+							>
+								{isSending ? "Resending…" : "Resend"}
+							</button>
+						</p>
+					</div>
+				) : (
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							sendReset();
+						}}
+						className="flex flex-col gap-4"
+					>
+						<div className="inputLabelGroup">
+							<label htmlFor="email-address" className="inputLabel">
 								Email address
 							</label>
 							<input
 								type="email"
-								placeholder="Email"
 								id="email-address"
-								className="w-full p-3 border rounded-lg border-slate-200 outline-0 focus:outline-0"
+								name="email"
+								autoComplete="email"
+								required
+								placeholder="you@example.com"
+								className="authInput"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
 							/>
 						</div>
-					</div>
 
-					<button
-						type="submit"
-						className=" w-full rounded-lg text-white bg-[#2D6A4F] py-3 my-4 font-semibold"
-						onClick={showAlertModal}
+						{errorMessage && (
+							<p role="alert" className="text-xs text-red-600 dark:text-red-400">
+								{errorMessage}
+							</p>
+						)}
+
+						<button
+							type="submit"
+							disabled={isSending}
+							className="w-full rounded-xl bg-brand-500 py-3 text-sm font-semibold text-white shadow-glow-green transition hover:bg-brand-600 disabled:opacity-60"
+						>
+							{isSending ? (
+								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+							) : (
+								"Send reset instructions"
+							)}
+						</button>
+					</form>
+				)}
+
+				<p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+					Go back to{" "}
+					<Link
+						href="/"
+						className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400"
 					>
-						Send reset instructions
-					</button>
-
-					<p className="text-center text-slate-400">
-						Go back to
-						<span className=" underline cursor-pointer text-[#2D6A4F] ">
-							<Link href={"/"}> Sign in</Link>
-						</span>
-					</p>
-				</form>
-			</div>
-
-			{/* alert modal */}
-			<div
-				className={`absolute top-5 left-1/2 -translate-x-1/2 text-center rounded-lg opacity-90 bg-white shadow-xl w-[92%] max-w-80 flex flex-col gap-4 p-9 transition ease-in-out duration-300 ${
-					hide ? "hideAlertModal" : ""
-				}`}
-				ref={alertModalRef}
-			>
-				<h1 className="text-lg font-bold ">Check your mail</h1>
-
-				<p>
-					We sent a password reset link to your email. Please click the link to
-					reset your password.
-				</p>
-
-				<p>
-					Didn’t received an email?{" "}
-					<span className=" underline text-[#101828] cursor-pointer">
-						Click to Resend
-					</span>
+						Sign in
+					</Link>
 				</p>
 			</div>
 		</div>

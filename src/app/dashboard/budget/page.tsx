@@ -2,7 +2,8 @@
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 
-import { auth, db } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
 	addDoc,
 	getDocs,
@@ -60,11 +61,12 @@ type CategoryTotals = {
 };
 
 const BudgetScreen = () => {
-	const user = auth.currentUser;
+	const { user, initialized: authInitialized } = useAuthStore();
 	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [dataLoading, setDataLoading] = useState<boolean>(false);
+	// starts true so the skeleton shows until the auth session resolves and the first fetch completes
+	const [dataLoading, setDataLoading] = useState<boolean>(true);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [selectedModal, setSelectedModal] = useState<
 		"daily needs" | "planned payments" | "others"
@@ -442,7 +444,11 @@ const BudgetScreen = () => {
 
 	// fetch budget data
 	useEffect(() => {
-		if (!user) return;
+		if (!authInitialized) return;
+		if (!user) {
+			setDataLoading(false);
+			return;
+		}
 
 		fetchBudgetData(user.uid);
 
@@ -452,8 +458,8 @@ const BudgetScreen = () => {
 				setExpenses(result); // store both expenses + totals
 			}
 		})();
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount / uid only
-	}, [user?.uid]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- refetch on session change only
+	}, [user?.uid, authInitialized]);
 
 	const modalTitle = useMemo(() => {
 		if (selectedModal === "daily needs") return "Add daily needs";
@@ -937,8 +943,8 @@ const BudgetScreen = () => {
 
 						{selectedModal === "planned payments" ? (
 							<div className="inputLabelGroup">
-								<label htmlFor="amount" className="inputLabel">
-									category
+								<label htmlFor="category" className="inputLabel">
+									Category
 								</label>
 								<input
 									className="px-4 py-2 border rounded-lg border-zinc-200 focus:outline-0"
@@ -991,7 +997,7 @@ const BudgetScreen = () => {
 
 						{selectedModal === "planned payments" ? (
 							<div className="inputLabelGroup">
-								<label htmlFor="set-amount" className="inputLabel">
+								<label htmlFor="set-plannedPayment-limit" className="inputLabel">
 									Set limit
 								</label>
 								<input

@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import Pagination from "@/utils/Pagination";
 
-import { db, auth } from "@/firebase/firebase";
+import { db } from "@/firebase/firebase";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
 	doc,
 	setDoc,
@@ -36,11 +37,12 @@ type tableDataType = {
 }[];
 
 const IncomeScreen = () => {
-	const user = auth.currentUser;
+	const { user, initialized: authInitialized } = useAuthStore();
 	const currency = usePreferencesStore((s) => s.currency);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+	// starts true so the skeleton shows until the auth session resolves and the first fetch completes
+	const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
 	const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
 	const [incomeData, setIncomeData] = useState<tableDataType>([]);
 	const totalIncome = incomeData.reduce((sum, entry) => sum + entry.amount, 0);
@@ -179,13 +181,16 @@ const IncomeScreen = () => {
 
 	useEffect(() => {
 		const getData = async () => {
-			if (user) {
-				setIncomeData((await fetchIncomeData(user.uid)) ?? []);
+			if (!authInitialized) return;
+			if (!user) {
+				setIsDataLoading(false);
+				return;
 			}
+			setIncomeData((await fetchIncomeData(user.uid)) ?? []);
 		};
 		getData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount / user session
-	}, []);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- refetch on session change only
+	}, [user?.uid, authInitialized]);
 
 	return (
 		<div className="relative dashboardScreen">
