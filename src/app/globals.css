@@ -2,9 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Base ──────────────────────────────────────────── */
+/* ─── Tokens ─────────────────────────────────────────────────────────────
+   Channel triplets so Tailwind can apply /alpha. The world: a register and
+   its paper roll — counter ground, thermal-white paper, two-colour print
+   (ink + debit red), dark graphite terminal chrome, green ENTER key. */
+:root {
+    color-scheme: light;
+
+    --ground: 227 231 226;
+    --ground-2: 214 220 213;
+    --paper: 255 255 255;
+    --paper-2: 243 245 242;
+    --paper-3: 232 236 231;
+    --ink: 18 22 20;
+    --ink-2: 69 77 72;
+    --ink-3: 94 102 97;
+    --rule: 201 207 202;
+    --rule-2: 154 163 157;
+
+    /* terminal chrome stays dark in both themes */
+    --term: 20 24 23;
+    --term-2: 31 37 34;
+    --term-3: 42 50 46;
+    --term-ink: 233 238 234;
+    --term-ink-2: 163 173 167;
+    --term-rule: 44 52 49;
+
+    --key: 14 122 75;
+    --key-hover: 11 106 64;
+    --key-edge: 6 74 44;
+
+    --pos: 12 107 65;
+    --pos-soft: 227 243 234;
+    --neg: 184 35 43;
+    --neg-soft: 251 233 233;
+    --warn: 154 70 8;
+    --warn-soft: 251 239 227;
+    --warn-fill: 194 112 16;
+
+    /* Chart inks — validated with the dataviz checks (CVD + contrast on paper). */
+    --chart-in: 29 138 85;
+    --chart-out: 209 59 46;
+    --chart-daily: 23 121 225;
+    --chart-planned: 157 15 93;
+    --chart-others: 169 145 43;
+
+    --focus: 14 122 75;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark {
+    color-scheme: dark;
+
+    --ground: 11 14 13;
+    --ground-2: 18 22 20;
+    --paper: 23 28 25;
+    --paper-2: 30 35 33;
+    --paper-3: 38 44 41;
+    --ink: 232 237 234;
+    --ink-2: 174 184 178;
+    --ink-3: 142 152 147;
+    --rule: 45 52 49;
+    --rule-2: 72 82 77;
+
+    --term: 6 8 7;
+    --term-2: 21 26 24;
+    --term-3: 31 37 34;
+    --term-rule: 28 34 32;
+
+    --key-hover: 16 137 90;
+
+    --pos: 82 211 148;
+    --pos-soft: 19 41 31;
+    --neg: 255 123 114;
+    --neg-soft: 46 23 22;
+    --warn: 242 166 94;
+    --warn-soft: 45 31 18;
+    --warn-fill: 217 139 43;
+
+    --chart-in: 42 148 99;
+    --chart-out: 224 82 63;
+    --chart-daily: 55 146 253;
+    --chart-planned: 178 53 134;
+    --chart-others: 169 145 43;
+
+    --focus: 82 211 148;
+}
+
+/* The terminal is dark in both themes, so its focus ring is always the bright step. */
+.terminal {
+    --focus: 110 231 168;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────── */
+html {
+    background: rgb(var(--ground));
+}
+
 body {
-    @apply scroll-smooth;
+    @apply bg-ground font-sans text-ink antialiased;
+    caret-color: rgb(var(--key));
+}
+
+::selection {
+    background: rgb(var(--key) / 0.22);
+}
+
+/* Zero specificity so a component's own focus treatment (e.g. field rings) wins. */
+:where(:focus-visible) {
+    outline: 2px solid rgb(var(--focus));
+    outline-offset: 2px;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -16,233 +123,171 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-/* ─── CSS variables ──────────────────────────────────── */
-:root {
-    --brand:        #2d6a4f;
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--rule-2)) transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--rule-2)); border-radius: 9999px; border: 2px solid transparent; background-clip: padding-box; }
 
-    /* Chart palette — every value is >= 4.9:1 against white so slices and
-       legend swatches stay visible on the card surface. */
-    --chart-1: #2d6a4f;
-    --chart-2: #1d4ed8;
-    --chart-3: #c2410c;
-    --chart-4: #7e22ce;
-    --chart-5: #0f766e;
-    --chart-6: #be185d;
-    --chart-7: #b45309;
-    --chart-8: #4d7c0f;
-    --chart-9: #b91c1c;
-    --chart-10: #52525b;
+a {
+    text-underline-offset: 3px;
 }
 
-.dark {
-    --brand:        #4ade80;
-
-    /* >= 6.4:1 against dark-raised (#18181b) */
-    --chart-1: #4ade80;
-    --chart-2: #60a5fa;
-    --chart-3: #fb923c;
-    --chart-4: #c084fc;
-    --chart-5: #2dd4bf;
-    --chart-6: #f472b6;
-    --chart-7: #fbbf24;
-    --chart-8: #a3e635;
-    --chart-9: #f87171;
-    --chart-10: #a1a1aa;
+/* Theme switch prints over the old page, top to bottom, like one pass of the head. */
+::view-transition-old(root) {
+    animation: none;
+}
+::view-transition-new(root) {
+    animation: print-pass 420ms steps(14, end) both;
+}
+@keyframes print-pass {
+    from { clip-path: inset(0 0 100% 0); }
+    to { clip-path: inset(0 0 0 0); }
 }
 
-/* ─── Focus ──────────────────────────────────────────── */
-/* One designed keyboard focus ring for everything that doesn't draw its own. */
-:focus-visible {
-    outline: 2px solid var(--brand);
-    outline-offset: 2px;
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    ::view-transition-new(root) { animation: none; }
 }
 
-/* ─── Scrollbar ──────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; background: transparent; }
-::-webkit-scrollbar-thumb { background: #c1c1c4; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #a0a0a5; }
-.dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
-
-/* Everything below is a component class. Keeping them in @layer components
-   lets plain utilities (w-auto, text-red-600, ...) override them at call sites. */
 @layer components {
-/* ─── Auth ───────────────────────────────────────────── */
-.inputLabelGroup {
-    @apply flex flex-col gap-1;
+/* ─── Type ───────────────────────────────────────────────────────────── */
+.page-title {
+    @apply font-mono text-[26px] font-bold uppercase leading-none tracking-[-0.01em] text-ink md:text-[32px];
 }
 
-.inputLabel {
-    @apply mb-1 text-sm font-semibold capitalize text-zinc-700 dark:text-zinc-300;
+/* Small printed label: a receipt's field name. */
+.label {
+    @apply font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-3;
 }
 
-.authInput {
-    @apply w-full rounded-xl border border-zinc-500 bg-white px-4 py-3 text-sm text-zinc-900
-           placeholder-zinc-500 outline-none transition
-           focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50
-           dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100
-           dark:placeholder-zinc-400 dark:focus:border-brand-400 dark:focus:ring-brand-400/40;
+.num {
+    @apply font-mono tabular-nums;
 }
 
-/* Shared control styling for dashboard forms (modals, settings). */
-.formInput {
-    @apply w-full rounded-xl border border-zinc-500 bg-white px-4 py-2.5 text-sm text-zinc-900
-           placeholder-zinc-500 outline-none transition
-           focus:border-brand-500 focus:ring-2 focus:ring-brand-400/50
-           disabled:opacity-60
-           dark:border-zinc-500 dark:bg-dark-base dark:text-zinc-100
-           dark:placeholder-zinc-400 dark:focus:border-brand-400 dark:focus:ring-brand-400/40;
+/* ─── Paper ──────────────────────────────────────────────────────────── */
+.slip {
+    @apply rounded-paper bg-paper shadow-slip dark:shadow-none dark:ring-1 dark:ring-rule/70;
 }
 
-/* 44px-square icon-only button (WCAG 2.5.5 target size). */
-.iconBtn {
-    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
-           text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900
-           dark:text-zinc-400 dark:hover:bg-dark-overlay dark:hover:text-zinc-100;
+/* Torn feed edge along the bottom. A mask clips box-shadow, so the shadow
+   comes from a .slip-shadow wrapper's drop-shadow instead. */
+.slip-torn {
+    --tooth: 12px;
+    @apply rounded-t-paper bg-paper;
+    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
+    mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
 }
 
-/* ─── Dashboard shell ───────────────────────────────── */
-.dashboardScreen {
-    @apply w-full min-h-[95dvh] px-3 py-3 mt-[72px]
-           md:px-10 md:py-8
-           bg-zinc-50 dark:bg-dark-base;
+.slip-shadow {
+    filter: drop-shadow(0 1px 0 rgb(18 22 20 / 0.05)) drop-shadow(0 10px 12px rgb(18 22 20 / 0.12));
+}
+.dark .slip-shadow {
+    filter: none;
 }
 
-.dashboardHeading {
-    @apply text-2xl md:text-3xl font-bold mb-6
-           text-zinc-900 dark:text-zinc-50
-           tracking-tight;
+/* Dashed tear line across a slip. */
+.rule-dash {
+    height: 1px;
+    background: repeating-linear-gradient(90deg, rgb(var(--rule-2)) 0 6px, transparent 6px 10px);
 }
 
-/* ─── Buttons ───────────────────────────────────────── */
-/* One button system. Tiers: primary (the action), outline-brand (secondary
-   action in brand colour), secondary (ghost / cancel), danger, outline-danger. */
-.btn-base {
-    @apply inline-flex min-h-11 items-center justify-center gap-2
-           rounded-xl px-5 py-2.5 text-sm font-semibold
-           transition-all duration-150 ease-in-out
-           disabled:opacity-50 disabled:cursor-not-allowed;
+/* Dotted leader between a label and its amount. */
+.leader {
+    @apply mx-2 min-w-[1.5rem] flex-1 self-end;
+    height: 3px;
+    margin-bottom: 0.32em;
+    background: radial-gradient(circle, rgb(var(--rule-2)) 1px, transparent 1.3px) 0 50% / 6px 3px repeat-x;
 }
 
-.btn-primary {
-    @apply btn-base text-white bg-brand-500 hover:bg-brand-600 shadow-sm
-           dark:hover:bg-brand-400;
+/* ─── Keys (buttons) ─────────────────────────────────────────────────── */
+/* POS keys: a physical edge that disappears when pressed. */
+.key {
+    @apply relative inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-key px-4
+           font-mono text-[12.5px] font-semibold uppercase tracking-[0.06em]
+           transition-[transform,box-shadow,background-color,color] duration-100 ease-out
+           disabled:cursor-not-allowed disabled:opacity-50;
+    --edge: rgb(var(--rule-2));
+    box-shadow: 0 2px 0 var(--edge);
+}
+.key:not(:disabled):active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--edge);
 }
 
-.btn-outline-brand {
-    @apply btn-base border border-brand-500 text-brand-500
-           hover:bg-brand-50
-           dark:border-green-500 dark:text-green-400 dark:hover:bg-green-500/10;
+.key-enter {
+    @apply key bg-key text-white hover:bg-key-hover;
+    --edge: rgb(var(--key-edge));
 }
 
-.btn-secondary {
-    @apply btn-base border border-zinc-300 text-zinc-700 hover:bg-zinc-100
-           dark:border-dark-muted dark:text-zinc-200 dark:hover:bg-dark-overlay;
+.key-plain {
+    @apply key bg-paper text-ink ring-1 ring-inset ring-rule-2 hover:bg-paper-2;
 }
 
-.btn-danger {
-    @apply btn-base text-white bg-red-600 hover:bg-red-700;
+.key-void {
+    @apply key bg-[#b8232b] text-white hover:bg-[#9e1d24];
+    --edge: #6f1318;
 }
 
-.btn-outline-danger {
-    @apply btn-base border border-red-600 text-red-600 hover:bg-red-50
-           dark:border-red-400 dark:text-red-400 dark:hover:bg-red-500/10;
+.key-ghost {
+    @apply key text-ink-2 hover:bg-paper-2 hover:text-ink;
+    box-shadow: none;
+}
+.key-ghost:not(:disabled):active {
+    transform: translateY(1px);
 }
 
-/* ─── Cards ─────────────────────────────────────────── */
-.card {
-    @apply rounded-2xl border bg-white shadow-card
-           border-zinc-200/80 dark:border-dark-border dark:bg-dark-raised dark:shadow-dark-card;
+/* 44px square icon key. */
+.key-icon {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-key text-ink-2
+           transition-[transform,background-color,color] duration-100
+           hover:bg-paper-2 hover:text-ink active:translate-y-px;
 }
 
-/* ─── Overview chart boxes ──────────────────────────── */
-.chartBox {
-    @apply flex flex-col items-center w-full p-5 rounded-2xl
-           bg-white border border-zinc-200/80 shadow-card
-           dark:bg-dark-raised dark:border-dark-border dark:shadow-dark-card;
+/* Text link in brand ink. */
+.link {
+    @apply font-semibold text-pos underline decoration-pos/40 decoration-1 hover:decoration-pos;
 }
 
-.chartBoxHeadingGroup {
-    @apply flex flex-row items-center justify-between w-full mb-4
-           font-bold text-zinc-900 dark:text-zinc-50;
+/* ─── Fields ─────────────────────────────────────────────────────────── */
+.field-label {
+    @apply mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-2;
 }
 
-/* ─── Settings ──────────────────────────────────────── */
-.settingsRow {
-    @apply flex flex-col gap-3 text-sm md:items-center md:flex-row md:justify-between
-           pb-6 border-b border-zinc-100 dark:border-dark-border last:border-0 last:pb-0;
+.field {
+    @apply block min-h-11 w-full rounded-[6px] border border-rule-2 bg-paper px-3.5 py-2.5 text-[15px] text-ink
+           placeholder:text-ink-3 transition-[border-color,box-shadow] duration-150
+           hover:border-ink-3 focus:border-key focus:outline-none focus:ring-2 focus:ring-key/25
+           disabled:cursor-not-allowed disabled:opacity-60
+           dark:bg-ground-2;
 }
 
-.settingsHeading {
-    @apply text-base font-semibold text-zinc-900 dark:text-zinc-100 md:text-lg;
+.field-hint {
+    @apply mt-1.5 text-[13px] text-ink-3;
 }
 
-/* ─── Notifications ─────────────────────────────────── */
-.notificationsContainer {
-    @apply flex flex-col gap-3 mt-4 max-h-[65dvh] md:max-h-[58dvh] overflow-y-auto;
+/* ─── Small print ────────────────────────────────────────────────────── */
+.tag {
+    @apply inline-flex items-center gap-1.5 rounded-[4px] bg-paper-3 px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.04em] text-ink-2;
 }
 
-.notificationsContainer::-webkit-scrollbar { width: 4px; background: transparent; }
-.notificationsContainer::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
-.notificationsContainer::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-.dark .notificationsContainer::-webkit-scrollbar-thumb { background: #3f3f46; }
-.notificationsContainer::-webkit-scrollbar-button { display: none; }
-
-/* ─── Budget ────────────────────────────────────────── */
-.budgetCategories {
-    @apply w-full px-4 py-5 mb-6 rounded-2xl shadow-card
-           bg-white border border-zinc-200/80
-           dark:bg-dark-raised dark:border-dark-border dark:shadow-dark-card
-           md:py-8 md:px-6;
+/* Rubber-stamp status: APPROVED, VOID, OVER. */
+.stamp {
+    @apply inline-flex items-center gap-1 rounded-[4px] border-2 px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase leading-none tracking-[0.1em];
 }
 
-.budgetCategoriesHeading {
-    @apply flex flex-col justify-between gap-3 pb-4 border-b
-           border-zinc-100 dark:border-dark-border
-           md:flex-row md:items-center md:gap-0;
+/* ─── Page shell ─────────────────────────────────────────────────────── */
+.page {
+    @apply mx-auto w-full max-w-[1240px] px-4 pb-10 pt-5 md:px-8 md:pt-8 lg:px-10;
 }
 
-.budgetCategoriesHeadingText {
-    @apply text-lg font-bold text-zinc-900 dark:text-zinc-50 md:text-xl;
+.skeleton {
+    @apply rounded-[4px] bg-paper-3 motion-safe:animate-feed-pulse;
+}
 }
 
-.progressBarContainer {
-    @apply flex flex-row items-center gap-4 py-3;
-}
-
-.progressBarBody {
-    @apply relative flex-1 max-w-[160px] h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-dark-border;
-}
-
-.progressBarTracker {
-    @apply h-2 rounded-full transition-all duration-500;
-}
-
-.progressBarLabel {
-    @apply text-xs font-semibold tabular-nums text-zinc-600 dark:text-zinc-300 min-w-[4.5rem] whitespace-nowrap shrink-0;
-}
-
-/* ─── Data tables ───────────────────────────────────── */
-.dataTableHeader {
-    @apply bg-brand-500 dark:bg-dark-overlay p-4 text-white
-           dark:text-zinc-100 rounded-t-2xl font-semibold tracking-wide text-sm
-           border-b border-brand-600 dark:border-dark-border;
-}
-
-.dataTableSurface {
-    @apply bg-white border shadow-card rounded-b-2xl
-           border-zinc-200/80 dark:border-dark-border
-           dark:bg-dark-raised dark:shadow-dark-card;
-}
-
-.tableStickyCell {
-    @apply sticky left-0 z-10 bg-white
-           dark:bg-dark-raised;
-}
-
-/* sticky cell inside .dataTableHeader — must match the header background */
-.tableStickyHeaderCell {
-    @apply sticky left-0 z-10 bg-brand-500
-           dark:bg-dark-overlay;
-}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }

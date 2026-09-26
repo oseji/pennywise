@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import { formatAuthError } from "@/utils/formatAuthError";
-import { Eye, EyeOff } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { AuthShowcase } from "@/components/AuthShowcase";
+import { PasswordField } from "@/components/ui/PasswordField";
 
 type SignUpInfo = {
 	firstName: string;
@@ -19,8 +19,6 @@ type SignUpInfo = {
 };
 
 const SignUp = () => {
-	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-	const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -54,27 +52,18 @@ const SignUp = () => {
 	};
 
 	const passwordFields = [
-		{ id: "password",         name: "password",        label: "Password",         visible: isPasswordVisible,        toggle: () => setIsPasswordVisible(!isPasswordVisible) },
-		{ id: "confirm-password", name: "confirmPassword", label: "Confirm password", visible: isConfirmPasswordVisible, toggle: () => setIsConfirmPasswordVisible(!isConfirmPasswordVisible) },
+		{ id: "password",         name: "password",        label: "Password" },
+		{ id: "confirm-password", name: "confirmPassword", label: "Confirm password" },
 	];
 
 	return (
-		<div className="flex min-h-dvh flex-col lg:flex-row">
-			{/* Form side */}
-			<div className="flex flex-1 flex-col items-center justify-center bg-white px-6 py-12 dark:bg-dark-surface">
-				<div className="w-full max-w-sm">
-					{/* Brand */}
-					<div className="mb-8 flex flex-col items-center gap-3">
-						<Logo size="lg" />
-						<div className="text-center">
-							<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-								Create your account
-							</h1>
-							<p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-								Start tracking your finances with Pennywise
-							</p>
-						</div>
-					</div>
+		<div className="grid min-h-dvh bg-ground lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+			<main className="flex flex-col px-5 py-6 md:px-10 md:py-8">
+				<Logo href="/" />
+
+				<div className="m-auto w-full max-w-[420px] py-10">
+					<h1 className="page-title">Open an account</h1>
+					<p className="mt-2.5 text-[15px] text-ink-2">A fresh roll for your income, spending and budgets.</p>
 
 					<form
 						onSubmit={(e) => {
@@ -85,39 +74,39 @@ const SignUp = () => {
 							}
 							signUpAccount(signUpInfo.email, signUpInfo.password);
 						}}
-						className="flex flex-col gap-4"
+						className="mt-7 flex flex-col gap-4"
 					>
 						<div className="grid grid-cols-2 gap-3">
-							<div className="inputLabelGroup">
-								<label htmlFor="first-name" className="inputLabel">First name</label>
+							<div>
+								<label htmlFor="first-name" className="field-label">First name</label>
 								<input
 									type="text"
 									id="first-name"
 									name="firstName"
 									autoComplete="given-name"
 									placeholder="Jane"
-									className="authInput"
+									className="field"
 									value={signUpInfo.firstName}
 									onChange={handleChange}
 								/>
 							</div>
-							<div className="inputLabelGroup">
-								<label htmlFor="last-name" className="inputLabel">Last name</label>
+							<div>
+								<label htmlFor="last-name" className="field-label">Last name</label>
 								<input
 									type="text"
 									id="last-name"
 									name="lastName"
 									autoComplete="family-name"
 									placeholder="Doe"
-									className="authInput"
+									className="field"
 									value={signUpInfo.lastName}
 									onChange={handleChange}
 								/>
 							</div>
 						</div>
 
-						<div className="inputLabelGroup">
-							<label htmlFor="email" className="inputLabel">Email</label>
+						<div>
+							<label htmlFor="email" className="field-label">Email</label>
 							<input
 								type="email"
 								id="email"
@@ -125,70 +114,45 @@ const SignUp = () => {
 								autoComplete="email"
 								required
 								placeholder="you@example.com"
-								className="authInput"
+								className="field"
 								value={signUpInfo.email}
 								onChange={handleChange}
 							/>
 						</div>
 
-						{passwordFields.map(({ id, name, label, visible, toggle }) => (
-							<div key={id} className="inputLabelGroup">
-								<label htmlFor={id} className="inputLabel">{label}</label>
-								<div className="flex items-center gap-3 rounded-xl border border-zinc-500 bg-white px-4 py-3
-								                transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-400/50
-								                dark:border-zinc-500 dark:bg-zinc-900 dark:focus-within:border-brand-400">
-									<input
-										type={visible ? "text" : "password"}
-										id={id}
-										name={name}
-										autoComplete="new-password"
-										required
-										minLength={6}
-										placeholder="••••••••"
-										className="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-500 outline-none dark:text-zinc-100 dark:placeholder-zinc-400"
-										value={signUpInfo[name as keyof SignUpInfo]}
-										onChange={handleChange}
-									/>
-									<button
-										type="button"
-										onClick={toggle}
-										className="iconBtn -my-3 -mr-3"
-										aria-label={visible ? "Hide password" : "Show password"}
-										aria-pressed={visible}
-									>
-										{visible ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
-									</button>
-								</div>
-							</div>
+						{passwordFields.map(({ id, name, label }) => (
+							<PasswordField
+								key={id}
+								id={id}
+								name={name}
+								label={label}
+								autoComplete="new-password"
+								minLength={6}
+								value={signUpInfo[name as keyof SignUpInfo]}
+								onChange={handleChange}
+							/>
 						))}
+						<p className="field-hint -mt-2">At least 6 characters.</p>
 
 						{signUpErrorMessage && (
-							<p role="alert" className="text-xs text-red-600 dark:text-red-400">
+							<p role="alert" className="text-[14px] font-medium text-neg">
 								{signUpErrorMessage}
 							</p>
 						)}
 
-						<button
-							type="submit"
-							disabled={isLoading}
-							className="btn-primary mt-1 w-full py-3 shadow-glow-green"
-						>
-							{isLoading ? (
-								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-							) : (
-								"Create account"
-							)}
+						<button type="submit" disabled={isLoading} className="key-enter mt-1 min-h-12 w-full text-[13px]">
+							{isLoading ? "Opening account…" : "Create account"}
 						</button>
 					</form>
 
-					<p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+					<p className="mt-6 text-[14px] text-ink-2">
 						Already have an account?{" "}
-						<Link href="/" className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400">
-							Sign in
+						<Link href="/" className="link">
+							Log in
 						</Link>
 					</p>
 				</div>
-			</div>
+			</main>
 
 			<AuthShowcase />
 		</div>

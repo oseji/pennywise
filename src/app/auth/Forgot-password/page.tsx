@@ -33,44 +33,29 @@ const ForgotPassword = () => {
 	};
 
 	return (
-		<div className="flex min-h-dvh flex-col items-center justify-center bg-white px-6 py-12 dark:bg-dark-surface">
-			<div className="w-full max-w-sm">
-				{/* Brand */}
-				<div className="mb-8 flex flex-col items-center gap-3">
-					<Logo size="lg" />
-					<div className="text-center">
-						<h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-							Reset your password
-						</h1>
-						<p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-							Enter your email and we&apos;ll send you a reset link.
-						</p>
-					</div>
-				</div>
+		<div className="flex min-h-dvh flex-col bg-ground px-5 py-6 md:px-10 md:py-8">
+			<Logo href="/" />
+
+			<main className="m-auto w-full max-w-[420px] py-10">
+				<h1 className="page-title">Reset password</h1>
+				<p className="mt-2.5 text-[15px] text-ink-2">Enter your email and we&apos;ll send you a reset link.</p>
 
 				{sentTo ? (
-					<div
-						role="status"
-						className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-4 text-sm dark:border-brand-600/30 dark:bg-brand-600/10"
-					>
-						<p className="font-semibold text-brand-600 dark:text-green-400">
-							Check your mail
-						</p>
-						<p className="mt-1 text-zinc-600 dark:text-zinc-300">
-							We sent a password reset link to <strong>{sentTo}</strong>.
-							Follow the link to choose a new password.
-						</p>
-						<p className="mt-3 text-zinc-500 dark:text-zinc-400">
-							Didn&apos;t receive it?{" "}
-							<button
-								type="button"
-								onClick={sendReset}
-								disabled={isSending}
-								className="font-semibold text-brand-500 hover:text-brand-600 disabled:opacity-60 dark:text-green-400"
-							>
-								{isSending ? "Resending…" : "Resend"}
-							</button>
-						</p>
+					<div className="slip-shadow mt-7">
+						<div role="status" className="slip-torn px-5 pb-9 pt-5">
+							<span className="stamp border-pos text-pos">Sent</span>
+							<p className="mt-3 font-mono text-[13px] font-bold uppercase tracking-[0.06em]">Check your mail</p>
+							<p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">
+								We sent a password reset link to <strong className="font-semibold text-ink">{sentTo}</strong>.
+								Follow the link to choose a new password.
+							</p>
+							<p className="mt-4 text-[14px] text-ink-2">
+								Didn&apos;t receive it?{" "}
+								<button type="button" onClick={sendReset} disabled={isSending} className="link disabled:opacity-60">
+									{isSending ? "Resending…" : "Resend"}
+								</button>
+							</p>
+						</div>
 					</div>
 				) : (
 					<form
@@ -78,10 +63,10 @@ const ForgotPassword = () => {
 							e.preventDefault();
 							sendReset();
 						}}
-						className="flex flex-col gap-4"
+						className="mt-7 flex flex-col gap-4"
 					>
-						<div className="inputLabelGroup">
-							<label htmlFor="email-address" className="inputLabel">
+						<div>
+							<label htmlFor="email-address" className="field-label">
 								Email address
 							</label>
 							<input
@@ -91,42 +76,31 @@ const ForgotPassword = () => {
 								autoComplete="email"
 								required
 								placeholder="you@example.com"
-								className="authInput"
+								className="field"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 							/>
 						</div>
 
 						{errorMessage && (
-							<p role="alert" className="text-xs text-red-600 dark:text-red-400">
+							<p role="alert" className="text-[14px] font-medium text-neg">
 								{errorMessage}
 							</p>
 						)}
 
-						<button
-							type="submit"
-							disabled={isSending}
-							className="btn-primary w-full py-3 shadow-glow-green"
-						>
-							{isSending ? (
-								<div className="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-							) : (
-								"Send reset instructions"
-							)}
+						<button type="submit" disabled={isSending} className="key-enter mt-1 min-h-12 w-full text-[13px]">
+							{isSending ? "Sending…" : "Send reset link"}
 						</button>
 					</form>
 				)}
 
-				<p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-					Go back to{" "}
-					<Link
-						href="/"
-						className="font-semibold text-brand-500 hover:text-brand-600 dark:text-green-400"
-					>
-						Sign in
+				<p className="mt-6 text-[14px] text-ink-2">
+					Remembered it?{" "}
+					<Link href="/" className="link">
+						Back to log in
 					</Link>
 				</p>
-			</div>
+			</main>
 		</div>
 	);
 };

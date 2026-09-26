@@ -1,54 +1,70 @@
 /** @type {import('tailwindcss').Config} */
+
+// Every colour resolves to a channel triplet in globals.css, so one class
+// works in both themes and still takes Tailwind's /alpha modifier.
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 module.exports = {
 	darkMode: "class",
 	content: [
 		"./src/app/**/*.{js,ts,jsx,tsx}",
 		"./src/components/**/*.{js,ts,jsx,tsx}",
 		"./src/utils/**/*.{js,ts,jsx,tsx}",
+		"./src/lib/**/*.{js,ts,jsx,tsx}",
 	],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+				mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+			},
 			colors: {
-				brand: {
-					50:  "#f0fdf6",
-					100: "#dcfce8",
-					200: "#bbf7d2",
-					300: "#74c69d",
-					400: "#40916c",
-					500: "#2d6a4f",
-					600: "#1b4332",
-					700: "#163727",
-					800: "#102b1e",
-					900: "#0b1f15",
+				ground: { DEFAULT: token("ground"), 2: token("ground-2") },
+				paper: { DEFAULT: token("paper"), 2: token("paper-2"), 3: token("paper-3") },
+				ink: { DEFAULT: token("ink"), 2: token("ink-2"), 3: token("ink-3") },
+				rule: { DEFAULT: token("rule"), 2: token("rule-2") },
+				term: {
+					DEFAULT: token("term"),
+					2: token("term-2"),
+					3: token("term-3"),
+					ink: token("term-ink"),
+					"ink-2": token("term-ink-2"),
+					rule: token("term-rule"),
 				},
-				surface: {
-					DEFAULT: "#ffffff",
-					secondary: "#f7f7f8",
-					tertiary: "#f0f0f2",
+				key: { DEFAULT: token("key"), hover: token("key-hover"), edge: token("key-edge") },
+				pos: { DEFAULT: token("pos"), soft: token("pos-soft") },
+				neg: { DEFAULT: token("neg"), soft: token("neg-soft") },
+				warn: { DEFAULT: token("warn"), soft: token("warn-soft"), fill: token("warn-fill") },
+				chart: {
+					in: token("chart-in"),
+					out: token("chart-out"),
+					daily: token("chart-daily"),
+					planned: token("chart-planned"),
+					others: token("chart-others"),
 				},
-				dark: {
-					base:    "#0a0a0b",
-					surface: "#111113",
-					raised:  "#18181b",
-					overlay: "#1f1f23",
-					border:  "#2a2a2e",
-					muted:   "#3f3f46",
-				},
+			},
+			borderRadius: {
+				paper: "3px",
+				key: "10px",
 			},
 			boxShadow: {
-				"glow-green": "0 0 20px -4px rgba(45,106,79,0.35)",
-				"glow-green-lg": "0 0 40px -8px rgba(45,106,79,0.25)",
-				"card": "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-				"card-md": "0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04)",
-				"dark-card": "0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-				"dark-card-md": "0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+				// paper lying on the counter
+				slip: "0 1px 0 rgb(18 22 20 / 0.05), 0 12px 24px -16px rgb(18 22 20 / 0.45)",
+				lift: "0 2px 0 rgb(18 22 20 / 0.06), 0 22px 40px -22px rgb(18 22 20 / 0.55)",
 			},
-			backgroundImage: {
-				"gradient-brand": "linear-gradient(135deg, #2d6a4f 0%, #40916c 100%)",
-				"gradient-brand-hover": "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
-				"gradient-dark-surface": "linear-gradient(145deg, #18181b 0%, #1f1f23 100%)",
+			transitionTimingFunction: {
+				out: "cubic-bezier(0.16, 1, 0.3, 1)",
+			},
+			keyframes: {
+				"feed-pulse": {
+					"0%, 100%": { opacity: "1" },
+					"50%": { opacity: "0.45" },
+				},
+			},
+			animation: {
+				"feed-pulse": "feed-pulse 1.6s ease-in-out infinite",
 			},
 		},
 	},
-	plugins: [],
+	plugins: [require("@tailwindcss/container-queries")],
 };

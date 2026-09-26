@@ -1,472 +1,162 @@
 "use client";
-import { useEffect, useState } from "react";
-import Pagination from "@/utils/Pagination";
 
-import { db } from "@/firebase/firebase";
-import { useAuthStore } from "@/store/useAuthStore";
-import {
-	doc,
-	setDoc,
-	deleteDoc,
-	collection,
-	getDocs,
-	serverTimestamp,
-	query,
-	orderBy,
-	addDoc,
-} from "firebase/firestore";
-
-import { formatFetchError } from "@/utils/formatFetchError";
-import { formatAddDocError } from "@/utils/formatAddDocError";
-import { getPaginationRange } from "@/utils/getPaginationRange";
-import { AccessibleDialog } from "@/components/AccessibleDialog";
-import { EmptyState } from "@/components/EmptyState";
-import { formatMoney } from "@/utils/formatMoney";
-import { usePreferencesStore } from "@/store/usePreferencesStore";
-
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
+import Pagination from "@/utils/Pagination";
+import { getPaginationRange } from "@/utils/getPaginationRange";
+import { formatAddDocError } from "@/utils/formatAddDocError";
+import { formatCurrency } from "@/utils/formatMoney";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptySlip } from "@/components/ui/EmptySlip";
+import { PrintIn } from "@/components/motion/PrintIn";
+import { usePrintOnce } from "@/components/motion/usePrintOnce";
+import { LedgerList, LEDGER_COLS } from "@/components/ledger/LedgerList";
+import { DeleteEntryDialog } from "@/components/ledger/DeleteEntryDialog";
+import { LedgerSkeleton } from "@/components/ledger/LedgerSkeleton";
+import { useFinanceStore } from "@/store/useFinanceStore";
+import { usePreferencesStore } from "@/store/usePreferencesStore";
+import { useUiStore } from "@/store/useUiStore";
+import { summarizeByCategory, type JournalEntry } from "@/lib/finance/derive";
+import { INCOME_CATEGORIES } from "@/lib/finance/types";
 
-type tableDataType = {
-	date: string;
-	narration: string;
-	amount: number;
-	category: string;
-	id: string;
-}[];
+const itemsPerPage = 10;
 
 const IncomeScreen = () => {
-	const { user, initialized: authInitialized } = useAuthStore();
+	const { status, income, lastAdded, deleteIncome } = useFinanceStore();
 	const currency = usePreferencesStore((s) => s.currency);
-
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	// starts true so the skeleton shows until the auth session resolves and the first fetch completes
-	const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
-	const [isDeletionLoading, setIsDeletionLoading] = useState<boolean>(false);
-	const [incomeData, setIncomeData] = useState<tableDataType>([]);
-	const totalIncome = incomeData.reduce((sum, entry) => sum + entry.amount, 0);
-
-	const [incomeInput, setIncomeInput] = useState<string>("");
-	const [categoryInput, setCategoryInput] = useState<string>("");
-	const [narrationInput, setNarrationInput] = useState<string>("");
-
-	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-	const [selectedIdForDeletion, setSelectedIdForDeletion] =
-		useState<string>("");
+	const openRingUp = useUiStore((s) => s.openRingUp);
+	const play = usePrintOnce("income");
+	const fmt = (v: number) => formatCurrency(v, currency);
 
 	const [currentPage, setCurrentPage] = useState(1);
-	const itemsPerPage = 6;
+	const [pendingDelete, setPendingDelete] = useState<JournalEntry | null>(null);
+	const [voidingId, setVoidingId] = useState<string | null>(null);
 
-	const indexOfLastItem = currentPage * itemsPerPage;
-	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-	const currentItems = incomeData.slice(indexOfFirstItem, indexOfLastItem);
+	const totalIncome = income.reduce((sum, entry) => sum + entry.amount, 0);
+	const sources = useMemo(
+		() => summarizeByCategory(income).categories.sort((a, b) => b.totalAmount - a.totalAmount),
+		[income]
+	);
 
-	const totalPages = Math.ceil(incomeData.length / itemsPerPage);
+	const entries: JournalEntry[] = useMemo(() => income.map((e) => ({ kind: "income" as const, ...e })), [income]);
+	const totalPages = Math.ceil(entries.length / itemsPerPage);
+	const currentItems = entries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 	const paginationRange = getPaginationRange(currentPage, totalPages);
 
-	const fetchIncomeData = async (userId: string) => {
-		if (!userId) return;
+	// a new entry lands on page one, as the old add flow did
+	useEffect(() => {
+		if (lastAdded?.kind === "income") setCurrentPage(1);
+	}, [lastAdded]);
 
-		setIsDataLoading(true);
-
+	const confirmDelete = async () => {
+		if (!pendingDelete) return;
+		const id = pendingDelete.id;
+		setPendingDelete(null);
+		setVoidingId(id);
 		try {
-			const incomeReference = collection(db, `users/${userId}/incomeData`);
-			const q = query(incomeReference, orderBy("createdAt", "desc"));
-
-			const querySnapshot = await getDocs(q);
-
-			const incomeList = querySnapshot.docs.map((docSnap) => {
-				const data = docSnap.data();
-
-				return {
-					date:
-						data.createdAt?.toDate().toLocaleString("en-GB", {
-							day: "2-digit",
-							month: "short",
-							year: "numeric",
-							hour: "2-digit",
-							minute: "2-digit",
-							hour12: true,
-						}) || "",
-					narration: data.narration || "",
-					category: data.category,
-					amount: Number(data.amount) || 0,
-					id: docSnap.id,
-				};
-			});
-
-			return incomeList;
-		} catch (err) {
-			const message = formatFetchError(err);
-			toast.error(`${message}`);
-		} finally {
-			setIsDataLoading(false);
-		}
-	};
-
-	const addIncome = async () => {
-		if (!user) return;
-
-		if (
-			!narrationInput.trim() ||
-			isNaN(Number(incomeInput)) ||
-			Number(incomeInput) <= 0
-		) {
-			toast.error("Narration and a valid income amount are required");
-			return;
-		}
-
-		setIsLoading(true);
-
-		try {
-			const newDocRef = doc(collection(db, `users/${user.uid}/incomeData`));
-
-			await setDoc(newDocRef, {
-				id: newDocRef.id,
-				narration: narrationInput,
-				category: categoryInput,
-				amount: Number(incomeInput),
-				createdAt: serverTimestamp(),
-			});
-
-			await addDoc(collection(db, `users/${user.uid}/notifications`), {
-				notification: `${formatMoney(Number(incomeInput), currency)} was added to Income under ${categoryInput}`,
-				category: categoryInput,
-				amount: Number(incomeInput),
-				createdAt: serverTimestamp(),
-			});
-
-			toast.success(
-				`${formatMoney(Number(incomeInput), currency)} added to Income`
-			);
-			setIsModalOpen(false);
+			await deleteIncome(id);
 			setCurrentPage(1);
-
-			const updatedData = await fetchIncomeData(user.uid);
-			setIncomeData(updatedData ?? []);
-		} catch (err) {
-			toast.error(`${formatAddDocError(err)}`);
-		} finally {
-			setIsLoading(false);
-			setNarrationInput("");
-			setIncomeInput("");
-			setCategoryInput("");
-		}
-	};
-
-	const deleteIncome = async (id: string) => {
-		if (!user) return;
-
-		setIsDeletionLoading(true);
-
-		try {
-			await deleteDoc(doc(db, `users/${user.uid}/incomeData/${id}`));
-
-			setCurrentPage(1);
-			const updatedData = await fetchIncomeData(user.uid);
-			setIncomeData(updatedData ?? []);
-
 			toast.success("Income entry deleted successfully");
 		} catch (err) {
-			const message = formatAddDocError(err);
-			toast.error(message);
+			toast.error(formatAddDocError(err));
 		} finally {
-			setSelectedIdForDeletion("");
-			setIsDeleteModalOpen(false);
-			setIsDeletionLoading(false);
+			setVoidingId(null);
 		}
 	};
 
-	useEffect(() => {
-		const getData = async () => {
-			if (!authInitialized) return;
-			if (!user) {
-				setIsDataLoading(false);
-				return;
-			}
-			setIncomeData((await fetchIncomeData(user.uid)) ?? []);
-		};
-		getData();
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- refetch on session change only
-	}, [user?.uid, authInitialized]);
+	const label = (v: string) => INCOME_CATEGORIES.find((c) => c.value === v)?.label ?? (v || "Uncategorised");
 
 	return (
-		<div className="relative dashboardScreen">
-			<div>
-				<h1 className="dashboardHeading">Income</h1>
-
-				<div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-					<div>
-						<p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-							Total income
-						</p>
-						<p className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 md:text-4xl">
-							{formatMoney(totalIncome, currency)}
-						</p>
-					</div>
-
-					<button
-						type="button"
-						className="btn-primary"
-						onClick={() => setIsModalOpen(true)}
-					>
-						+ Add income
+		<div className="page">
+			<PageHeader
+				title="Income"
+				actions={
+					<button type="button" className="key-enter" onClick={() => openRingUp("income")}>
+						<Plus className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+						Add income
 					</button>
-				</div>
-
-				<div>
-					{/* Mobile cards */}
-					<div className="mt-5 space-y-3 md:hidden">
-						{isDataLoading ? (
-							<div className="space-y-3">
-								{[1, 2, 3, 4].map((i) => (
-									<div
-										key={i}
-										className="h-28 animate-pulse rounded-xl bg-zinc-200 dark:bg-dark-muted"
-									/>
-								))}
-							</div>
-						) : currentItems.length === 0 ? (
-							<EmptyState
-								title="No income entries yet"
-								description="Add your first income entry to see it here."
-							/>
-						) : (
-							currentItems.map((element) => (
-								<div
-									key={element.id}
-									className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-dark-border dark:bg-dark-raised"
-								>
-									<div className="flex flex-row items-start justify-between gap-2">
-										<div>
-											<p className="text-xs text-zinc-500 dark:text-zinc-400">
-												{element.date}
-											</p>
-											<p className="mt-1 font-medium text-zinc-900 dark:text-zinc-100">
-												{element.narration}
-											</p>
-											<p className="mt-1 text-xs font-semibold capitalize text-brand-500 dark:text-green-400">
-												{element.category}
-											</p>
-										</div>
-										<div className="text-right">
-											<p className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
-												{formatMoney(element.amount, currency)}
-											</p>
-											<button
-												type="button"
-												className="-mr-3 mt-1 inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-												onClick={() => {
-													setSelectedIdForDeletion(element.id);
-													setIsDeleteModalOpen(true);
-												}}
-											>
-												Delete
-											</button>
-										</div>
-									</div>
-								</div>
-							))
-						)}
-					</div>
-
-					{/* Desktop table */}
-					<div className="mt-5 hidden text-sm md:block">
-						<div className="dataTableHeader grid w-full min-w-[720px] grid-cols-4 rounded-t-2xl">
-							<p className="text-center">Date</p>
-							<p className="text-start">Narration</p>
-							<p className="text-center">Amount</p>
-							<p className="text-center">Action</p>
-						</div>
-
-						{isDataLoading ? (
-							<div className="dataTableSurface min-h-[45dvh] space-y-3 p-4">
-								{[1, 2, 3, 4, 5, 6].map((i) => (
-									<div
-										key={i}
-										className="h-12 animate-pulse rounded-xl bg-zinc-200 dark:bg-dark-muted"
-									/>
-								))}
-							</div>
-						) : currentItems.length === 0 ? (
-							<div className="dataTableSurface min-h-[40dvh]">
-								<EmptyState
-									title="No income entries yet"
-									description="Add your first income entry to see it here."
-								/>
-							</div>
-						) : (
-							<div className="dataTableSurface min-h-[50dvh] p-2 md:p-4">
-								{currentItems.map((element) => (
-									<div
-										className="grid grid-cols-4 border-b border-zinc-100 py-4 last:border-0 dark:border-dark-border"
-										key={element.id}
-									>
-										<p className="text-center text-zinc-700 dark:text-zinc-300">
-											{element.date}
-										</p>
-
-										<p className="text-zinc-900 dark:text-zinc-100">
-											{element.narration}
-										</p>
-
-										<div className="text-center">
-											<p className="tabular-nums font-medium text-zinc-900 dark:text-zinc-100">
-												{formatMoney(element.amount, currency)}
-											</p>
-											<p className="text-xs font-semibold capitalize text-brand-500 dark:text-green-400">
-												{element.category}
-											</p>
-										</div>
-
-										<div className="flex flex-row items-center justify-center gap-4">
-											<button
-												type="button"
-												className="iconBtn text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
-												onClick={() => {
-													setSelectedIdForDeletion(element.id);
-													setIsDeleteModalOpen(true);
-												}}
-												aria-label="Delete income entry"
-											>
-												<Trash2 className="h-5 w-5" aria-hidden />
-											</button>
-										</div>
-									</div>
-								))}
-							</div>
-						)}
-					</div>
-
-					{totalPages > 1 && (
-						<Pagination
-							currentPage={currentPage}
-							totalPages={totalPages}
-							totalItems={incomeData.length}
-							itemsPerPage={itemsPerPage}
-							paginationRange={paginationRange}
-							onPageChange={setCurrentPage}
-						/>
-					)}
-				</div>
-			</div>
-
-			<AccessibleDialog
-				open={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				title="Add cash income"
-				titleId="income-add-dialog-title"
+				}
 			>
-				<form
-					className="flex flex-col gap-2"
-					onSubmit={(e) => {
-						e.preventDefault();
-						addIncome();
-					}}
-				>
-					<div className="inputLabelGroup">
-						<label htmlFor="narration" className="inputLabel">
-							Narration
-						</label>
-						<input
-							className="formInput"
-							type="text"
-							name="narration"
-							id="narration"
-							placeholder="Enter narration"
-							value={narrationInput}
-							onChange={(e) => setNarrationInput(e.target.value)}
-						/>
-					</div>
+				{status !== "ready" ? (
+					"Loading…"
+				) : income.length ? (
+					<>
+						<span className="num text-[17px] font-semibold text-ink">{fmt(totalIncome)}</span> in total, across {income.length}{" "}
+						{income.length === 1 ? "entry" : "entries"}.
+					</>
+				) : (
+					"Everything that comes in: salary, allowances, gifts, the odd sale."
+				)}
+			</PageHeader>
 
-					<div className="inputLabelGroup">
-						<label htmlFor="income-category" className="inputLabel">
-							Category
-						</label>
-
-						<select
-							name="income-category"
-							id="income-category"
-							className="formInput"
-							value={categoryInput}
-							onChange={(e) => setCategoryInput(e.target.value)}
+			{status !== "ready" ? (
+				<LedgerSkeleton />
+			) : income.length === 0 ? (
+				<PrintIn play={play} lines={12} className="slip-shadow">
+					<div className="slip-torn px-5 pb-10 pt-3 md:px-7">
+						<EmptySlip
+							title="No income rung up yet"
+							ghosts={[{ label: "Salary" }, { label: "Allowance" }, { label: "Gift" }]}
+							actions={
+								<button type="button" className="key-enter" onClick={() => openRingUp("income")}>
+									<Plus className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+									Ring up income
+								</button>
+							}
 						>
-							<option value="" disabled>
-								Select a category
-							</option>
-							<option value="salary">Salary</option>
-							<option value="allowance">Allowance</option>
-							<option value="gift">Gift</option>
-							<option value="petty cash">Petty Cash</option>
-						</select>
+							Each payment you log prints here as a line, grouped by day, with its source. Your net balance starts from these.
+						</EmptySlip>
 					</div>
+				</PrintIn>
+			) : (
+				<div className="flex flex-col gap-5">
+					<PrintIn as="section" aria-label="By source" play={play} lines={6} className="slip px-4 py-3.5 md:px-5">
+						<ul className="flex flex-wrap gap-x-6 gap-y-2">
+							{sources.map((s) => (
+								<li key={s.name || "none"} className="flex items-baseline gap-2">
+									<span className="h-2 w-2 translate-y-[-1px] rounded-[2px] bg-chart-in" aria-hidden />
+									<span className="text-[14px] text-ink-2">{label(s.name)}</span>
+									<span className="font-mono text-[14px] font-semibold tabular-nums">{fmt(s.totalAmount)}</span>
+								</li>
+							))}
+						</ul>
+					</PrintIn>
 
-					<div className="inputLabelGroup">
-						<label htmlFor="amount" className="inputLabel">
-							Amount
-						</label>
-						<input
-							className="formInput"
-							type="number"
-							inputMode="decimal"
-							min="0"
-							step="0.01"
-							name="amount"
-							id="amount"
-							placeholder="Enter amount"
-							value={incomeInput}
-							onChange={(e) => setIncomeInput(e.target.value)}
+					<PrintIn as="section" aria-labelledby="income-ledger" play={play} delay={0.08} lines={20} className="slip">
+						<h2 id="income-ledger" className="sr-only">
+							Income entries
+						</h2>
+						<div className={`hidden border-b border-dashed border-rule-2 px-5 py-2.5 ${LEDGER_COLS}`} aria-hidden>
+							<span className="label">Time</span>
+							<span className="label">Narration</span>
+							<span className="label">Source</span>
+							<span className="label text-right">Amount</span>
+							<span />
+						</div>
+						<LedgerList
+							entries={currentItems}
+							currency={currency}
+							freshId={lastAdded?.kind === "income" && Date.now() - lastAdded.at < 4000 ? lastAdded.id : null}
+							voidingId={voidingId}
+							onDelete={setPendingDelete}
 						/>
-					</div>
-
-					<button
-						type="submit"
-						className="btn-primary mt-4 w-full"
-						disabled={isLoading}
-					>
-						{isLoading ? (
-							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-						) : (
-							"Add"
+						<div className="h-2" />
+						{totalPages > 1 && (
+							<Pagination
+								currentPage={currentPage}
+								totalPages={totalPages}
+								totalItems={entries.length}
+								itemsPerPage={itemsPerPage}
+								paginationRange={paginationRange}
+								onPageChange={setCurrentPage}
+							/>
 						)}
-					</button>
-				</form>
-			</AccessibleDialog>
-
-			<AccessibleDialog
-				open={isDeleteModalOpen}
-				onClose={() => setIsDeleteModalOpen(false)}
-				title="Delete income?"
-				titleId="income-delete-dialog-title"
-			>
-				<p className="mb-5 text-zinc-600 dark:text-zinc-400">
-					This removes the entry permanently. This cannot be undone.
-				</p>
-
-				<div className="flex flex-row items-center justify-center gap-5">
-					<button
-						type="button"
-						className="btn-danger w-28"
-						onClick={() => {
-							deleteIncome(selectedIdForDeletion);
-						}}
-					>
-						{isDeletionLoading ? (
-							<div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-						) : (
-							"Delete"
-						)}
-					</button>
-					<button
-						type="button"
-						className="btn-secondary w-28"
-						onClick={() => setIsDeleteModalOpen(false)}
-					>
-						Cancel
-					</button>
+					</PrintIn>
 				</div>
-			</AccessibleDialog>
+			)}
+
+			<DeleteEntryDialog entry={pendingDelete} currency={currency} onCancel={() => setPendingDelete(null)} onConfirm={confirmDelete} />
 		</div>
 	);
 };

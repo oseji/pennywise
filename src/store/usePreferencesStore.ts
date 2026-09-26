@@ -57,8 +57,13 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
 		const rawN = localStorage.getItem(STORAGE_NOTIFICATIONS);
 		const currency: CurrencyCode =
 			rawC === "NGN" || rawC === "USD" || rawC === "EUR" ? rawC : "NGN";
+		// no saved choice: follow the OS (the inline script in layout.tsx does the same before paint)
 		const theme: ThemePreference =
-			rawT === "dark" || rawT === "light" ? rawT : "light";
+			rawT === "dark" || rawT === "light"
+				? rawT
+				: window.matchMedia("(prefers-color-scheme: dark)").matches
+					? "dark"
+					: "light";
 		const notificationsEnabled = rawN === null ? true : rawN === "true";
 		set({ currency, theme, notificationsEnabled });
 		applyThemeClass(theme);
